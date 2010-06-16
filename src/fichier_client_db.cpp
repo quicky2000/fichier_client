@@ -16,6 +16,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       m_table_livre_facture.set_db(m_db);
       m_table_ville.set_db(m_db);
       m_table_marque.set_db(m_db);
+      m_table_type_achat.set_db(m_db);
     }
   else
     {
@@ -140,9 +141,46 @@ const std::vector<marque> * fichier_client_db::get_all_marque(void)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<marque> * fichier_client_db::get_marque_by_name(const std::string & p_date)
+const std::vector<marque> * fichier_client_db::get_marque_by_name(const std::string & p_name)
 {
-  return m_table_marque.get_by_name(p_date);
+  return m_table_marque.get_by_name(p_name);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create(const type_achat & p_type_achat)
+{
+  m_table_type_achat.create(p_type_achat);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const type_achat & p_type_achat)
+{
+  m_table_type_achat.update(p_type_achat);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const type_achat & p_type_achat)
+{
+  m_table_type_achat.remove(p_type_achat);
+}
+
+//------------------------------------------------------------------------------
+type_achat * fichier_client_db::get_type_achat(uint32_t p_id)
+{
+  return m_table_type_achat.get(p_id);
+}
+
+//------------------------------------------------------------------------------
+const std::vector<type_achat*> * fichier_client_db::get_all_type_achat(void)
+{
+  return m_table_type_achat.get_all();
+}
+
+//------------------------------------------------------------------------------
+const std::vector<type_achat> * fichier_client_db::get_type_achat_by_name(const std::string & p_name)
+{
+  //  return m_table_type_achat.get_by_name(p_name);
+  return new vector<type_achat>();
 }
 
 //EOF

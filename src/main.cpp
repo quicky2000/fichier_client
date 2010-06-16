@@ -34,6 +34,19 @@ template <class T> void display(const vector<T> *p_list)
   cout << "------------------" << endl ;
 }
 
+template <class T> void display(const vector<T*> *p_list)
+{
+  typename::vector<T*>::const_iterator l_iter = p_list->begin();
+  typename::vector<T*>::const_iterator l_iter_end = p_list->end();
+  cout << "------------------" << endl ;
+  while(l_iter != l_iter_end)
+    {
+      cout << *(*l_iter) << endl ;
+      ++l_iter;
+    }
+  cout << "------------------" << endl ;
+}
+
 int main(int argc, char **argv)
 {
 
@@ -101,6 +114,9 @@ int main(int argc, char **argv)
   
   display(l_fichier_client.get_all_ville());
 
+
+  // Testing Marque management
+  //---------------------------
   marque l_marque(1,"BOSCH");
   cout << l_marque << endl ;
 
@@ -129,6 +145,37 @@ int main(int argc, char **argv)
   l_fichier_client.remove(*l_dummy_marque);
 
   display(l_fichier_client.get_all_marque());
+
+  // Testing Marque management
+  //---------------------------
+  type_achat l_type_achat(1,"Frigo");
+  cout << l_type_achat << endl ;
+
+  l_fichier_client.create(l_type_achat);
+
+  display(l_fichier_client.get_all_type_achat());
+
+  type_achat l_type_achat2(2,"Fur");
+  cout << l_type_achat2 << endl ;
+
+  l_fichier_client.create(l_type_achat2);
+
+  display(l_fichier_client.get_all_type_achat());
+
+  l_type_achat2.setName("Four");
+  cout << l_type_achat2 << endl ;
+  l_fichier_client.update(l_type_achat2);
+
+  display(l_fichier_client.get_all_type_achat());
+
+  l_fichier_client.create(type_achat(12,"DUMMY"));
+
+  display(l_fichier_client.get_all_type_achat());
+
+  type_achat * l_dummy_type_achat = l_fichier_client.get_type_achat(12);
+  l_fichier_client.remove(*l_dummy_type_achat);
+
+  display(l_fichier_client.get_all_type_achat());
 
   exit(-1);
 
