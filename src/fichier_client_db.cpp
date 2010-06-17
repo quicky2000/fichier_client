@@ -177,10 +177,9 @@ const std::vector<type_achat*> * fichier_client_db::get_all_type_achat(void)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<type_achat> * fichier_client_db::get_type_achat_by_name(const std::string & p_name)
+const std::vector<type_achat*> * fichier_client_db::get_type_achat_by_name(const std::string & p_name)
 {
-  //  return m_table_type_achat.get_by_name(p_name);
-  return new vector<type_achat>();
+  return m_table_type_achat.get_by_name(p_name);
 }
 
 //EOF

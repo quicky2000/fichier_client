@@ -177,6 +177,8 @@ int main(int argc, char **argv)
 
   display(l_fichier_client.get_all_type_achat());
 
+  display(l_fichier_client.get_type_achat_by_name("F"));
+
   exit(-1);
 
   sqlite3 *db;
