@@ -1,7 +1,9 @@
 #ifndef DESCRIPTION
 #define DESCRIPTION
 
-class qlite3;
+#include <string>
+
+class sqlite3;
 class sqlite3_stmt;
 
 template <class T> class description
