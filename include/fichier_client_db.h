@@ -7,6 +7,8 @@
 #include "marque.h"
 #include "named_table.h"
 #include "description_type_achat.h"
+#include "table_achat.h"
+#include "table_client.h"
 #include <string>
 #include <vector>
 #include <stdint.h>
@@ -53,12 +55,29 @@ class fichier_client_db
   const std::vector<type_achat*> * get_all_type_achat(void);
   const std::vector<type_achat*> * get_type_achat_by_name(const std::string & p_name);
   
+  //Management of achat
+  void create(const achat & p_achat);
+  void update(const achat & p_achat);
+  void remove(const achat & p_achat);
+  achat* get_achat(uint32_t p_id);
+  const std::vector<achat*> * get_all_achat(void);
+  const std::vector<achat*> * get_achat_by_date(const std::string & p_date);
+  
+  //Management of client
+  void create(const client & p_client);
+  void update(const client & p_client);
+  void remove(const client & p_client);
+  client* get_client(uint32_t p_id);
+  const std::vector<client*> * get_all_client(void);
+  
  private:
 
   table_livre_facture m_table_livre_facture;
   table_ville m_table_ville;
   table_named_item<marque> m_table_marque;
   named_table<type_achat> m_table_type_achat;
+  table_achat m_table_achat;
+  table_client m_table_client;
   sqlite3 *m_db;
 };
 

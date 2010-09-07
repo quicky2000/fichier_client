@@ -17,6 +17,8 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       m_table_ville.set_db(m_db);
       m_table_marque.set_db(m_db);
       m_table_type_achat.set_db(m_db);
+      m_table_achat.set_db(m_db);
+      m_table_client.set_db(m_db);
     }
   else
     {
@@ -180,6 +182,72 @@ const std::vector<type_achat*> * fichier_client_db::get_all_type_achat(void)
 const std::vector<type_achat*> * fichier_client_db::get_type_achat_by_name(const std::string & p_name)
 {
   return m_table_type_achat.get_by_name(p_name);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create(const achat & p_achat)
+{
+  m_table_achat.create(p_achat);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const achat & p_achat)
+{
+  m_table_achat.update(p_achat);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const achat & p_achat)
+{
+  m_table_achat.remove(p_achat);
+}
+
+//------------------------------------------------------------------------------
+achat * fichier_client_db::get_achat(uint32_t p_id)
+{
+  return m_table_achat.get(p_id);
+}
+
+//------------------------------------------------------------------------------
+const std::vector<achat*> * fichier_client_db::get_all_achat(void)
+{
+  return m_table_achat.get_all();
+}
+
+//------------------------------------------------------------------------------
+const std::vector<achat*> * fichier_client_db::get_achat_by_date(const std::string & p_date)
+{
+  return m_table_achat.get_by_date(p_date);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create(const client & p_client)
+{
+  m_table_client.create(p_client);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const client & p_client)
+{
+  m_table_client.update(p_client);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const client & p_client)
+{
+  m_table_client.remove(p_client);
+}
+
+//------------------------------------------------------------------------------
+client * fichier_client_db::get_client(uint32_t p_id)
+{
+  return m_table_client.get(p_id);
+}
+
+//------------------------------------------------------------------------------
+const std::vector<client*> * fichier_client_db::get_all_client(void)
+{
+  return m_table_client.get_all();
 }
 
 //EOF

@@ -32,5 +32,4 @@ const std::string type_achat::getType(void)const
   return "Type_achat";
 }
 
-
 #endif

@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 
   display(l_fichier_client.get_all_marque());
 
-  // Testing Marque management
+  // Testing Type_Achat management
   //---------------------------
   type_achat l_type_achat(1,"Frigo");
   cout << l_type_achat << endl ;
@@ -178,6 +178,72 @@ int main(int argc, char **argv)
   display(l_fichier_client.get_all_type_achat());
 
   display(l_fichier_client.get_type_achat_by_name("F"));
+
+  // Testing Achat management
+  //---------------------------
+  achat l_achat(1,10,"2010-08-15",7,5,"MKV",100.0,15.0,false);
+  cout << l_achat << endl ;
+
+  l_fichier_client.create(l_achat);
+
+  display(l_fichier_client.get_all_achat());
+
+  achat l_achat2(2,13,"2010-09-03",2,3,"PQ",300,45.0,true);
+  cout << l_achat2 << endl ;
+
+  l_fichier_client.create(l_achat2);
+
+  display(l_fichier_client.get_all_achat());
+
+  l_achat2.set_date("1981-11-23");
+  cout << l_achat2 << endl ;
+  l_fichier_client.update(l_achat2);
+
+  display(l_fichier_client.get_all_achat());
+
+  l_fichier_client.create(achat(3,2012,"2012-01-01",2012,2012,"Fin du Monde",0.0,0.0,false));
+
+  display(l_fichier_client.get_all_achat());
+
+  achat * l_dummy_achat = l_fichier_client.get_achat(3);
+  l_fichier_client.remove(*l_dummy_achat);
+
+  display(l_fichier_client.get_all_achat());
+
+  display(l_fichier_client.get_achat_by_date(""));
+
+  // Testing Client management
+  //---------------------------
+  client l_client(1,"THEVENON","Julien","12 rue des bains","06-83-03-37-49",10);
+  cout << l_client << endl ;
+
+  l_fichier_client.create(l_client);
+
+  display(l_fichier_client.get_all_client());
+
+  client l_client2(2,"LANCEART","Celine","Le Zephyr","04-77-26-05-25",10);
+  cout << l_client2 << endl ;
+
+  l_fichier_client.create(l_client2);
+
+  display(l_fichier_client.get_all_client());
+
+  l_client2.set_tel("06-88-77-89-00");
+  cout << l_client2 << endl ;
+  l_fichier_client.update(l_client2);
+
+  display(l_fichier_client.get_all_client());
+
+  l_fichier_client.create(client(3,"DURAND", "Joel","rue de je sais pas ou","",12));
+
+  display(l_fichier_client.get_all_client());
+
+  client * l_dummy_client = l_fichier_client.get_client(3);
+  l_fichier_client.remove(*l_dummy_client);
+
+  display(l_fichier_client.get_all_client());
+
+  // 
 
   exit(-1);
 
