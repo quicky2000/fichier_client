@@ -279,23 +279,26 @@ template <class T> T * base_table<T>::get(uint32_t p_id)
     {
       std::cout << description<T>::getClassType() << " successfully selected" << std::endl ;
       l_result = description<T>::getItemFromRow(m_get_by_id_stmt);
+
+      // Ensure that ID is unique
+      l_status = sqlite3_step(m_get_by_id_stmt);
+      if( l_status == SQLITE_DONE)
+	{
+	  std::cout << description<T>::getClassType() << " successfully selected done" << std::endl ;
+	}
+      else
+	{
+	  std::cout << "ERROR during selection of " << description<T>::getClassType() << " : Id " << p_id << " is not unique " << sqlite3_errmsg(m_db) << std::endl ;
+	  exit(-1);
+	}
     }
-  else
+  else if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during selection of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
-  l_status = sqlite3_step(m_get_by_id_stmt);
-  if( l_status == SQLITE_DONE)
-    {
-      std::cout << description<T>::getClassType() << " successfully selected done" << std::endl ;
-    }
-  else
-    {
-      std::cout << "ERROR during selection of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
-      exit(-1);
-    }
+
 
   // Reset the statement for the next use
   //--------------------------------------

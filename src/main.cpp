@@ -181,14 +181,14 @@ int main(int argc, char **argv)
 
   // Testing Achat management
   //---------------------------
-  achat l_achat(1,10,"2010-08-15",7,5,"MKV",100.0,15.0,false);
+  achat l_achat(1,1,"2010-08-15",2,7,5,"MKV",100.0,15.0,false);
   cout << l_achat << endl ;
 
   l_fichier_client.create(l_achat);
 
   display(l_fichier_client.get_all_achat());
 
-  achat l_achat2(2,13,"2010-09-03",2,3,"PQ",300,45.0,true);
+  achat l_achat2(2,13,"2010-09-03",1,2,3,"PQ",300,45.0,true);
   cout << l_achat2 << endl ;
 
   l_fichier_client.create(l_achat2);
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
   display(l_fichier_client.get_all_achat());
 
-  l_fichier_client.create(achat(3,2012,"2012-01-01",2012,2012,"Fin du Monde",0.0,0.0,false));
+  l_fichier_client.create(achat(3,2012,"2012-01-01",1,2012,2012,"Fin du Monde",0.0,0.0,false));
 
   display(l_fichier_client.get_all_achat());
 
@@ -243,7 +243,8 @@ int main(int argc, char **argv)
 
   display(l_fichier_client.get_all_client());
 
-  // 
+  // Database coherency checking
+  l_fichier_client.check_db_coherency();
 
   exit(-1);
 

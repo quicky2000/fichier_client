@@ -268,23 +268,27 @@ livre_facture * table_livre_facture::get(uint32_t p_id)
     {
       cout << "Livre_facture successfully selected" << endl ;
       l_result = new livre_facture(sqlite3_column_int(m_get_by_id_livre_facture_stmt,0),(const char*)sqlite3_column_text(m_get_by_id_livre_facture_stmt,1),(const char*)sqlite3_column_text(m_get_by_id_livre_facture_stmt,2));
+
+      // Ensure that there is only one entry
+      l_status = sqlite3_step(m_get_by_id_livre_facture_stmt);
+      if( l_status == SQLITE_DONE)
+	{
+	  cout << "Livre_facture successfully selected done" << endl ;
+	}
+      else
+	{
+	  cout << "ERROR during selection of livre_facture : " << sqlite3_errmsg(m_db) << endl ;
+	  exit(-1);
+	}
     }
-  else
+  else if(l_status != SQLITE_DONE)
     {
+      
       cout << "ERROR during selection of livre_facture : " << sqlite3_errmsg(m_db) << endl ;
       exit(-1);
     }
 
-  l_status = sqlite3_step(m_get_by_id_livre_facture_stmt);
-  if( l_status == SQLITE_DONE)
-    {
-      cout << "Livre_facture successfully selected done" << endl ;
-    }
-  else
-    {
-      cout << "ERROR during selection of livre_facture : " << sqlite3_errmsg(m_db) << endl ;
-      exit(-1);
-    }
+ 
 
   // Reset the statement for the next use
   //--------------------------------------

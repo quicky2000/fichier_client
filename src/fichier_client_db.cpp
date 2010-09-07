@@ -137,13 +137,13 @@ marque * fichier_client_db::get_marque(uint32_t p_id)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<marque> * fichier_client_db::get_all_marque(void)
+const std::vector<marque*> * fichier_client_db::get_all_marque(void)
 {
   return m_table_marque.get_all();
 }
 
 //------------------------------------------------------------------------------
-const std::vector<marque> * fichier_client_db::get_marque_by_name(const std::string & p_name)
+const std::vector<marque*> * fichier_client_db::get_marque_by_name(const std::string & p_name)
 {
   return m_table_marque.get_by_name(p_name);
 }
@@ -248,6 +248,53 @@ client * fichier_client_db::get_client(uint32_t p_id)
 const std::vector<client*> * fichier_client_db::get_all_client(void)
 {
   return m_table_client.get_all();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::check_db_coherency(void)
+{
+  cout << "Starting database coherency checking" << endl ;
+  
+  //Check that all id referenced in achat table really existe in the various table.
+  const vector<achat*> * l_achats = this->get_all_achat();
+  vector<achat*>::const_iterator l_iter = l_achats->begin();
+  vector<achat*>::const_iterator l_iter_end = l_achats->end();
+  while(l_iter != l_iter_end)
+    {
+      // Check client id
+      uint32_t l_client_id = (*l_iter)->get_client_id();
+      client * l_client = m_table_client.get(l_client_id);
+      if(l_client == NULL)
+	{
+	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << **l_iter << endl ; 
+	}
+
+      // Check type_achat id
+      uint32_t l_type_achat_id = (*l_iter)->get_type_id();
+      type_achat * l_type_achat = m_table_type_achat.get(l_type_achat_id);
+      if(l_type_achat == NULL)
+	{
+	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << **l_iter << endl ; 
+	}
+
+      // Check livre facture id
+      uint32_t l_livre_facture_id = (*l_iter)->get_livre_facture_id();
+      if(l_livre_facture_id)
+	{
+	  livre_facture * l_livre = m_table_livre_facture.get(l_livre_facture_id);
+	  if(l_livre == NULL)
+	    {
+	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << **l_iter << endl ; 
+	    }
+	}
+      else
+	{
+	  cout << "WARNING : no livre facture assosicated with " << *l_iter << endl;
+	}
+      ++l_iter;
+    }
+
+  cout << "End of database coherency checking" << endl ;
 }
 
 //EOF
