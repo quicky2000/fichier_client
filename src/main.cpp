@@ -104,7 +104,7 @@ int main(int argc, char **argv)
   display(l_fichier_client.get_all_ville());
 
   display(l_fichier_client.get_ville_by_name("bain"));
-  display(l_fichier_client.get_ville_by_code_postal("2"));
+  display(l_fichier_client.get_ville_by_code_postal("7"));
 
   l_ville3.setName("Chamonix");
   l_fichier_client.update(l_ville3);

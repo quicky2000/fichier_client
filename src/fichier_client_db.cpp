@@ -95,19 +95,19 @@ ville * fichier_client_db::get_ville(uint32_t p_id)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville> * fichier_client_db::get_all_ville(void)
+const std::vector<ville*> * fichier_client_db::get_all_ville(void)
 {
   return m_table_ville.get_all();
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville> * fichier_client_db::get_ville_by_name(const std::string & p_date)
+const std::vector<ville*> * fichier_client_db::get_ville_by_name(const std::string & p_date)
 {
   return m_table_ville.get_by_name(p_date);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville> * fichier_client_db::get_ville_by_code_postal(const std::string & p_date)
+const std::vector<ville*> * fichier_client_db::get_ville_by_code_postal(const std::string & p_date)
 {
   return m_table_ville.get_by_code_postal(p_date);
 }

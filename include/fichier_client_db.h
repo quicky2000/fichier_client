@@ -34,9 +34,9 @@ class fichier_client_db
   void update(const ville & p_ville);
   void remove(const ville & p_ville);
   ville* get_ville(uint32_t p_id);
-  const std::vector<ville> * get_all_ville(void);
-  const std::vector<ville> * get_ville_by_name(const std::string & p_name);
-  const std::vector<ville> * get_ville_by_code_postal(const std::string & p_code_postal);
+  const std::vector<ville*> * get_all_ville(void);
+  const std::vector<ville*> * get_ville_by_name(const std::string & p_name);
+  const std::vector<ville*> * get_ville_by_code_postal(const std::string & p_code_postal);
   
   //Management of marque table
   void create(const marque & p_marque);
