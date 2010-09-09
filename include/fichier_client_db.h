@@ -26,8 +26,8 @@ class fichier_client_db
   void update(const livre_facture & p_livre_facture);
   void remove(const livre_facture & p_livre_facture);
   livre_facture* get_livre_facture(uint32_t p_id);
-  const std::vector<livre_facture> * get_all_livre_facture(void);
-  const std::vector<livre_facture> * get_livre_facture_containing_date(const std::string & p_date);
+  const std::vector<livre_facture*> * get_all_livre_facture(void);
+  const std::vector<livre_facture*> * get_livre_facture_containing_date(const std::string & p_date);
   
   //Management of ville table
   void create(const ville & p_ville);

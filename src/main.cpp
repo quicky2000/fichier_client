@@ -75,9 +75,7 @@ int main(int argc, char **argv)
 
   l_fichier_client.update(l_livre2);
 
-  const vector<livre_facture> *l_list = l_fichier_client.get_all_livre_facture();
-  display(l_list);
-  delete l_list;
+  display(l_fichier_client.get_all_livre_facture());
 
   livre_facture * l_result = l_fichier_client.get_livre_facture(1);
 

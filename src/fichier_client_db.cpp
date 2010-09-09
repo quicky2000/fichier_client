@@ -59,13 +59,13 @@ livre_facture * fichier_client_db::get_livre_facture(uint32_t p_id)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<livre_facture> * fichier_client_db::get_all_livre_facture(void)
+const std::vector<livre_facture*> * fichier_client_db::get_all_livre_facture(void)
 {
   return m_table_livre_facture.get_all();
 }
 
 //------------------------------------------------------------------------------
-const std::vector<livre_facture> * fichier_client_db::get_livre_facture_containing_date(const std::string & p_date)
+const std::vector<livre_facture*> * fichier_client_db::get_livre_facture_containing_date(const std::string & p_date)
 {
   return m_table_livre_facture.containing_date(p_date);
 }
