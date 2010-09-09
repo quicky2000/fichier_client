@@ -13,7 +13,7 @@ table_ville::table_ville(void):
 table_ville::~table_ville(void)
 {
   sqlite3_finalize(m_get_by_code_postal_stmt);
-  cout << "Table ville end of destruction" << endl ;
+  cout << "Table " << description<ville>::getClassType() << " end of destruction" << endl ;
 }
 
 //------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ const std::vector<ville*>* table_ville::get_by_code_postal(const std::string & p
   int l_status = sqlite3_bind_text(m_get_by_code_postal_stmt,sqlite3_bind_parameter_index(m_get_by_code_postal_stmt,"@code_postal"),l_param_value.c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      cout << "ERROR during binding of code_postal parameter for get_by_code_postal statement of ville : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
+      cout << "ERROR during binding of code_postal parameter for get_by_code_postal statement of " << description<ville>::getClassType() << " : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
       exit(-1);
     }
     

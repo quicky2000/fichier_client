@@ -62,7 +62,7 @@ void description<ville>::bind_update_values(const ville & p_ville,sqlite3_stmt* 
   l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$code_postal"),p_ville.getCodePostal().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of name parameter for update statement of " << getClassType() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
+      std::cout << "ERROR during binding of code_postal parameter for update statement of " << getClassType() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
       exit(-1);
     }  
 }
