@@ -11,7 +11,7 @@ class table_ville: public named_table<ville>
   ~table_ville(void);
   void set_db(sqlite3 *p_db);
 
-  const std::vector<ville*>* get_by_code_postal(const std::string & p_name);
+  void get_by_code_postal(const std::string & p_name,std::vector<ville> & p_result);
 
  private:
   sqlite3_stmt *m_get_by_code_postal_stmt;

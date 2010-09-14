@@ -14,7 +14,7 @@ template <> class description<marque>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const marque & p_marque);
   inline static void bind_update_values(const marque & p_marque,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static marque* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static marque getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -62,9 +62,9 @@ void description<marque>::bind_update_values(const marque & p_marque,sqlite3_stm
 }
 
 //------------------------------------------------------------------------------
-marque* description<marque>::getItemFromRow(sqlite3_stmt* p_stmt)
+marque description<marque>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new marque(sqlite3_column_int(p_stmt,0),(const char*)sqlite3_column_text(p_stmt,1));
+  return marque(sqlite3_column_int(p_stmt,0),(const char*)sqlite3_column_text(p_stmt,1));
 }
 
 #endif

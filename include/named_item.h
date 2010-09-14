@@ -13,6 +13,7 @@ class named_item: public item
   friend std::ostream& operator<<(std::ostream& s, const named_item & p_named_item);
 
  public:
+  inline named_item(void);
   inline named_item(const std::string &p_name);
   inline named_item(uint32_t p_id, const std::string &p_name);
   inline const std::string & getName(void)const;
@@ -24,6 +25,13 @@ class named_item: public item
 };
 
 inline std::ostream& operator<<(std::ostream& s, const named_item & p_named_item);
+
+//------------------------------------------------------------------------------
+named_item::named_item(void):
+  item(),
+  m_name("")
+{
+}
 
 //------------------------------------------------------------------------------
 named_item::named_item(const std::string &p_name):

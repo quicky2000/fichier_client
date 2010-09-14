@@ -14,7 +14,7 @@ template <> class description<type_achat>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const type_achat & p_type_achat);
   inline static void bind_update_values(const type_achat & p_type_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static type_achat* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static type_achat getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -62,9 +62,9 @@ void description<type_achat>::bind_update_values(const type_achat & p_type_achat
 }
 
 //------------------------------------------------------------------------------
-type_achat* description<type_achat>::getItemFromRow(sqlite3_stmt* p_stmt)
+type_achat description<type_achat>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new type_achat(sqlite3_column_int(p_stmt,0),(const char*)sqlite3_column_text(p_stmt,1));
+  return type_achat(sqlite3_column_int(p_stmt,0),(const char*)sqlite3_column_text(p_stmt,1));
 }
 
 #endif

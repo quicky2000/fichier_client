@@ -9,6 +9,8 @@ class achat:public item
   friend std::ostream& operator<<(std::ostream& s, const achat & p_achat);
 
  public:
+  inline achat(void);
+
   inline achat(uint32_t p_client_id,
 	       const std::string &p_date,
 	       uint32_t p_livre_facture_id,
@@ -53,7 +55,7 @@ class achat:public item
   */
   inline const std::string getType(void)const;
  private:
-  const uint32_t m_client_id;
+  uint32_t m_client_id;
   std::string m_date;
   uint32_t m_livre_facture_id;
   uint32_t m_marque_id;
@@ -65,6 +67,21 @@ class achat:public item
 };
 
 inline std::ostream& operator<<(std::ostream& s, const achat & p_item);
+
+//------------------------------------------------------------------------------
+achat::achat(void):
+  item(),
+  m_client_id(0),
+  m_date(""),
+  m_livre_facture_id(0),
+  m_marque_id(0),
+  m_type_id(0),
+  m_reference(""),
+  m_prix_franc(0.0),
+  m_prix_euro(0.0),
+  m_garantie(false)
+{
+}
 
 //------------------------------------------------------------------------------
 achat::achat(uint32_t p_client_id,

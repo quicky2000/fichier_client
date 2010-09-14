@@ -32,9 +32,8 @@ void table_achat::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<achat*>* table_achat::get_by_date(const std::string & p_date)
+void table_achat::get_by_date(const std::string & p_date,std::vector<achat> & p_result)
 {
-  std::vector<achat*> *l_result = new std::vector<achat*>();
   std::string l_param_value("%");
   l_param_value += p_date + "%";
 
@@ -52,7 +51,7 @@ const std::vector<achat*>* table_achat::get_by_date(const std::string & p_date)
   //---------------------
   while( (l_status = sqlite3_step(m_get_by_date_stmt)) == SQLITE_ROW)
     {
-      l_result->push_back(description<achat>::getItemFromRow(m_get_by_date_stmt));
+      p_result.push_back(description<achat>::getItemFromRow(m_get_by_date_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -81,7 +80,6 @@ const std::vector<achat*>* table_achat::get_by_date(const std::string & p_date)
       exit(-1);
     }
 
-  return l_result;
 }
 
 //EOF

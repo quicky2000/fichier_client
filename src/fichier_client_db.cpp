@@ -31,6 +31,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 //------------------------------------------------------------------------------
 fichier_client_db::~fichier_client_db(void)
 {
+  cout << "Closing db" << endl ;
   sqlite3_close(m_db);
 }
 
@@ -53,21 +54,21 @@ void fichier_client_db::remove(const livre_facture & p_livre_facture)
 }
 
 //------------------------------------------------------------------------------
-livre_facture * fichier_client_db::get_livre_facture(uint32_t p_id)
+uint32_t fichier_client_db::get_livre_facture(uint32_t p_id,livre_facture & p_data)
 {
-  return m_table_livre_facture.get(p_id);
+  return m_table_livre_facture.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<livre_facture*> * fichier_client_db::get_all_livre_facture(void)
+void fichier_client_db::get_all_livre_facture(std::vector<livre_facture> & p_list)
 {
-  return m_table_livre_facture.get_all();
+  m_table_livre_facture.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<livre_facture*> * fichier_client_db::get_livre_facture_containing_date(const std::string & p_date)
+void fichier_client_db::get_livre_facture_containing_date(const std::string & p_date,std::vector<livre_facture> & p_result)
 {
-  return m_table_livre_facture.containing_date(p_date);
+  m_table_livre_facture.containing_date(p_date,p_result);
 }
 
 //------------------------------------------------------------------------------
@@ -89,27 +90,27 @@ void fichier_client_db::remove(const ville & p_ville)
 }
 
 //------------------------------------------------------------------------------
-ville * fichier_client_db::get_ville(uint32_t p_id)
+uint32_t fichier_client_db::get_ville(uint32_t p_id,ville &p_data)
 {
-  return m_table_ville.get(p_id);
+  return m_table_ville.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville*> * fichier_client_db::get_all_ville(void)
+void fichier_client_db::get_all_ville(std::vector<ville> & p_list)
 {
-  return m_table_ville.get_all();
+  m_table_ville.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville*> * fichier_client_db::get_ville_by_name(const std::string & p_date)
+void fichier_client_db::get_ville_by_name(const std::string & p_date,std::vector<ville> & p_result)
 {
-  return m_table_ville.get_by_name(p_date);
+  m_table_ville.get_by_name(p_date,p_result);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville*> * fichier_client_db::get_ville_by_code_postal(const std::string & p_date)
+void fichier_client_db::get_ville_by_code_postal(const std::string & p_date,std::vector<ville> & p_result)
 {
-  return m_table_ville.get_by_code_postal(p_date);
+  m_table_ville.get_by_code_postal(p_date,p_result);
 }
 
 //------------------------------------------------------------------------------
@@ -131,21 +132,21 @@ void fichier_client_db::remove(const marque & p_marque)
 }
 
 //------------------------------------------------------------------------------
-marque * fichier_client_db::get_marque(uint32_t p_id)
+uint32_t fichier_client_db::get_marque(uint32_t p_id,marque & p_data)
 {
-  return m_table_marque.get(p_id);
+  return m_table_marque.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<marque*> * fichier_client_db::get_all_marque(void)
+void fichier_client_db::get_all_marque(std::vector<marque> & p_list)
 {
-  return m_table_marque.get_all();
+  m_table_marque.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<marque*> * fichier_client_db::get_marque_by_name(const std::string & p_name)
+void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result)
 {
-  return m_table_marque.get_by_name(p_name);
+  m_table_marque.get_by_name(p_name,p_result);
 }
 
 //------------------------------------------------------------------------------
@@ -167,21 +168,21 @@ void fichier_client_db::remove(const type_achat & p_type_achat)
 }
 
 //------------------------------------------------------------------------------
-type_achat * fichier_client_db::get_type_achat(uint32_t p_id)
+uint32_t fichier_client_db::get_type_achat(uint32_t p_id,type_achat & p_data)
 {
-  return m_table_type_achat.get(p_id);
+  return m_table_type_achat.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<type_achat*> * fichier_client_db::get_all_type_achat(void)
+void fichier_client_db::get_all_type_achat(std::vector<type_achat> & p_list)
 {
-  return m_table_type_achat.get_all();
+  m_table_type_achat.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<type_achat*> * fichier_client_db::get_type_achat_by_name(const std::string & p_name)
+void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result)
 {
-  return m_table_type_achat.get_by_name(p_name);
+  m_table_type_achat.get_by_name(p_name,p_result);
 }
 
 //------------------------------------------------------------------------------
@@ -203,21 +204,21 @@ void fichier_client_db::remove(const achat & p_achat)
 }
 
 //------------------------------------------------------------------------------
-achat * fichier_client_db::get_achat(uint32_t p_id)
+uint32_t fichier_client_db::get_achat(uint32_t p_id,achat & p_data)
 {
-  return m_table_achat.get(p_id);
+  return m_table_achat.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<achat*> * fichier_client_db::get_all_achat(void)
+void fichier_client_db::get_all_achat(std::vector<achat> & p_list)
 {
-  return m_table_achat.get_all();
+  m_table_achat.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<achat*> * fichier_client_db::get_achat_by_date(const std::string & p_date)
+void fichier_client_db::get_achat_by_date(const std::string & p_date,std::vector<achat> & p_result)
 {
-  return m_table_achat.get_by_date(p_date);
+  m_table_achat.get_by_date(p_date,p_result);
 }
 
 //------------------------------------------------------------------------------
@@ -239,15 +240,15 @@ void fichier_client_db::remove(const client & p_client)
 }
 
 //------------------------------------------------------------------------------
-client * fichier_client_db::get_client(uint32_t p_id)
+uint32_t fichier_client_db::get_client(uint32_t p_id,client & p_data)
 {
-  return m_table_client.get(p_id);
+  return m_table_client.get(p_id,p_data);
 }
 
 //------------------------------------------------------------------------------
-const std::vector<client*> * fichier_client_db::get_all_client(void)
+void fichier_client_db::get_all_client(std::vector<client> & p_list)
 {
-  return m_table_client.get_all();
+  m_table_client.get_all(p_list);
 }
 
 //------------------------------------------------------------------------------
@@ -256,36 +257,46 @@ void fichier_client_db::check_db_coherency(void)
   cout << "Starting database coherency checking" << endl ;
   
   //Check that all id referenced in achat table really existe in the various table.
-  const vector<achat*> * l_achats = this->get_all_achat();
-  vector<achat*>::const_iterator l_iter = l_achats->begin();
-  vector<achat*>::const_iterator l_iter_end = l_achats->end();
+  vector<achat> l_achats;
+  this->get_all_achat(l_achats);
+  vector<achat>::const_iterator l_iter = l_achats.begin();
+  vector<achat>::const_iterator l_iter_end = l_achats.end();
   while(l_iter != l_iter_end)
     {
       // Check client id
-      uint32_t l_client_id = (*l_iter)->get_client_id();
-      client * l_client = m_table_client.get(l_client_id);
-      if(l_client == NULL)
+      uint32_t l_client_id = l_iter->get_client_id();
+      client l_client;
+      
+      if(!m_table_client.get(l_client_id,l_client))
 	{
-	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << **l_iter << endl ; 
+	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << *l_iter << endl ; 
+	}
+
+      // Check marque id
+      uint32_t l_marque_id = l_iter->get_marque_id();
+      marque l_marque;
+      if(!m_table_marque.get(l_marque_id,l_marque))
+	{
+	      cout << "ERROR : no marque corresponding to id " << l_marque_id << " referenced by " << *l_iter << endl ; 
 	}
 
       // Check type_achat id
-      uint32_t l_type_achat_id = (*l_iter)->get_type_id();
-      type_achat * l_type_achat = m_table_type_achat.get(l_type_achat_id);
-      if(l_type_achat == NULL)
+      uint32_t l_type_achat_id = l_iter->get_type_id();
+      type_achat l_type_achat;
+      if(!m_table_type_achat.get(l_type_achat_id,l_type_achat))
 	{
-	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << **l_iter << endl ; 
+	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << *l_iter << endl ; 
 	}
 
       // Check livre facture id
-      uint32_t l_livre_facture_id = (*l_iter)->get_livre_facture_id();
+      uint32_t l_livre_facture_id = l_iter->get_livre_facture_id();
       if(l_livre_facture_id)
 	{
-	  livre_facture * l_livre = m_table_livre_facture.get(l_livre_facture_id);
-	  if(l_livre == NULL)
+	  livre_facture l_livre;
+	  if(!m_table_livre_facture.get(l_livre_facture_id,l_livre))
 	    {
-	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << **l_iter << endl ; 
-	    }
+	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << *l_iter << endl ; 
+	    }	 
 	}
       else
 	{

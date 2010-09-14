@@ -14,7 +14,7 @@ template <> class description<livre_facture>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const livre_facture & p_livre_facture);
   inline static void bind_update_values(const livre_facture & p_livre_facture,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static livre_facture* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static livre_facture getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -68,12 +68,12 @@ void description<livre_facture>::bind_update_values(const livre_facture & p_livr
 }
 
 //------------------------------------------------------------------------------
-livre_facture* description<livre_facture>::getItemFromRow(sqlite3_stmt* p_stmt)
+livre_facture description<livre_facture>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new livre_facture(sqlite3_column_int(p_stmt,0),//Id
-		   (const char*)sqlite3_column_text(p_stmt,1),//StartDate
-		   (const char*)sqlite3_column_text(p_stmt,2) //EndDate
-		   );
+  return livre_facture(sqlite3_column_int(p_stmt,0),//Id
+		       (const char*)sqlite3_column_text(p_stmt,1),//StartDate
+		       (const char*)sqlite3_column_text(p_stmt,2) //EndDate
+		       );
 }
 
 #endif

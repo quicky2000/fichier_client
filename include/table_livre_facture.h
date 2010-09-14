@@ -11,7 +11,7 @@ class table_livre_facture: public base_table<livre_facture>
   ~table_livre_facture(void);
   void set_db(sqlite3 *p_db);
 
-  const std::vector<livre_facture*>* containing_date(const std::string & p_date);
+  void containing_date(const std::string & p_date,std::vector<livre_facture> & p_result);
 
  private:
   sqlite3_stmt *m_containing_date_stmt;

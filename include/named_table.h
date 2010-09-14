@@ -12,7 +12,7 @@ template <class T> class named_table:public base_table<T>
   ~named_table(void);
   void set_db(sqlite3 *p_db);
 
-  const std::vector<T*>* get_by_name(const std::string & p_name);
+  void get_by_name(const std::string & p_name,std::vector<T> & p_list);
 
  private:
   sqlite3_stmt *m_get_by_name_stmt;
@@ -49,9 +49,8 @@ template <class T> void named_table<T>::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-template <class T> const std::vector<T*>* named_table<T>::get_by_name(const std::string & p_name)
+template <class T> void named_table<T>::get_by_name(const std::string & p_name,std::vector<T> &p_result)
 {
-  std::vector<T*> *l_result = new std::vector<T*>();
   std::string l_param_value("%");
   l_param_value += p_name + "%";
 
@@ -69,7 +68,7 @@ template <class T> const std::vector<T*>* named_table<T>::get_by_name(const std:
   //---------------------
   while( (l_status = sqlite3_step(m_get_by_name_stmt)) == SQLITE_ROW)
     {
-      l_result->push_back(description<T>::getItemFromRow(m_get_by_name_stmt));
+      p_result.push_back(description<T>::getItemFromRow(m_get_by_name_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -98,7 +97,6 @@ template <class T> const std::vector<T*>* named_table<T>::get_by_name(const std:
       exit(-1);
     }
 
-  return l_result;
 }
 
 

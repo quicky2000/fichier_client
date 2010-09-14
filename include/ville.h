@@ -9,6 +9,7 @@ class ville: public item
   friend std::ostream& operator<<(std::ostream& s, const ville & p_ville);
 
  public:
+  inline ville(void);
   inline ville(const std::string &p_name, const std::string &p_code_postal);
   inline ville(uint32_t p_id, const std::string &p_name, const std::string &p_code_postal);
   inline const std::string & getName(void)const;
@@ -33,6 +34,14 @@ inline std::ostream& operator<<(std::ostream& s, const ville & p_ville);
 const std::string ville::getType(void)const
 {
   return "Ville";
+}
+
+//------------------------------------------------------------------------------
+ville::ville(void):
+  item(),
+  m_name(""),
+  m_code_postal("")
+{
 }
 
 //------------------------------------------------------------------------------

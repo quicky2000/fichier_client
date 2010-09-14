@@ -14,7 +14,7 @@ template <> class description<achat>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const achat & p_achat);
   inline static void bind_update_values(const achat & p_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static achat* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static achat getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -121,19 +121,19 @@ void description<achat>::bind_update_values(const achat & p_achat,sqlite3_stmt* 
 }
 
 //------------------------------------------------------------------------------
-achat* description<achat>::getItemFromRow(sqlite3_stmt* p_stmt)
+achat description<achat>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new achat(sqlite3_column_int(p_stmt,0),//Achat Id
-		   sqlite3_column_int(p_stmt,1),//ClientId
-		   (const char*)sqlite3_column_text(p_stmt,2),//Date
-		   sqlite3_column_int(p_stmt,3),//LivreFactureId
-		   sqlite3_column_int(p_stmt,4),//MarqueId
-		   sqlite3_column_int(p_stmt,5),//TypeId
-		   (const char*)sqlite3_column_text(p_stmt,6),//Reference
-		   sqlite3_column_double(p_stmt,7),//PrixFranc
-		   sqlite3_column_double(p_stmt,8),//PrixEuro
-		   sqlite3_column_int(p_stmt,9)//Garantie
-		   );
+  return achat(sqlite3_column_int(p_stmt,0),//Achat Id
+	       sqlite3_column_int(p_stmt,1),//ClientId
+	       (const char*)sqlite3_column_text(p_stmt,2),//Date
+	       sqlite3_column_int(p_stmt,3),//LivreFactureId
+	       sqlite3_column_int(p_stmt,4),//MarqueId
+	       sqlite3_column_int(p_stmt,5),//TypeId
+	       (const char*)sqlite3_column_text(p_stmt,6),//Reference
+	       sqlite3_column_double(p_stmt,7),//PrixFranc
+	       sqlite3_column_double(p_stmt,8),//PrixEuro
+	       sqlite3_column_int(p_stmt,9)//Garantie
+	       );
 }
 
 #endif

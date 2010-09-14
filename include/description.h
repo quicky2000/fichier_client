@@ -17,7 +17,7 @@ template <class T> class description
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const T & p_type_instance);
   inline static void bind_update_values(const T & p_type_instance,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static T* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static T getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };

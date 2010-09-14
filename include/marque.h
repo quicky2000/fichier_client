@@ -7,6 +7,7 @@ class marque: public named_item
 {
 
  public:
+  inline marque(void);
   inline marque(const std::string &p_name);
   inline marque(uint32_t p_id, const std::string &p_name);
   inline const std::string getType(void)const;
@@ -15,6 +16,12 @@ class marque: public named_item
  private:
   
 };
+
+//------------------------------------------------------------------------------
+marque::marque():
+  named_item()
+{
+}
 
 //------------------------------------------------------------------------------
 marque::marque(const std::string &p_name):

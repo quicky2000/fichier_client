@@ -9,6 +9,7 @@ class livre_facture: public item
   friend std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_facture);
 
  public:
+  inline livre_facture(void);
   inline livre_facture(uint32_t p_livre_id, const std::string &p_start_date, const std::string &p_end_date);
   inline const std::string & getStartDate(void)const;
   inline const std::string & getEndDate(void)const;
@@ -35,6 +36,14 @@ inline std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_f
 const std::string livre_facture::getType(void)const
 {
   return "LivreFacture";
+}
+
+//------------------------------------------------------------------------------
+livre_facture::livre_facture(void):
+  item(),
+  m_start_date(""),
+  m_end_date("")
+{
 }
 
 //------------------------------------------------------------------------------

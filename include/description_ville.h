@@ -14,7 +14,7 @@ template <> class description<ville>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const ville & p_ville);
   inline static void bind_update_values(const ville & p_ville,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static ville* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static ville getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -68,12 +68,12 @@ void description<ville>::bind_update_values(const ville & p_ville,sqlite3_stmt* 
 }
 
 //------------------------------------------------------------------------------
-ville* description<ville>::getItemFromRow(sqlite3_stmt* p_stmt)
+ville description<ville>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new ville(sqlite3_column_int(p_stmt,0),//Id
-		   (const char*)sqlite3_column_text(p_stmt,1),//Name
-		   (const char*)sqlite3_column_text(p_stmt,2) //CodePostal
-		   );
+  return ville(sqlite3_column_int(p_stmt,0),//Id
+	       (const char*)sqlite3_column_text(p_stmt,1),//Name
+	       (const char*)sqlite3_column_text(p_stmt,2) //CodePostal
+	       );
 }
 
 #endif

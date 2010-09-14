@@ -14,7 +14,7 @@ template <> class description<client>
   inline static const std::string getUpdateFields(void);
   inline static const std::string getFieldValues(const client & p_client);
   inline static void bind_update_values(const client & p_client,sqlite3_stmt* p_stmt,sqlite3 *p_db);
-  inline static client* getItemFromRow(sqlite3_stmt* p_stmt);
+  inline static client getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
 };
@@ -92,15 +92,15 @@ void description<client>::bind_update_values(const client & p_client,sqlite3_stm
 }
 
 //------------------------------------------------------------------------------
-client* description<client>::getItemFromRow(sqlite3_stmt* p_stmt)
+client description<client>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
-  return new client(sqlite3_column_int(p_stmt,0),//Client Id
-		   (const char*)sqlite3_column_text(p_stmt,1),//Name
-		   (const char*)sqlite3_column_text(p_stmt,2),//First Name
-		   (const char*)sqlite3_column_text(p_stmt,3),//Address
-		   (const char*)sqlite3_column_text(p_stmt,4),//Tel
-		   sqlite3_column_int(p_stmt,5)//VilleId
-		   );
+  return client(sqlite3_column_int(p_stmt,0),//Client Id
+		(const char*)sqlite3_column_text(p_stmt,1),//Name
+		(const char*)sqlite3_column_text(p_stmt,2),//First Name
+		(const char*)sqlite3_column_text(p_stmt,3),//Address
+		(const char*)sqlite3_column_text(p_stmt,4),//Tel
+		sqlite3_column_int(p_stmt,5)//VilleId
+		);
 }
 
 #endif

@@ -11,7 +11,7 @@ class table_achat:public base_table<achat>
   ~table_achat(void);
   void set_db(sqlite3 *p_db);
 
-  const std::vector<achat*>* get_by_date(const std::string & p_date);
+  void get_by_date(const std::string & p_date,std::vector<achat> & p_result);
 
  private:
   sqlite3_stmt *m_get_by_date_stmt;

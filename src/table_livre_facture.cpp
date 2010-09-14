@@ -32,10 +32,8 @@ void table_livre_facture::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<livre_facture*>* table_livre_facture::containing_date(const std::string & p_date)
+void table_livre_facture::containing_date(const std::string & p_date,std::vector<livre_facture> & p_result)
 {
-  vector<livre_facture*> *l_result = new vector<livre_facture*>();
-
   // Binding values to statement
   //----------------------------
   int l_status = sqlite3_bind_text(m_containing_date_stmt,sqlite3_bind_parameter_index(m_containing_date_stmt,"$date"),p_date.c_str(),-1,SQLITE_STATIC);
@@ -49,7 +47,7 @@ const std::vector<livre_facture*>* table_livre_facture::containing_date(const st
   //---------------------
   while( (l_status = sqlite3_step(m_containing_date_stmt)) == SQLITE_ROW)
     {
-      l_result->push_back(description<livre_facture>::getItemFromRow(m_containing_date_stmt));
+      p_result.push_back(description<livre_facture>::getItemFromRow(m_containing_date_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -78,7 +76,6 @@ const std::vector<livre_facture*>* table_livre_facture::containing_date(const st
       exit(-1);
     }
 
-  return l_result;
 }
 
 

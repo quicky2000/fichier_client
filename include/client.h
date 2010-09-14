@@ -10,6 +10,7 @@ class client: public item
   friend std::ostream& operator<<(std::ostream& s, const client & p_client);
 
  public:
+  inline client(void);
   inline client(uint32_t p_id,const std::string & p_surname, const std::string & p_first_name,const std::string & p_address,const std::string & p_tel, uint32_t p_ville_id);
   inline client(const std::string & p_surname, const std::string & p_first_name,const std::string & p_address,const std::string & p_tel, uint32_t p_ville_id);
 
@@ -42,6 +43,17 @@ inline std::ostream& operator<<(std::ostream& s, const client & p_item);
 const std::string client::getType(void)const
 {
   return "Client";
+}
+
+//------------------------------------------------------------------------------
+client::client(void):
+  item(),
+  m_surname(""),
+  m_first_name(""),
+  m_address(""),
+  m_tel(""),
+  m_ville_id(0)
+{
 }
 
 //------------------------------------------------------------------------------

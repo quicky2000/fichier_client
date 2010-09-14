@@ -32,9 +32,8 @@ void table_ville::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-const std::vector<ville*>* table_ville::get_by_code_postal(const std::string & p_code_postal)
+void table_ville::get_by_code_postal(const std::string & p_code_postal,std::vector<ville> & p_result)
 {
-  vector<ville*> *l_result = new vector<ville*>();
   string l_param_value("%");
   l_param_value += p_code_postal + "%";
 
@@ -51,7 +50,7 @@ const std::vector<ville*>* table_ville::get_by_code_postal(const std::string & p
   //---------------------
   while( (l_status = sqlite3_step(m_get_by_code_postal_stmt)) == SQLITE_ROW)
     {
-      l_result->push_back(description<ville>::getItemFromRow(m_get_by_code_postal_stmt));
+      p_result.push_back(description<ville>::getItemFromRow(m_get_by_code_postal_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -80,7 +79,6 @@ const std::vector<ville*>* table_ville::get_by_code_postal(const std::string & p
       exit(-1);
     }
 
-  return l_result;
 }
 
 

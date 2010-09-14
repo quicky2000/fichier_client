@@ -7,12 +7,19 @@ class type_achat: public named_item
 {
 
  public:
+  inline type_achat(void);
   inline type_achat(const std::string &p_name);
   inline type_achat(uint32_t p_id, const std::string &p_name);
   inline const std::string getType(void)const;
  private:
   
 };
+
+//------------------------------------------------------------------------------
+type_achat::type_achat():
+  named_item()
+{
+}
 
 //------------------------------------------------------------------------------
 type_achat::type_achat(const std::string &p_name):

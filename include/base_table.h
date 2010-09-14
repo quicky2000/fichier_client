@@ -20,8 +20,8 @@ template <class T> class base_table
   void create(const T & p_named_item);
   void update(const T & p_named_item);
   void remove(const T & p_named_item);
-  T* get(uint32_t p_id);
-  const std::vector<T*>* get_all(void);
+  uint32_t get(uint32_t p_id, T & p_data);
+  void get_all(std::vector<T> & p_list);
 
  protected:
   base_table(void);
@@ -258,10 +258,10 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
 }
 
 //------------------------------------------------------------------------------
-template <class T> T * base_table<T>::get(uint32_t p_id)
+template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
 {
   
-  T * l_result = NULL;
+  uint32_t l_result = 0;
 
   // Binding values to statement
   //----------------------------
@@ -278,13 +278,14 @@ template <class T> T * base_table<T>::get(uint32_t p_id)
   if( l_status == SQLITE_ROW)
     {
       std::cout << description<T>::getClassType() << " successfully selected" << std::endl ;
-      l_result = description<T>::getItemFromRow(m_get_by_id_stmt);
+      p_data = description<T>::getItemFromRow(m_get_by_id_stmt);
 
       // Ensure that ID is unique
       l_status = sqlite3_step(m_get_by_id_stmt);
       if( l_status == SQLITE_DONE)
 	{
 	  std::cout << description<T>::getClassType() << " successfully selected done" << std::endl ;
+	  l_result = 1;
 	}
       else
 	{
@@ -322,16 +323,15 @@ template <class T> T * base_table<T>::get(uint32_t p_id)
 }
 
 //------------------------------------------------------------------------------
-template <class T> const std::vector<T*>* base_table<T>::get_all(void)
+template <class T> void base_table<T>::get_all(std::vector<T> & p_list)
 {
-  std::vector<T*> *l_result = new std::vector<T*>();
 
   int l_status = 0;
   // Executing statement
   //---------------------
   while( (l_status = sqlite3_step(m_get_all_stmt)) == SQLITE_ROW)
     {
-      l_result->push_back(description<T>::getItemFromRow(m_get_all_stmt));
+      p_list.push_back(description<T>::getItemFromRow(m_get_all_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -350,7 +350,6 @@ template <class T> const std::vector<T*>* base_table<T>::get_all(void)
       exit(-1);
     }
 
-  return l_result;
 }
 
 #endif
