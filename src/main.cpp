@@ -273,7 +273,7 @@ int main(int argc, char **argv)
   l_fichier_client.get_all_client(l_result_client);
   display(l_result_client);
 
-  client l_client2(2,"LANCEART","Celine","Le Zephyr","04-77-26-05-25",10);
+  client l_client2(2,"LANCEART","Celine","Le Zephyr","04-77-26-05-25",2);
   cout << l_client2 << endl ;
 
   l_fichier_client.create(l_client2);

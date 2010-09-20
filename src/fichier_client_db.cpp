@@ -305,6 +305,26 @@ void fichier_client_db::check_db_coherency(void)
       ++l_iter;
     }
 
+
+  //Check that all id referenced in achat table really existe in the various table.
+  vector<client> l_clients;
+  this->get_all_client(l_clients);
+  vector<client>::const_iterator l_iter_client = l_clients.begin();
+  vector<client>::const_iterator l_iter_client_end = l_clients.end();
+  while(l_iter_client != l_iter_client_end)
+    {
+      // Check client id
+      uint32_t l_ville_id = l_iter_client->get_ville_id();
+      ville l_ville;
+      
+      if(!m_table_ville.get(l_ville_id,l_ville))
+	{
+	      cout << "ERROR : no ville corresponding to id " << l_ville_id << " referenced by " << *l_iter_client << endl ; 
+	}
+      ++l_iter_client;
+    }
+
+
   cout << "End of database coherency checking" << endl ;
 }
 
