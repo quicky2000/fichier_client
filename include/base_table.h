@@ -84,6 +84,7 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
   if(!l_status == SQLITE_DONE)
     {
       std::cout << "ERROR during creation of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
+      exit(-1);
     }
   sqlite3_finalize(l_stmt);  
 
@@ -123,10 +124,11 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
       exit(-1);
     }
 
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout << "Statements OK" << std::endl ;
 
   std::cout << "Table " << description<T>::getClassType() << " successfully created" << std::endl ;
-  
+#endif  
 }
 
 //------------------------------------------------------------------------------
@@ -154,7 +156,9 @@ template <class T> void base_table<T>::create(const T & p_named_item)
   l_status = sqlite3_step(l_stmt);
   if( l_status == SQLITE_DONE)
     {
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
       std::cout << description<T>::getClassType() << " successfully created" << std::endl ;
+#endif
     }
   else
     {
@@ -183,7 +187,9 @@ template <class T> void base_table<T>::update(const T & p_named_item)
   l_status = sqlite3_step(m_update_stmt);
   if( l_status == SQLITE_DONE)
     {
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
       std::cout << description<T>::getClassType() << " successfully updated" << std::endl ;
+#endif
     }
   else
     {
@@ -229,7 +235,9 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
   l_status = sqlite3_step(m_delete_stmt);
   if( l_status == SQLITE_DONE)
     {
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
       std::cout << description<T>::getClassType() << " successfully deleted" << std::endl ;
+#endif
     }
   else
     {
@@ -277,14 +285,18 @@ template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
   l_status = sqlite3_step(m_get_by_id_stmt);
   if( l_status == SQLITE_ROW)
     {
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
       std::cout << description<T>::getClassType() << " successfully selected" << std::endl ;
+#endif
       p_data = description<T>::getItemFromRow(m_get_by_id_stmt);
 
       // Ensure that ID is unique
       l_status = sqlite3_step(m_get_by_id_stmt);
       if( l_status == SQLITE_DONE)
 	{
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
 	  std::cout << description<T>::getClassType() << " successfully selected done" << std::endl ;
+#endif
 	  l_result = 1;
 	}
       else
@@ -339,7 +351,9 @@ template <class T> void base_table<T>::get_all(std::vector<T> & p_list)
       exit(-1);
     }
 
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout <<  description<T>::getClassType() << " successfully listed" << std::endl ;
+#endif
 
   // Reset the statement for the next use
   //--------------------------------------
