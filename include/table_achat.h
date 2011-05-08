@@ -12,9 +12,10 @@ class table_achat:public base_table<achat>
   void set_db(sqlite3 *p_db);
 
   void get_by_date(const std::string & p_date,std::vector<achat> & p_result);
-
+  void get_by_client_id(uint32_t p_client_id,std::vector<achat> & p_result);
  private:
   sqlite3_stmt *m_get_by_date_stmt;
+  sqlite3_stmt *m_get_by_client_id_stmt;
 };
 
 
