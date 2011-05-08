@@ -222,6 +222,12 @@ void fichier_client_db::get_achat_by_date(const std::string & p_date,std::vector
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<achat> & p_result)
+{
+  m_table_achat.get_by_client_id(p_client_id,p_result);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client_db::create(const client & p_client)
 {
   m_table_client.create(p_client);
@@ -306,14 +312,14 @@ void fichier_client_db::check_db_coherency(void)
     }
 
 
-  //Check that all id referenced in achat table really existe in the various table.
+  //Check that all id referenced in client table really existe in the various table.
   vector<client> l_clients;
   this->get_all_client(l_clients);
   vector<client>::const_iterator l_iter_client = l_clients.begin();
   vector<client>::const_iterator l_iter_client_end = l_clients.end();
   while(l_iter_client != l_iter_client_end)
     {
-      // Check client id
+      // Check vile id
       uint32_t l_ville_id = l_iter_client->get_ville_id();
       ville l_ville;
       
@@ -321,6 +327,16 @@ void fichier_client_db::check_db_coherency(void)
 	{
 	      cout << "ERROR : no ville corresponding to id " << l_ville_id << " referenced by " << *l_iter_client << endl ; 
 	}
+
+      // Check if client has associated achats
+      uint32_t l_client_id = l_iter_client->getId();
+      vector<achat> l_achats;
+      m_table_achat.get_by_client_id(l_client_id,l_achats);
+      if(!l_achats.size())
+	{
+	  cout << "ERROR : no achat associated to client " << *l_iter_client << endl ;
+	}
+
       ++l_iter_client;
     }
 

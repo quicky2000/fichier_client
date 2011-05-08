@@ -61,6 +61,7 @@ class fichier_client_db
   uint32_t get_achat(uint32_t p_id,achat & p_data);
   void get_all_achat(std::vector<achat> & p_list);
   void get_achat_by_date(const std::string & p_date,std::vector<achat> & p_result);
+  void get_achat_by_client_id(uint32_t p_client_id,std::vector<achat> & p_result);
   
   //Management of client table
   void create(const client & p_client);
