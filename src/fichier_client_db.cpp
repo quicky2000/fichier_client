@@ -7,7 +7,8 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 fichier_client_db::fichier_client_db(const std::string &p_name):
-  m_db(NULL)
+  m_db(NULL),
+  m_search_client_stmt(NULL)
 {
   // Opening the database
   int l_status = sqlite3_open(p_name.c_str(), &m_db);
@@ -25,6 +26,17 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       cerr << "Can't open database \"" << p_name << "\" : " << sqlite3_errmsg(m_db) << endl ;
     }
   cout << "Database successfully opened" << endl ; 
+
+  // Preparing search client statements
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id AND Client.Name LIKE @client_name AND FirstName LIKE @client_first_name AND Ville.Name LIKE @ville_name",-1,&m_search_client_stmt,NULL);
+  //l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id @client_name @client_first_name @ville_name",-1,&m_search_client_stmt,NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement to get "+description<achat>::getTableFields()+" item by date : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
 
 }
 
@@ -256,6 +268,83 @@ void fichier_client_db::get_all_client(std::vector<client> & p_list)
 {
   m_table_client.get_all(p_list);
 }
+
+//------------------------------------------------------------------------------
+void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, vector<search_client_item> & p_result)
+{
+  //Preparing search criteria
+  //  string l_client_name_criteria("");
+  string l_client_name_criteria("%");
+  l_client_name_criteria += p_name + "%";
+
+  //Preparing search criteria
+  // string l_client_first_name_criteria("");
+  string l_client_first_name_criteria("%");
+  l_client_first_name_criteria += p_first_name + "%";
+
+  //Preparing search criteria
+  // string l_city_criteria("");
+  string l_city_criteria("%");
+  l_city_criteria += p_city + "%";
+
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_text(m_search_client_stmt,sqlite3_bind_parameter_index(m_search_client_stmt,"@client_name"),l_client_name_criteria.c_str(),-1,SQLITE_STATIC);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of Client name for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  l_status = sqlite3_bind_text(m_search_client_stmt,sqlite3_bind_parameter_index(m_search_client_stmt,"@client_first_name"),l_client_first_name_criteria.c_str(),-1,SQLITE_STATIC);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of Client first name for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  l_status = sqlite3_bind_text(m_search_client_stmt,sqlite3_bind_parameter_index(m_search_client_stmt,"@ville_name"),l_city_criteria.c_str(),-1,SQLITE_STATIC);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of Client first name for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_search_client_stmt)) == SQLITE_ROW)
+    {
+      p_result.push_back(search_client_item(m_search_client_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of search client result : " << m_db << endl ;
+      exit(-1);
+    }
+
+  cout << "Client containing \"" << p_name << "\" in their name and \"" << p_first_name << "\" in their first name and \"" << p_city << "\" in their city successfully listed" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_search_client_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of search_client_statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_search_client_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of search_client statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client_db::check_db_coherency(void)

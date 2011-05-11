@@ -8,6 +8,8 @@
 #include "description_type_achat.h"
 #include "table_achat.h"
 #include "table_client.h"
+#include "search_client_item.h"
+
 #include <string>
 #include <vector>
 #include <stdint.h>
@@ -70,6 +72,9 @@ class fichier_client_db
   uint32_t get_client(uint32_t p_id,client & p_data);
   void get_all_client(std::vector<client> & p_list );
 
+  //Mangement of jointures
+  void search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, std::vector<search_client_item> & p_result);
+
   void check_db_coherency(void);
   
  private:
@@ -81,6 +86,8 @@ class fichier_client_db
   table_achat m_table_achat;
   table_client m_table_client;
   sqlite3 *m_db;
+  sqlite3_stmt *m_search_client_stmt;
+  
 };
 
 #endif // FICHIER_CLIENT_DB_H

@@ -48,7 +48,7 @@ void table_ville::get_by_code_postal(const std::string & p_code_postal,std::vect
     
   // Executing statement
   //---------------------
-  while( (l_status = sqlite3_step(m_get_by_code_postal_stmt)) == SQLITE_ROW)
+  while((l_status = sqlite3_step(m_get_by_code_postal_stmt)) == SQLITE_ROW)
     {
       p_result.push_back(description<ville>::getItemFromRow(m_get_by_code_postal_stmt));
     }
