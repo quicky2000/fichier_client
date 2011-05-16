@@ -31,6 +31,11 @@ void fichier_client::search_client(const std::string & p_name, const std::string
   m_db->search_client(p_name,p_first_name,p_city,p_result);
 }
 
+void fichier_client::get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result)
+{
+  m_db->get_achat_by_client_id(p_client_id,p_result);
+}
+
 void fichier_client::import_external_sql(const std::string & p_name)
 {
   cout << "Importing file name \"" << p_name << "\"" << endl ;

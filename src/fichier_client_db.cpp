@@ -8,7 +8,8 @@ using namespace std;
 //------------------------------------------------------------------------------
 fichier_client_db::fichier_client_db(const std::string &p_name):
   m_db(NULL),
-  m_search_client_stmt(NULL)
+  m_search_client_stmt(NULL),
+  m_search_achat_stmt(NULL)
 {
   // Opening the database
   int l_status = sqlite3_open(p_name.c_str(), &m_db);
@@ -30,13 +31,20 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   // Preparing search client statements
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id AND Client.Name LIKE @client_name AND FirstName LIKE @client_first_name AND Ville.Name LIKE @ville_name",-1,&m_search_client_stmt,NULL);
-  //l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id @client_name @client_first_name @ville_name",-1,&m_search_client_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get "+description<achat>::getTableFields()+" item by date : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get search_client_item: " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
+  // Preparing search achat statements
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<achat>::getClassType() + ".Id,Date,"+ description<marque>::getClassType() + ".Name,"+description<type_achat>::getClassType()+".Name,Reference,PrixEuro, PrixFranc,Garantie FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + " WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id").c_str(),-1,&m_search_achat_stmt,NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement to get search_client_achat : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
 
 }
 
@@ -273,17 +281,14 @@ void fichier_client_db::get_all_client(std::vector<client> & p_list)
 void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, vector<search_client_item> & p_result)
 {
   //Preparing search criteria
-  //  string l_client_name_criteria("");
   string l_client_name_criteria("%");
   l_client_name_criteria += p_name + "%";
 
   //Preparing search criteria
-  // string l_client_first_name_criteria("");
   string l_client_first_name_criteria("%");
   l_client_first_name_criteria += p_first_name + "%";
 
   //Preparing search criteria
-  // string l_city_criteria("");
   string l_city_criteria("%");
   l_city_criteria += p_city + "%";
 
@@ -344,6 +349,51 @@ void fichier_client_db::search_client(const std::string & p_name, const std::str
 
 
 }
+
+void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_search_achat_stmt,sqlite3_bind_parameter_index(m_search_achat_stmt,"$client_id"),p_client_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of client_id parameter for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_search_achat_stmt)) == SQLITE_ROW)
+    {
+      p_result.push_back(search_achat_item(m_search_achat_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of search achat result : " << m_db << endl ;
+      exit(-1);
+    }
+
+  cout << "Achat for client_id " << p_client_id << " successfully listed" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_search_achat_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of search_achat statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_search_achat_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of search achat statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+}
+
 
 
 //------------------------------------------------------------------------------
