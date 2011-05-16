@@ -38,7 +38,7 @@ template <class T> void display(const vector<T> &p_list)
   cout << "------------------" << endl ;
 }
 
-int main(int argc, char **argv)
+int my_main(int argc, char **argv)
 {
 
   fichier_client l_fichier;
