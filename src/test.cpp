@@ -29,6 +29,22 @@ namespace test
     cout << "------------------" << endl ;
   }
 
+  void display_info(const pair<string,string> & p_info)
+  {
+    cout << "information[\"" << p_info.first << "\"]=\"" << p_info.second << "\"" << endl ;
+  }
+
+  void display(const vector<pair<string,string> > & p_infos)
+  {
+    vector<pair<string,string> >::const_iterator l_iter_info = p_infos.begin();
+    vector<pair<string,string> >::const_iterator l_iter_info_end = p_infos.end();
+    while(l_iter_info != l_iter_info_end)
+      {
+	display_info(*l_iter_info);
+	++l_iter_info;
+      }
+  }
+
   void test(void)
   {
 
@@ -58,6 +74,60 @@ namespace test
 #endif
 
     fichier_client_db l_fichier_client("toto");
+
+    // Testing information_table
+    //---------------------------
+    vector<pair<string,string> > l_informations;
+    cout << "Get all informations" << endl ;
+    l_fichier_client.get_all_information(l_informations);
+    cout << "Display result" << endl ;
+    display(l_informations);
+    
+    cout << "get schena db version info " << endl ;
+    pair<string,string> l_db_schema_version;
+    uint32_t l_valid = l_fichier_client.get_information("db_schema_version",l_db_schema_version);
+    if(l_valid)
+      {
+	display_info(l_db_schema_version);
+      }
+    else
+      {
+	cout << "create schena db version info " << endl ;
+	l_fichier_client.create_information("db_schema_version","0.0");
+      }
+
+    cout << "get all informations" << endl ; 
+    l_informations.clear();
+    l_fichier_client.get_all_information(l_informations);
+    cout << "display result" << endl ;
+    display(l_informations);
+
+    cout << "Create dummy info" << endl ;
+    l_fichier_client.create_information("dummy_key","dummy_value");
+  
+    cout << "get all informations" << endl ; 
+    l_informations.clear();
+    l_fichier_client.get_all_information(l_informations);
+    cout << "display result" << endl ;
+    display(l_informations);
+
+    cout << "Modify schema verison" << endl ;
+    l_fichier_client.update_information("db_schema_version","1.0");
+
+    cout << "get all informations" << endl ; 
+    l_informations.clear();
+    l_fichier_client.get_all_information(l_informations);
+    cout << "display result" << endl ;
+    display(l_informations);
+
+    cout << "Remove dummy info " << endl ;
+    l_fichier_client.remove_information("dummy_key");
+
+    cout << "get all informations" << endl ; 
+    l_informations.clear();
+    l_fichier_client.get_all_information(l_informations);
+    cout << "display result" << endl ;
+    display(l_informations);
 
     // Testing facture management
     //-----------------------------

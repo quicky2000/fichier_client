@@ -9,6 +9,7 @@
 #include "description_type_achat.h"
 #include "table_achat.h"
 #include "table_client.h"
+#include "information_table.h"
 #include "search_client_item.h"
 #include "search_achat_item.h"
 
@@ -24,6 +25,13 @@ class fichier_client_db
  public:
   fichier_client_db(const std::string &p_name);
   ~fichier_client_db(void);
+
+  //Management of information table
+  void create_information(const std::string & p_key, const std::string &p_value);
+  void update_information(const std::string & p_key, const std::string &p_value);
+  void remove_information(const std::string & p_key);
+  uint32_t get_information(const std::string & p_key, std::pair<std::string,std::string> & p_data);
+  void get_all_information(std::vector<std::pair<std::string,std::string> > & p_list);
 
   //Management of livre facture table
   void create( livre_facture & p_livre_facture);
@@ -98,6 +106,7 @@ class fichier_client_db
   named_table<type_achat> m_table_type_achat;
   table_achat m_table_achat;
   table_client m_table_client;
+  information_table m_information_table;
   sqlite3 *m_db;
   sqlite3_stmt *m_search_client_stmt;
   sqlite3_stmt *m_search_achat_stmt;

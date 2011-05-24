@@ -22,6 +22,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       m_table_type_achat.set_db(m_db);
       m_table_achat.set_db(m_db);
       m_table_client.set_db(m_db);
+      m_information_table.set_db(m_db);
     }
   else
     {
@@ -57,6 +58,37 @@ fichier_client_db::~fichier_client_db(void)
   sqlite3_finalize(m_search_client_stmt);
   sqlite3_close(m_db);
 }
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create_information(const std::string & p_key, const std::string &p_value)
+{
+  m_information_table.create(p_key,p_value);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update_information(const std::string & p_key, const std::string &p_value)
+{
+  m_information_table.update(p_key,p_value);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove_information(const std::string & p_key)
+{
+  m_information_table.remove(p_key);
+}
+
+//------------------------------------------------------------------------------
+uint32_t fichier_client_db::get_information(const std::string & p_key, std::pair<std::string,std::string> & p_data)
+{
+  return m_information_table.get(p_key,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_all_information(std::vector<std::pair<std::string,std::string> > & p_list)
+{
+  m_information_table.get_all(p_list);
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client_db::create( livre_facture & p_livre_facture)
