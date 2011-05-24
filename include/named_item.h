@@ -62,7 +62,7 @@ void named_item::setName(const std::string & p_name)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const named_item & p_named_item)
 {
-  s << p_named_item.getType() << "{Id=" << p_named_item.getId() << ",Name=\"" << p_named_item.m_name << "\"}" ;
+  s << p_named_item.getType() << "{Id=" << p_named_item.get_id() << ",Name=\"" << p_named_item.m_name << "\"}" ;
   return s;
 }
 

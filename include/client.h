@@ -142,7 +142,7 @@ void client::set_ville_id(uint32_t p_ville_id)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const client & p_client)
 {
-  s << p_client.getType() << "{Id=" << p_client.getId() << "\",Name=\"" << p_client.m_surname << "\",First Name=\"" << p_client.m_first_name << "\",Tel=\"" << p_client.m_tel << "\",VilleId=\"" << p_client.m_ville_id << "\"" ;
+  s << p_client.getType() << "{Id=" << p_client.get_id() << "\",Name=\"" << p_client.m_surname << "\",First Name=\"" << p_client.m_first_name << "\",Tel=\"" << p_client.m_tel << "\",VilleId=\"" << p_client.m_ville_id << "\"" ;
   return s;
 }
 

@@ -88,7 +88,7 @@ void livre_facture::setEndDate(const std::string & p_end_date)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_facture)
 {
-  s << p_livre_facture.getType() << "{Id=" << p_livre_facture.getId() << ",start_date=\"" << p_livre_facture.m_start_date << "\",end_date=\"" << p_livre_facture.m_end_date << "\"}" ;
+  s << p_livre_facture.getType() << "{Id=" << p_livre_facture.get_id() << ",start_date=\"" << p_livre_facture.m_start_date << "\",end_date=\"" << p_livre_facture.m_end_date << "\"}" ;
   return s;
 }
 

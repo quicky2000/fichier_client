@@ -88,7 +88,7 @@ void ville::setCodePostal(const std::string & p_code_postal)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const ville & p_ville)
 {
-  s << p_ville.getType() << "{Id=" << p_ville.getId() << ",Name=\"" << p_ville.m_name << "\",Code_postal=\"" << p_ville.m_code_postal << "\"}" ;
+  s << p_ville.getType() << "{Id=" << p_ville.get_id() << ",Name=\"" << p_ville.m_name << "\",Code_postal=\"" << p_ville.m_code_postal << "\"}" ;
   return s;
 }
 

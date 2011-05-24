@@ -2,6 +2,7 @@
 #define FICHIER_CLIENT_DB_H
 
 #include "table_livre_facture.h"
+#include "table_facture.h"
 #include "table_ville.h"
 #include "named_table.h"
 #include "description_marque.h"
@@ -25,15 +26,25 @@ class fichier_client_db
   ~fichier_client_db(void);
 
   //Management of livre facture table
-  void create(const livre_facture & p_livre_facture);
+  void create( livre_facture & p_livre_facture);
   void update(const livre_facture & p_livre_facture);
   void remove(const livre_facture & p_livre_facture);
   uint32_t get_livre_facture(uint32_t p_id,livre_facture & p_data);
   void get_all_livre_facture(std::vector<livre_facture> & p_list);
   void get_livre_facture_containing_date(const std::string & p_date,std::vector<livre_facture> & p_result);
   
+  //Management of facture table
+  void create( facture & p_facture);
+  void update(const facture & p_facture);
+  void remove(const facture & p_facture);
+  uint32_t get_facture(uint32_t p_id,facture & p_data);
+  void get_all_facture(std::vector<facture> & p_list);
+  void get_by_date(const std::string & p_date,std::vector<facture> & p_result);
+  void get_by_date_and_client_id(const std::string & p_date,uint32_t p_client_id,std::vector<facture> & p_result);
+  void get_by_livre_facture_and_ref(uint32_t p_facture_ref, uint32_t p_livre_facture_id,std::vector<facture> & p_result);
+
   //Management of ville table
-  void create(const ville & p_ville);
+  void create( ville & p_ville);
   void update(const ville & p_ville);
   void remove(const ville & p_ville);
   uint32_t get_ville(uint32_t p_id,ville & p_data);
@@ -42,7 +53,7 @@ class fichier_client_db
   void get_ville_by_code_postal(const std::string & p_code_postal,std::vector<ville> & p_result);
   
   //Management of marque table
-  void create(const marque & p_marque);
+  void create( marque & p_marque);
   void update(const marque & p_marque);
   void remove(const marque & p_marque);
   uint32_t get_marque(uint32_t p_id,marque & p_data);
@@ -50,7 +61,7 @@ class fichier_client_db
   void get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result);
   
   //Management of type_achat table
-  void create(const type_achat & p_type_achat);
+  void create( type_achat & p_type_achat);
   void update(const type_achat & p_type_achat);
   void remove(const type_achat & p_type_achat);
   uint32_t get_type_achat(uint32_t p_id,type_achat & p_data);
@@ -58,16 +69,15 @@ class fichier_client_db
   void get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result);
   
   //Management of achat table
-  void create(const achat & p_achat);
+  void create( achat & p_achat);
   void update(const achat & p_achat);
   void remove(const achat & p_achat);
   uint32_t get_achat(uint32_t p_id,achat & p_data);
   void get_all_achat(std::vector<achat> & p_list);
-  void get_achat_by_date(const std::string & p_date,std::vector<achat> & p_result);
-  void get_achat_by_client_id(uint32_t p_client_id,std::vector<achat> & p_result);
+  void get_by_facture_id(uint32_t p_facture_id,std::vector<achat> & p_result);
   
   //Management of client table
-  void create(const client & p_client);
+  void create( client & p_client);
   void update(const client & p_client);
   void remove(const client & p_client);
   uint32_t get_client(uint32_t p_id,client & p_data);
@@ -82,6 +92,7 @@ class fichier_client_db
  private:
 
   table_livre_facture m_table_livre_facture;
+  table_facture m_table_facture;
   table_ville m_table_ville;
   named_table<marque> m_table_marque;
   named_table<type_achat> m_table_type_achat;

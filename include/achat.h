@@ -11,9 +11,10 @@ class achat:public item
  public:
   inline achat(void);
 
-  inline achat(uint32_t p_client_id,
-	       const std::string &p_date,
-	       uint32_t p_livre_facture_id,
+  inline achat(uint32_t p_facture_id,
+	       //uint32_t p_client_id,
+	       //const std::string &p_date,
+	       //uint32_t p_livre_facture_id,
 	       uint32_t p_marque_id,
 	       uint32_t p_type_id,
 	       const std::string & p_reference ,
@@ -22,9 +23,10 @@ class achat:public item
 	       bool p_garantie);
 
   inline achat(uint32_t p_id,
-	       uint32_t p_client_id,
-	       const std::string &p_date,
-	       uint32_t p_livre_facture_id,
+	       uint32_t p_facture_id,
+	       //uint32_t p_client_id,
+	       //const std::string &p_date,
+	       //uint32_t p_livre_facture_id,
 	       uint32_t p_marque_id,
 	       uint32_t p_type_id,
 	       const std::string & p_reference ,
@@ -32,11 +34,13 @@ class achat:public item
 	       float p_prix_euro,
 	       bool p_garantie);
 
-  inline uint32_t get_client_id(void)const;
-  inline const std::string & get_date(void)const;
-  inline void set_date(const std::string & p_date);
-  inline uint32_t get_livre_facture_id(void)const;
-  inline void set_livre_facture_id(uint32_t p_livre_facture_id);
+  inline uint32_t get_facture_id(void)const;
+  inline void set_facture_id(uint32_t p_facture_id);
+  //  inline uint32_t get_client_id(void)const;
+  //  inline const std::string & get_date(void)const;
+  //  inline void set_date(const std::string & p_date);
+  //  inline uint32_t get_livre_facture_id(void)const;
+  //  inline void set_livre_facture_id(uint32_t p_livre_facture_id);
   inline uint32_t get_marque_id(void)const;
   inline void set_marque_id(uint32_t p_marque_id);
   inline uint32_t get_type_id(void)const;
@@ -55,9 +59,10 @@ class achat:public item
   */
   inline const std::string getType(void)const;
  private:
-  uint32_t m_client_id;
-  std::string m_date;
-  uint32_t m_livre_facture_id;
+  uint32_t m_facture_id;
+  //  uint32_t m_client_id;
+  //  std::string m_date;
+  //  uint32_t m_livre_facture_id;
   uint32_t m_marque_id;
   uint32_t m_type_id;
   std::string m_reference;
@@ -71,9 +76,10 @@ inline std::ostream& operator<<(std::ostream& s, const achat & p_item);
 //------------------------------------------------------------------------------
 achat::achat(void):
   item(),
-  m_client_id(0),
-  m_date(""),
-  m_livre_facture_id(0),
+  m_facture_id(0),
+  //  m_client_id(0),
+  //  m_date(""),
+  //  m_livre_facture_id(0),
   m_marque_id(0),
   m_type_id(0),
   m_reference(""),
@@ -84,9 +90,10 @@ achat::achat(void):
 }
 
 //------------------------------------------------------------------------------
-achat::achat(uint32_t p_client_id,
-	     const std::string &p_date,
-	     uint32_t p_livre_facture_id,
+achat::achat(uint32_t p_facture_id,
+	     //uint32_t p_client_id,
+	     //	     const std::string &p_date,
+	     //	     uint32_t p_livre_facture_id,
 	     uint32_t p_marque_id,
 	     uint32_t p_type_id,
 	     const std::string & p_reference ,
@@ -95,9 +102,10 @@ achat::achat(uint32_t p_client_id,
 	     bool p_garantie
 	     ):
   item(),
-  m_client_id(p_client_id),
-  m_date(p_date),
-  m_livre_facture_id(p_livre_facture_id),
+  m_facture_id(p_facture_id),
+  //  m_client_id(p_client_id),
+  //  m_date(p_date),
+  //  m_livre_facture_id(p_livre_facture_id),
   m_marque_id(p_marque_id),
   m_type_id(p_type_id),
   m_reference(p_reference),
@@ -109,9 +117,10 @@ achat::achat(uint32_t p_client_id,
 
 //------------------------------------------------------------------------------
 achat::achat(uint32_t p_id,
-	     uint32_t p_client_id,
-	     const std::string &p_date,
-	     uint32_t p_livre_facture_id,
+	     uint32_t p_facture_id,
+	     //	     uint32_t p_client_id,
+	     //	     const std::string &p_date,
+	     //	     uint32_t p_livre_facture_id,
 	     uint32_t p_marque_id,
 	     uint32_t p_type_id,
 	     const std::string & p_reference ,
@@ -119,9 +128,10 @@ achat::achat(uint32_t p_id,
 	     float p_prix_euro,
 	     bool p_garantie):
   item(p_id),
-  m_client_id(p_client_id),
-  m_date(p_date),
-  m_livre_facture_id(p_livre_facture_id),
+  m_facture_id(p_facture_id),
+  //  m_client_id(p_client_id),
+  //  m_date(p_date),
+  //  m_livre_facture_id(p_livre_facture_id),
   m_marque_id(p_marque_id),
   m_type_id(p_type_id),
   m_reference(p_reference),
@@ -131,11 +141,11 @@ achat::achat(uint32_t p_id,
 {
 }
 
-//------------------------------------------------------------------------------
-uint32_t achat::get_client_id(void)const
-{
-  return m_client_id;
-}
+//TO DELETE//------------------------------------------------------------------------------
+//TO DELETEuint32_t achat::get_client_id(void)const
+//TO DELETE{
+//TO DELETE  return m_client_id;
+//TO DELETE}
 
 //------------------------------------------------------------------------------
 const std::string achat::getType(void)const
@@ -143,17 +153,17 @@ const std::string achat::getType(void)const
   return "Achat";
 }
 
-//------------------------------------------------------------------------------
-const std::string & achat::get_date(void)const
-{
-  return m_date;
-}
+//TO DELETE//------------------------------------------------------------------------------
+//TO DELETEconst std::string & achat::get_date(void)const
+//TO DELETE{
+//TO DELETE  return m_date;
+//TO DELETE}
 
-//------------------------------------------------------------------------------
-void achat::set_date(const std::string & p_date)
-{
-  m_date = p_date;
-}
+//TO DELETE//------------------------------------------------------------------------------
+//TO DELETEvoid achat::set_date(const std::string & p_date)
+//TO DELETE{
+//TO DELETE  m_date = p_date;
+//TO DELETE}
 
 //------------------------------------------------------------------------------
 uint32_t achat::get_marque_id(void)const
@@ -168,16 +178,28 @@ void achat::set_marque_id(uint32_t p_marque_id)
 }
 
 //------------------------------------------------------------------------------
-uint32_t achat::get_livre_facture_id(void)const
+uint32_t achat::get_facture_id(void)const
 {
-  return m_livre_facture_id;
+  return m_facture_id;
 }
 
 //------------------------------------------------------------------------------
-void achat::set_livre_facture_id(uint32_t p_livre_facture_id)
+void achat::set_facture_id(uint32_t p_facture_id)
 {
-  m_livre_facture_id = p_livre_facture_id;
+  m_facture_id = p_facture_id;
 }
+
+//TO DELETE//------------------------------------------------------------------------------
+//TO DELETEuint32_t achat::get_livre_facture_id(void)const
+//TO DELETE{
+//TO DELETE  return m_livre_facture_id;
+//TO DELETE}
+
+//TO DELETE//------------------------------------------------------------------------------
+//TO DELETEvoid achat::set_livre_facture_id(uint32_t p_livre_facture_id)
+//TO DELETE{
+//TO DELETE  m_livre_facture_id = p_livre_facture_id;
+//TO DELETE}
 
 //------------------------------------------------------------------------------
 uint32_t achat::get_type_id(void)const
@@ -243,7 +265,8 @@ void achat::set_garantie(bool p_garantie)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const achat & p_achat)
 {
-  s << p_achat.getType() << "{Id=" << p_achat.getId() << "\",ClientId=\"" << p_achat.m_client_id << "\",Date=\"" << p_achat.m_date << "\",LivreFactureId=\"" << p_achat.m_livre_facture_id << "\",MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
+  //TO DELETE  s << p_achat.getType() << "{Id=" << p_achat.get_id() << "\",ClientId=\"" << p_achat.m_client_id << "\",Date=\"" << p_achat.m_date << "\",LivreFactureId=\"" << p_achat.m_livre_facture_id << "\",MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
+  s << p_achat.getType() << "{Id=" << p_achat.get_id() << "\",FactureId=\"" << p_achat.m_facture_id << "\", MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
   return s;
 }
 

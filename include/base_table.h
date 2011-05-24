@@ -17,7 +17,7 @@ class named_item;
 template <class T> class base_table
 {
  public:
-  void create(const T & p_named_item);
+  void create(T & p_named_item);
   void update(const T & p_named_item);
   void remove(const T & p_named_item);
   uint32_t get(uint32_t p_id, T & p_data);
@@ -30,11 +30,14 @@ template <class T> class base_table
   sqlite3 * get_db(void);
 
  private:
+  uint32_t get_max_id(void);
+
   sqlite3 *m_db;
   sqlite3_stmt *m_update_stmt;
   sqlite3_stmt *m_delete_stmt;
   sqlite3_stmt *m_get_by_id_stmt;
   sqlite3_stmt *m_get_all_stmt;
+  sqlite3_stmt *m_get_max_id_stmt;
 };
 
 //------------------------------------------------------------------------------
@@ -43,13 +46,15 @@ template <class T> base_table<T>::base_table(void):
   m_update_stmt(NULL),
   m_delete_stmt(NULL),
   m_get_by_id_stmt(NULL),
-  m_get_all_stmt(NULL)
+  m_get_all_stmt(NULL),
+  m_get_max_id_stmt(NULL)
 {
 }
 
 //------------------------------------------------------------------------------
 template <class T> base_table<T>::~base_table(void)
 {
+  sqlite3_finalize(m_get_max_id_stmt);
   sqlite3_finalize(m_get_all_stmt);
   sqlite3_finalize(m_get_by_id_stmt);
   sqlite3_finalize(m_delete_stmt);  
@@ -124,6 +129,15 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
       exit(-1);
     }
 
+  // Preparing get_max_id statements
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,("SELECT MAX(Id) FROM " + description<T>::getClassType()).c_str(),-1,&m_get_max_id_stmt,NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement to get max Id of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout << "Statements OK" << std::endl ;
 
@@ -132,18 +146,22 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-template <class T> void base_table<T>::create(const T & p_named_item)
+template <class T> void base_table<T>::create(T & p_named_item)
 {
   sqlite3_stmt *l_stmt = NULL;
   std::string l_stmt_text("INSERT INTO " + description<T>::getClassType() + " (");
   std::string l_stmt_text_values(description<T>::getTableFields()+") VALUES (");
-  if(p_named_item.getId())
+  if(!p_named_item.get_id())
     {
-      l_stmt_text += "Id,";
-      std::stringstream l_id_str;
-      l_id_str << p_named_item.getId();
-      l_stmt_text_values += l_id_str.str() +",";
+      uint32_t l_new_id = get_max_id() + 1;
+      p_named_item.set_id(l_new_id);
     }
+
+  l_stmt_text += "Id,";
+  std::stringstream l_id_str;
+  l_id_str << p_named_item.get_id();
+  l_stmt_text_values += l_id_str.str() +",";
+  
   l_stmt_text += l_stmt_text_values+description<T>::getFieldValues(p_named_item)+")";
   
   int l_status = sqlite3_prepare_v2(m_db,l_stmt_text.c_str(),-1,&l_stmt,NULL);
@@ -173,7 +191,7 @@ template <class T> void base_table<T>::update(const T & p_named_item)
 {
   // Binding values to statement
   //----------------------------
-  int l_status = sqlite3_bind_int(m_update_stmt,sqlite3_bind_parameter_index(m_update_stmt,"$id"),p_named_item.getId());
+  int l_status = sqlite3_bind_int(m_update_stmt,sqlite3_bind_parameter_index(m_update_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during binding of Id parameter for update statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -223,7 +241,7 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
 {
   // Binding values to statement
   //----------------------------
-  int l_status = sqlite3_bind_int(m_delete_stmt,sqlite3_bind_parameter_index(m_delete_stmt,"$id"),p_named_item.getId());
+  int l_status = sqlite3_bind_int(m_delete_stmt,sqlite3_bind_parameter_index(m_delete_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during binding of Id parameter for delete statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -364,6 +382,56 @@ template <class T> void base_table<T>::get_all(std::vector<T> & p_list)
       exit(-1);
     }
 
+}
+
+//------------------------------------------------------------------------------
+template <class T> uint32_t base_table<T>::get_max_id(void)
+{
+  int l_status = 0;
+  uint32_t l_result = 0;
+
+  // Executing statement
+  //---------------------
+  l_status = sqlite3_step(m_get_max_id_stmt);
+  if( l_status == SQLITE_ROW)
+    {
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
+      std::cout << description<T>::getClassType() << " successfully max determined" << std::endl ;
+#endif
+      l_result = sqlite3_column_int(m_get_max_id_stmt,0);
+
+      // Ensure that ID is unique
+      l_status = sqlite3_step(m_get_max_id_stmt);
+      if( l_status == SQLITE_DONE)
+	{
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
+	  std::cout << description<T>::getClassType() << " successfully max done" << std::endl ;
+#endif
+	}
+      else
+	{
+	  std::cout << "ERROR during determination of max Id of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
+	  exit(-1);
+	}
+    }
+  else
+    {
+      std::cout << "ERROR during dtermiantion of max Id of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      exit(-1);
+    }
+
+
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_get_max_id_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during reset of " << description<T>::getClassType() << " get_max_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
+  return l_result;
 }
 
 #endif

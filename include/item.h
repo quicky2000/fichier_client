@@ -14,7 +14,8 @@ class item
  public:
   inline item(void);
   inline item(uint32_t p_id);
-  inline uint32_t getId(void)const;
+  inline uint32_t get_id(void)const;
+  inline void set_id(uint32_t p_id);
   virtual const std::string getType(void)const=0;
   
  private:
@@ -38,7 +39,15 @@ item::item(uint32_t p_id):
 }
 
 //------------------------------------------------------------------------------
-uint32_t item::getId(void)const
+void item::set_id(uint32_t p_id)
+{
+  assert(!m_id);
+  assert(p_id);
+  m_id = p_id;
+}
+
+//------------------------------------------------------------------------------
+uint32_t item::get_id(void)const
 {
   return m_id;
 }

@@ -16,6 +16,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   if(l_status == SQLITE_OK)
     {
       m_table_livre_facture.set_db(m_db);
+      m_table_facture.set_db(m_db);
       m_table_ville.set_db(m_db);
       m_table_marque.set_db(m_db);
       m_table_type_achat.set_db(m_db);
@@ -39,7 +40,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 
   // Preparing search achat statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<achat>::getClassType() + ".Id,Date,"+ description<marque>::getClassType() + ".Name,"+description<type_achat>::getClassType()+".Name,Reference,PrixEuro, PrixFranc,Garantie FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + " WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id").c_str(),-1,&m_search_achat_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<achat>::getClassType() + ".Id, "+ description<facture>::getClassType() +".Date,"+ description<marque>::getClassType() + ".Name,"+description<type_achat>::getClassType()+".Name,Reference,PrixEuro, PrixFranc,Garantie, "+description<facture>::getClassType()+".LivreFactureId FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + ","+ description<facture>::getClassType()+" WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get search_client_achat : " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -52,11 +53,13 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 fichier_client_db::~fichier_client_db(void)
 {
   cout << "Closing db" << endl ;
+  sqlite3_finalize(m_search_achat_stmt);
+  sqlite3_finalize(m_search_client_stmt);
   sqlite3_close(m_db);
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::create(const livre_facture & p_livre_facture)
+void fichier_client_db::create( livre_facture & p_livre_facture)
 {
   m_table_livre_facture.create(p_livre_facture);
 }
@@ -92,7 +95,55 @@ void fichier_client_db::get_livre_facture_containing_date(const std::string & p_
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::create(const ville & p_ville)
+void fichier_client_db::create( facture & p_facture)
+{
+  m_table_facture.create(p_facture);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const facture & p_facture)
+{
+  m_table_facture.update(p_facture);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const facture & p_facture)
+{
+  m_table_facture.remove(p_facture);
+}
+
+//------------------------------------------------------------------------------
+uint32_t fichier_client_db::get_facture(uint32_t p_id,facture & p_data)
+{
+  return m_table_facture.get(p_id,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_all_facture(std::vector<facture> & p_list)
+{
+  m_table_facture.get_all(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_by_date(const std::string & p_date,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_date(p_date,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_by_date_and_client_id(const std::string & p_date,uint32_t p_client_id,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_date_and_client_id(p_date,p_client_id,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_by_livre_facture_and_ref(uint32_t p_facture_ref, uint32_t p_livre_facture_id,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_livre_facture_and_ref(p_facture_ref,p_livre_facture_id,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create( ville & p_ville)
 {
   m_table_ville.create(p_ville);
 }
@@ -134,7 +185,7 @@ void fichier_client_db::get_ville_by_code_postal(const std::string & p_date,std:
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::create(const marque & p_marque)
+void fichier_client_db::create( marque & p_marque)
 {
   m_table_marque.create(p_marque);
 }
@@ -170,7 +221,7 @@ void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vecto
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::create(const type_achat & p_type_achat)
+void fichier_client_db::create( type_achat & p_type_achat)
 {
   m_table_type_achat.create(p_type_achat);
 }
@@ -206,7 +257,7 @@ void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::v
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::create(const achat & p_achat)
+void fichier_client_db::create( achat & p_achat)
 {
   m_table_achat.create(p_achat);
 }
@@ -236,19 +287,13 @@ void fichier_client_db::get_all_achat(std::vector<achat> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_achat_by_date(const std::string & p_date,std::vector<achat> & p_result)
+void fichier_client_db::get_by_facture_id(uint32_t p_facture_id,std::vector<achat> & p_result)
 {
-  m_table_achat.get_by_date(p_date,p_result);
+  m_table_achat.get_by_facture_id(p_facture_id,p_result);
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<achat> & p_result)
-{
-  m_table_achat.get_by_client_id(p_client_id,p_result);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client_db::create(const client & p_client)
+void fichier_client_db::create( client & p_client)
 {
   m_table_client.create(p_client);
 }
@@ -404,52 +449,79 @@ void fichier_client_db::check_db_coherency(void)
   //Check that all id referenced in achat table really existe in the various table.
   vector<achat> l_achats;
   this->get_all_achat(l_achats);
-  vector<achat>::const_iterator l_iter = l_achats.begin();
-  vector<achat>::const_iterator l_iter_end = l_achats.end();
-  while(l_iter != l_iter_end)
+  vector<achat>::const_iterator l_iter_achat = l_achats.begin();
+  vector<achat>::const_iterator l_iter_achat_end = l_achats.end();
+  while(l_iter_achat != l_iter_achat_end)
     {
-      // Check client id
-      uint32_t l_client_id = l_iter->get_client_id();
-      client l_client;
+      // Check facture id
+      uint32_t l_facture_id = l_iter_achat->get_facture_id();
+      facture l_facture;
       
-      if(!m_table_client.get(l_client_id,l_client))
+      if(!m_table_facture.get(l_facture_id,l_facture))
 	{
-	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << *l_iter << endl ; 
+	      cout << "ERROR : no facture corresponding to id " << l_facture_id << " referenced by " << *l_iter_achat << endl ; 
 	}
 
       // Check marque id
-      uint32_t l_marque_id = l_iter->get_marque_id();
+      uint32_t l_marque_id = l_iter_achat->get_marque_id();
       marque l_marque;
       if(!m_table_marque.get(l_marque_id,l_marque))
 	{
-	      cout << "ERROR : no marque corresponding to id " << l_marque_id << " referenced by " << *l_iter << endl ; 
+	      cout << "ERROR : no marque corresponding to id " << l_marque_id << " referenced by " << *l_iter_achat << endl ; 
 	}
 
       // Check type_achat id
-      uint32_t l_type_achat_id = l_iter->get_type_id();
+      uint32_t l_type_achat_id = l_iter_achat->get_type_id();
       type_achat l_type_achat;
       if(!m_table_type_achat.get(l_type_achat_id,l_type_achat))
 	{
-	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << *l_iter << endl ; 
+	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << *l_iter_achat << endl ; 
 	}
 
-      // Check livre facture id
-      uint32_t l_livre_facture_id = l_iter->get_livre_facture_id();
+      ++l_iter_achat;
+    }
+
+  //Check that all id referenced in facture table really existe in the various table.
+  vector<facture> l_factures;
+  this->get_all_facture(l_factures);
+  vector<facture>::const_iterator l_iter_facture = l_factures.begin();
+  vector<facture>::const_iterator l_iter_facture_end = l_factures.end();
+  while(l_iter_facture != l_iter_facture_end)
+    {
+      
+      // Check client id
+      uint32_t l_client_id = l_iter_facture->get_client_id();
+      cout << "Client id is " << l_client_id << endl ;
+       client l_client;
+      
+      if(!m_table_client.get(l_client_id,l_client))
+	{
+	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << *l_iter_facture << endl ; 
+	}
+      
+      // Check facture ref
+      if(!l_iter_facture->get_facture_ref())
+	{
+	  cout << "WARNING : no facture refence for facture " << *l_iter_facture << endl ;
+	}
+
+      // Check livre_facture_id 
+      uint32_t l_livre_facture_id = l_iter_facture->get_livre_facture_id();
       if(l_livre_facture_id)
 	{
 	  livre_facture l_livre;
 	  if(!m_table_livre_facture.get(l_livre_facture_id,l_livre))
 	    {
-	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << *l_iter << endl ; 
+	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << *l_iter_facture << endl ; 
 	    }	 
 	}
       else
 	{
-	  cout << "WARNING : no livre facture assosicated with " << *l_iter << endl;
+	  cout << "WARNING : no livre facture id for facture " << *l_iter_facture << endl ;
 	}
-      ++l_iter;
-    }
 
+      ++l_iter_facture;
+    }
 
   //Check that all id referenced in client table really existe in the various table.
   vector<client> l_clients;
@@ -468,9 +540,9 @@ void fichier_client_db::check_db_coherency(void)
 	}
 
       // Check if client has associated achats
-      uint32_t l_client_id = l_iter_client->getId();
-      vector<achat> l_achats;
-      m_table_achat.get_by_client_id(l_client_id,l_achats);
+      uint32_t l_client_id = l_iter_client->get_id();
+      vector<search_achat_item> l_achats;
+      get_achat_by_client_id(l_client_id,l_achats);
       if(!l_achats.size())
 	{
 	  cout << "ERROR : no achat associated to client " << *l_iter_client << endl ;
