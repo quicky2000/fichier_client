@@ -10,7 +10,7 @@ class livre_facture: public item
 
  public:
   inline livre_facture(void);
-  inline livre_facture(uint32_t p_livre_id, const std::string &p_start_date, const std::string &p_end_date);
+  inline livre_facture(uint32_t p_livre_id, const std::string &p_start_date, const std::string &p_end_date,bool p_complete=true);
   inline const std::string & getStartDate(void)const;
   inline const std::string & getEndDate(void)const;
   inline bool containsDate(const std::string & p_date)const;
@@ -47,12 +47,16 @@ livre_facture::livre_facture(void):
 }
 
 //------------------------------------------------------------------------------
-livre_facture::livre_facture(uint32_t p_livre_id, const std::string &p_start_date, const std::string &p_end_date):
+livre_facture::livre_facture(uint32_t p_livre_id, const std::string &p_start_date, const std::string &p_end_date,bool p_complete):
   item(p_livre_id),
   m_start_date(p_start_date),
   m_end_date(p_end_date)
 {
-  assert(m_start_date < m_end_date);
+  assert(m_start_date != "");
+  if(p_complete)
+    {
+      assert(m_start_date < m_end_date);
+    }
 }
 
 //------------------------------------------------------------------------------

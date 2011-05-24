@@ -83,6 +83,7 @@ namespace test
     //---------------------------
     livre_facture l_livre(1,"20100101","20100113");
     livre_facture l_livre2(2,"20100110", "20100115");
+    livre_facture l_livre3(3,"20100110", "",false);
   
     l_fichier_client.create(l_livre);
     l_fichier_client.create(l_livre2);
