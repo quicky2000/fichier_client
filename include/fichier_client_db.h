@@ -7,6 +7,7 @@
 #include "named_table.h"
 #include "description_marque.h"
 #include "description_type_achat.h"
+#include "description_facture_status.h"
 #include "table_achat.h"
 #include "table_client.h"
 #include "information_table.h"
@@ -76,6 +77,14 @@ class fichier_client_db
   void get_all_type_achat(std::vector<type_achat> & p_list);
   void get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result);
   
+  //Management of facture_status table
+  void create( facture_status & p_facture_status);
+  void update(const facture_status & p_facture_status);
+  void remove(const facture_status & p_facture_status);
+  uint32_t get_facture_status(uint32_t p_id,facture_status & p_data);
+  void get_all_facture_status(std::vector<facture_status> & p_list);
+  void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result);
+  
   //Management of achat table
   void create( achat & p_achat);
   void update(const achat & p_achat);
@@ -104,6 +113,7 @@ class fichier_client_db
   table_ville m_table_ville;
   named_table<marque> m_table_marque;
   named_table<type_achat> m_table_type_achat;
+  named_table<facture_status> m_table_facture_status;
   table_achat m_table_achat;
   table_client m_table_client;
   information_table m_information_table;

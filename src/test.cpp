@@ -335,6 +335,66 @@ namespace test
     l_fichier_client.get_type_achat_by_name("F",l_result_type_achat);
     display(l_result_type_achat);
 
+    // Testing facture_status management
+    //-----------------------------------
+    cout << "Create facture status : "<< endl ;
+    facture_status l_facture_status("OK");
+    cout << l_facture_status << endl ;
+
+    cout << "Insert status in database" << endl ;
+    l_fichier_client.create(l_facture_status);
+
+    cout << "Display all facture status : " << endl ;
+    vector<facture_status> l_result_facture_status;
+    l_fichier_client.get_all_facture_status(l_result_facture_status);
+    display(l_result_facture_status);
+
+    cout << "Create new facture status" << endl ;
+    facture_status l_facture_status2("NON_CHECKED");
+    cout << l_facture_status2 << endl ;
+
+    cout << "Insert status in database" << endl ;
+    l_fichier_client.create(l_facture_status2);
+
+    cout << "Display all facture status : " << endl ;
+    l_result_facture_status.clear();
+    l_fichier_client.get_all_facture_status(l_result_facture_status);
+    display(l_result_facture_status);
+
+    cout << "Create new facture status" << endl ;
+    facture_status l_facture_status3("DUMMY");
+    cout << l_facture_status3 << endl ;
+
+    cout << "Insert status in database" << endl ;
+    l_fichier_client.create(l_facture_status3);
+
+    cout << "Display all facture status : " << endl ;
+    l_result_facture_status.clear();
+    l_fichier_client.get_all_facture_status(l_result_facture_status);
+    display(l_result_facture_status);
+
+    cout << "Modify status" << endl ;
+    l_facture_status2.setName("Non vérifée");
+    cout << l_facture_status2 << endl ;
+
+    cout << "Update db" << endl ;
+    l_fichier_client.update(l_facture_status2);
+
+    cout << "Display all facture status : " << endl ;
+    l_result_facture_status.clear();
+    l_fichier_client.get_all_facture_status(l_result_facture_status);
+    display(l_result_facture_status);
+
+    cout << "Remove dummy status" << endl ;
+    l_fichier_client.remove(l_facture_status3);
+
+    cout << "Display all facture status : " << endl ;
+    l_result_facture_status.clear();
+    l_fichier_client.get_all_facture_status(l_result_facture_status);
+    display(l_result_facture_status);
+
+    exit(-1);
+
     // Testing Achat management
     //---------------------------
     achat l_achat(1,1,7,5,"MKV",100.0,15.0,false);

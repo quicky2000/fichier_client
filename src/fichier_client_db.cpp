@@ -20,6 +20,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       m_table_ville.set_db(m_db);
       m_table_marque.set_db(m_db);
       m_table_type_achat.set_db(m_db);
+      m_table_facture_status.set_db(m_db);
       m_table_achat.set_db(m_db);
       m_table_client.set_db(m_db);
       m_information_table.set_db(m_db);
@@ -286,6 +287,42 @@ void fichier_client_db::get_all_type_achat(std::vector<type_achat> & p_list)
 void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result)
 {
   m_table_type_achat.get_by_name(p_name,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create( facture_status & p_facture_status)
+{
+  m_table_facture_status.create(p_facture_status);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const facture_status & p_facture_status)
+{
+  m_table_facture_status.update(p_facture_status);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const facture_status & p_facture_status)
+{
+  m_table_facture_status.remove(p_facture_status);
+}
+
+//------------------------------------------------------------------------------
+uint32_t fichier_client_db::get_facture_status(uint32_t p_id,facture_status & p_data)
+{
+  return m_table_facture_status.get(p_id,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_all_facture_status(std::vector<facture_status> & p_list)
+{
+  m_table_facture_status.get_all(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result)
+{
+  m_table_facture_status.get_by_name(p_name,p_result);
 }
 
 //------------------------------------------------------------------------------
