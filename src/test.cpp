@@ -393,8 +393,6 @@ namespace test
     l_fichier_client.get_all_facture_status(l_result_facture_status);
     display(l_result_facture_status);
 
-    exit(-1);
-
     // Testing Achat management
     //---------------------------
     achat l_achat(1,1,7,5,"MKV",100.0,15.0,false);

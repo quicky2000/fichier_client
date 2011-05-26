@@ -81,8 +81,9 @@ void table_facture::get_by_date(const std::string & p_date,std::vector<facture> 
       exit(-1);
     }
 
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout << "" << description<facture>::getClassType() << " get_by_date successfully listed" << std::endl ;
-
+#endif
 
   // Reset the statement for the next use
   //--------------------------------------
@@ -136,8 +137,9 @@ void table_facture::get_by_date_and_client_id(const std::string & p_date,uint32_
       exit(-1);
     }
 
+#ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout << "" << description<facture>::getClassType() << " get_by_date_and_client_id successfully listed "<< p_date << "\t" << p_client_id << std::endl ;
-
+#endif
 
   // Reset the statement for the next use
   //--------------------------------------
