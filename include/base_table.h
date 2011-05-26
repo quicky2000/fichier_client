@@ -33,6 +33,7 @@ template <class T> class base_table
   uint32_t get_max_id(void);
 
   sqlite3 *m_db;
+  sqlite3_stmt *m_create_stmt;
   sqlite3_stmt *m_update_stmt;
   sqlite3_stmt *m_delete_stmt;
   sqlite3_stmt *m_get_by_id_stmt;
@@ -43,6 +44,7 @@ template <class T> class base_table
 //------------------------------------------------------------------------------
 template <class T> base_table<T>::base_table(void):
   m_db(NULL),
+  m_create_stmt(NULL),
   m_update_stmt(NULL),
   m_delete_stmt(NULL),
   m_get_by_id_stmt(NULL),
@@ -59,6 +61,7 @@ template <class T> base_table<T>::~base_table(void)
   sqlite3_finalize(m_get_by_id_stmt);
   sqlite3_finalize(m_delete_stmt);  
   sqlite3_finalize(m_update_stmt);  
+  sqlite3_finalize(m_create_stmt);  
   std::cout << "Table " << description<T>::getClassType() << " end of destruction" << std::endl ;
 }
 
@@ -76,7 +79,7 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
 
   sqlite3_stmt *l_stmt = NULL;
 
-  // Creation to table
+  // Creation of table
   //--------------------
   int l_status = sqlite3_prepare_v2(m_db,("CREATE TABLE IF NOT EXISTS " + description<T>::getClassType() + " ( Id INTEGER PRIMARY KEY AUTOINCREMENT, "+ description<T>::getTableFieldsDeclaration()+");").c_str(),-1,&l_stmt,NULL);
   if(l_status != SQLITE_OK)
@@ -93,12 +96,21 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
     }
   sqlite3_finalize(l_stmt);  
 
+  // Preparing named_item create statement
+  //----------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,("INSERT INTO " + description<T>::getClassType() + " (Id,"+description<T>::getTableFields()+") VALUES ($id, "+description<T>::getFieldValues()+")").c_str(),-1,&m_create_stmt,NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement to create " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
   // Preparing named_item update statement
   //-------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,("UPDATE " + description<T>::getClassType() + " SET " + description<T>::getUpdateFields() + " WHERE Id == $id ;").c_str(),-1,&m_update_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of staement to update " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to update " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -148,30 +160,28 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
 //------------------------------------------------------------------------------
 template <class T> void base_table<T>::create(T & p_named_item)
 {
-  sqlite3_stmt *l_stmt = NULL;
-  std::string l_stmt_text("INSERT INTO " + description<T>::getClassType() + " (");
-  std::string l_stmt_text_values(description<T>::getTableFields()+") VALUES (");
+
+  // Determine Id if needed
   if(!p_named_item.get_id())
     {
       uint32_t l_new_id = get_max_id() + 1;
       p_named_item.set_id(l_new_id);
     }
 
-  l_stmt_text += "Id,";
-  std::stringstream l_id_str;
-  l_id_str << p_named_item.get_id();
-  l_stmt_text_values += l_id_str.str() +",";
-  
-  l_stmt_text += l_stmt_text_values+description<T>::getFieldValues(p_named_item)+")";
-  
-  int l_status = sqlite3_prepare_v2(m_db,l_stmt_text.c_str(),-1,&l_stmt,NULL);
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_create_stmt,sqlite3_bind_parameter_index(m_create_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of staement to create " << description<T>::getClassType() << " \"" <<  l_stmt_text << "\" : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during binding of Id parameter for create statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
   
-  l_status = sqlite3_step(l_stmt);
+  description<T>::bind_item_values(p_named_item,m_create_stmt,m_db);
+
+  // Executing statement
+  //---------------------
+  l_status = sqlite3_step(m_create_stmt);
   if( l_status == SQLITE_DONE)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
@@ -180,10 +190,28 @@ template <class T> void base_table<T>::create(T & p_named_item)
     }
   else
     {
-      std::cout << "ERROR during creation of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during creation of " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
-  sqlite3_finalize(l_stmt);  
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_create_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during reset of " << description<T>::getClassType() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_create_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -198,7 +226,7 @@ template <class T> void base_table<T>::update(const T & p_named_item)
       exit(-1);
     }
   
-  description<T>::bind_update_values(p_named_item,m_update_stmt,m_db);
+  description<T>::bind_item_values(p_named_item,m_update_stmt,m_db);
 
   // Executing statement
   //---------------------

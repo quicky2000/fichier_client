@@ -12,8 +12,8 @@ template <> class description<achat>
   inline static const std::string getTableFieldsDeclaration(void);
   inline static const std::string getTableFields(void);
   inline static const std::string getUpdateFields(void);
-  inline static const std::string getFieldValues(const achat & p_achat);
-  inline static void bind_update_values(const achat & p_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
+  inline static const std::string getFieldValues(void);
+  inline static void bind_item_values(const achat & p_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
   inline static achat getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
@@ -45,15 +45,13 @@ const std::string description<achat>::getUpdateFields(void)
 }
 
 //------------------------------------------------------------------------------
-const std::string description<achat>::getFieldValues(const achat & p_achat)
+const std::string description<achat>::getFieldValues(void)
 {
-  std::stringstream l_result;
-  l_result << p_achat.get_facture_id() << ", " << p_achat.get_marque_id() <<  ", " << p_achat.get_type_id() << ", \"" << p_achat.get_reference() << "\" ," << p_achat.get_prix_franc() << ", " << p_achat.get_prix_euro() <<  ", " << p_achat.get_garantie();
-  return l_result.str();
+  return "$facture_id, $marque_id , $type_id , $reference, $prix_franc , $prix_euro, $garantie";
 }
 
 //------------------------------------------------------------------------------
-void description<achat>::bind_update_values(const achat & p_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db)
+void description<achat>::bind_item_values(const achat & p_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db)
 {
   int l_status = sqlite3_bind_int(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$facture_id"),p_achat.get_facture_id());
   if(l_status != SQLITE_OK)

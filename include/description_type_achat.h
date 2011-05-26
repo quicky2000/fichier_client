@@ -12,8 +12,8 @@ template <> class description<type_achat>
   inline static const std::string getTableFieldsDeclaration(void);
   inline static const std::string getTableFields(void);
   inline static const std::string getUpdateFields(void);
-  inline static const std::string getFieldValues(const type_achat & p_type_achat);
-  inline static void bind_update_values(const type_achat & p_type_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
+  inline static const std::string getFieldValues(void);
+  inline static void bind_item_values(const type_achat & p_type_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db);
   inline static type_achat getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
@@ -45,13 +45,13 @@ const std::string description<type_achat>::getUpdateFields(void)
 }
 
 //------------------------------------------------------------------------------
-const std::string description<type_achat>::getFieldValues(const type_achat & p_type_achat)
+const std::string description<type_achat>::getFieldValues(void)
 {
-  return "\""+p_type_achat.getName()+"\"";
+  return "$name";
 }
 
 //------------------------------------------------------------------------------
-void description<type_achat>::bind_update_values(const type_achat & p_type_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db)
+void description<type_achat>::bind_item_values(const type_achat & p_type_achat,sqlite3_stmt* p_stmt,sqlite3 *p_db)
 {
   int l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$name"),p_type_achat.getName().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)

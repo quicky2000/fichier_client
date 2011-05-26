@@ -12,8 +12,8 @@ template <> class description<client>
   inline static const std::string getTableFieldsDeclaration(void);
   inline static const std::string getTableFields(void);
   inline static const std::string getUpdateFields(void);
-  inline static const std::string getFieldValues(const client & p_client);
-  inline static void bind_update_values(const client & p_client,sqlite3_stmt* p_stmt,sqlite3 *p_db);
+  inline static const std::string getFieldValues(void);
+  inline static void bind_item_values(const client & p_client,sqlite3_stmt* p_stmt,sqlite3 *p_db);
   inline static client getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
@@ -45,15 +45,13 @@ const std::string description<client>::getUpdateFields(void)
 }
 
 //------------------------------------------------------------------------------
-const std::string description<client>::getFieldValues(const client & p_client)
+const std::string description<client>::getFieldValues(void)
 {
-  std::stringstream l_result;
-  l_result << "\"" << p_client.get_name() << "\", \"" << p_client.get_first_name() << "\", \"" << p_client.get_address() <<  "\", \"" << p_client.get_tel() << "\", " << p_client.get_ville_id() ;
-  return l_result.str();
+  return "$name, $first_name, $address , $tel , $ville_id";
 }
 
 //------------------------------------------------------------------------------
-void description<client>::bind_update_values(const client & p_client,sqlite3_stmt* p_stmt,sqlite3 *p_db)
+void description<client>::bind_item_values(const client & p_client,sqlite3_stmt* p_stmt,sqlite3 *p_db)
 {
   int l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$name"),p_client.get_name().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)

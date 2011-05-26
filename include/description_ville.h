@@ -12,8 +12,8 @@ template <> class description<ville>
   inline static const std::string getTableFieldsDeclaration(void);
   inline static const std::string getTableFields(void);
   inline static const std::string getUpdateFields(void);
-  inline static const std::string getFieldValues(const ville & p_ville);
-  inline static void bind_update_values(const ville & p_ville,sqlite3_stmt* p_stmt,sqlite3 *p_db);
+  inline static const std::string getFieldValues(void);
+  inline static void bind_item_values(const ville & p_ville,sqlite3_stmt* p_stmt,sqlite3 *p_db);
   inline static ville getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
@@ -45,13 +45,13 @@ const std::string description<ville>::getUpdateFields(void)
 }
 
 //------------------------------------------------------------------------------
-const std::string description<ville>::getFieldValues(const ville & p_ville)
+const std::string description<ville>::getFieldValues(void)
 {
-  return "\"" + p_ville.getName() + "\", \"" + p_ville.getCodePostal() + "\"";
+  return "$name, $code_postal";
 }
 
 //------------------------------------------------------------------------------
-void description<ville>::bind_update_values(const ville & p_ville,sqlite3_stmt* p_stmt,sqlite3 *p_db)
+void description<ville>::bind_item_values(const ville & p_ville,sqlite3_stmt* p_stmt,sqlite3 *p_db)
 {
   int l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$name"),p_ville.getName().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)

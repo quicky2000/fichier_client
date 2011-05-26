@@ -12,8 +12,8 @@ template <> class description<marque>
   inline static const std::string getTableFieldsDeclaration(void);
   inline static const std::string getTableFields(void);
   inline static const std::string getUpdateFields(void);
-  inline static const std::string getFieldValues(const marque & p_marque);
-  inline static void bind_update_values(const marque & p_marque,sqlite3_stmt* p_stmt,sqlite3 *p_db);
+  inline static const std::string getFieldValues(void);
+  inline static void bind_item_values(const marque & p_marque,sqlite3_stmt* p_stmt,sqlite3 *p_db);
   inline static marque getItemFromRow(sqlite3_stmt* p_stmt);
  private:
   
@@ -45,13 +45,13 @@ const std::string description<marque>::getUpdateFields(void)
 }
 
 //------------------------------------------------------------------------------
-const std::string description<marque>::getFieldValues(const marque & p_marque)
+const std::string description<marque>::getFieldValues(void)
 {
-  return "\"" + p_marque.getName() + "\"";
+  return "$name";
 }
 
 //------------------------------------------------------------------------------
-void description<marque>::bind_update_values(const marque & p_marque,sqlite3_stmt* p_stmt,sqlite3 *p_db)
+void description<marque>::bind_item_values(const marque & p_marque,sqlite3_stmt* p_stmt,sqlite3 *p_db)
 {
   int l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$name"),p_marque.getName().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
