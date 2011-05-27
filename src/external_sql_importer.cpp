@@ -221,7 +221,7 @@ namespace external_sql_importer
 
 	  }
       }
-    while(!l_input_file.eof() && l_line != "");
+    while(!l_input_file.eof() );
 
     l_input_file.close();
 
