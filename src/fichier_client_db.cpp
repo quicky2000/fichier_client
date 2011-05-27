@@ -31,6 +31,19 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
     }
   cout << "Database successfully opened" << endl ; 
 
+  pair<string,string> l_info;
+  
+  if(get_information("db_schema_version",l_info))
+    {
+      cout << "Database schema version is \"" << l_info.second << endl ;
+      assert(l_info.second == m_schema_version);
+    }
+  else
+    {
+      cout << "Create db_schema_version" << endl ;
+      create_information("db_schema_version",m_schema_version);
+    }
+
   // Preparing search client statements
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id AND Client.Name LIKE @client_name AND FirstName LIKE @client_first_name AND Ville.Name LIKE @ville_name",-1,&m_search_client_stmt,NULL);
@@ -623,5 +636,7 @@ void fichier_client_db::check_db_coherency(void)
 
   cout << "End of database coherency checking" << endl ;
 }
+
+const std::string fichier_client_db::m_schema_version = "1.0";
 
 //EOF

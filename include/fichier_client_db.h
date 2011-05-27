@@ -120,7 +120,7 @@ class fichier_client_db
   sqlite3 *m_db;
   sqlite3_stmt *m_search_client_stmt;
   sqlite3_stmt *m_search_achat_stmt;
-  
+  static const std::string m_schema_version;
 };
 
 #endif // FICHIER_CLIENT_DB_H
