@@ -22,6 +22,12 @@ fichier_client::~fichier_client(void)
 }
 
 //------------------------------------------------------------------------------
+bool fichier_client::need_save(void)const
+{
+  return (m_db ? m_db->is_modified():false);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client::check_db_coherency(void)
 {
   assert(m_db);
@@ -135,6 +141,8 @@ void fichier_client::save(void)
 //------------------------------------------------------------------------------
 void fichier_client::save_as(const std::string & p_name)
 {
+  assert(m_db!=NULL);
+  m_db->save();
   close_tmp_db();
   copy(m_tmp_db_name,p_name);
   m_db_name = p_name;

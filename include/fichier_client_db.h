@@ -27,6 +27,9 @@ class fichier_client_db
   fichier_client_db(const std::string &p_name);
   ~fichier_client_db(void);
 
+  bool is_modified(void)const;
+  void save(void);
+
   //Management of information table
   void create_information(const std::string & p_key, const std::string &p_value);
   void update_information(const std::string & p_key, const std::string &p_value);
@@ -107,7 +110,7 @@ class fichier_client_db
   void check_db_coherency(void);
   
  private:
-
+  bool m_modified;
   table_livre_facture m_table_livre_facture;
   table_facture m_table_facture;
   table_ville m_table_ville;

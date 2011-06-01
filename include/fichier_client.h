@@ -20,6 +20,7 @@ class fichier_client
   void close_db(void);
   void save(void);
   void save_as(const std::string & p_name);
+  bool need_save(void)const;
 
   // Operations on database
   void check_db_coherency(void);

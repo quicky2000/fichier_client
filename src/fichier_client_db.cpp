@@ -7,6 +7,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 fichier_client_db::fichier_client_db(const std::string &p_name):
+  m_modified(false),
   m_db(NULL),
   m_search_client_stmt(NULL),
   m_search_achat_stmt(NULL)
@@ -65,6 +66,18 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::save(void)
+{
+  m_modified = false;
+}
+
+//------------------------------------------------------------------------------
+bool fichier_client_db::is_modified(void)const
+{
+  return m_modified;
+}
+
+//------------------------------------------------------------------------------
 fichier_client_db::~fichier_client_db(void)
 {
   cout << "Closing db" << endl ;
@@ -76,18 +89,21 @@ fichier_client_db::~fichier_client_db(void)
 //------------------------------------------------------------------------------
 void fichier_client_db::create_information(const std::string & p_key, const std::string &p_value)
 {
+  m_modified = true;
   m_information_table.create(p_key,p_value);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update_information(const std::string & p_key, const std::string &p_value)
 {
+  m_modified = true;
   m_information_table.update(p_key,p_value);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove_information(const std::string & p_key)
 {
+  m_modified = true;
   m_information_table.remove(p_key);
 }
 
@@ -107,18 +123,21 @@ void fichier_client_db::get_all_information(std::vector<std::pair<std::string,st
 //------------------------------------------------------------------------------
 void fichier_client_db::create( livre_facture & p_livre_facture)
 {
+  m_modified = true;
   m_table_livre_facture.create(p_livre_facture);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const livre_facture & p_livre_facture)
 {
+  m_modified = true;
   m_table_livre_facture.update(p_livre_facture);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const livre_facture & p_livre_facture)
 {
+  m_modified = true;
   m_table_livre_facture.remove(p_livre_facture);
 }
 
@@ -143,18 +162,21 @@ void fichier_client_db::get_livre_facture_containing_date(const std::string & p_
 //------------------------------------------------------------------------------
 void fichier_client_db::create( facture & p_facture)
 {
+  m_modified = true;
   m_table_facture.create(p_facture);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const facture & p_facture)
 {
+  m_modified = true;
   m_table_facture.update(p_facture);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const facture & p_facture)
 {
+  m_modified = true;
   m_table_facture.remove(p_facture);
 }
 
@@ -191,18 +213,21 @@ void fichier_client_db::get_by_livre_facture_and_ref(uint32_t p_facture_ref, uin
 //------------------------------------------------------------------------------
 void fichier_client_db::create( ville & p_ville)
 {
+  m_modified = true;
   m_table_ville.create(p_ville);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const ville & p_ville)
 {
+  m_modified = true;
   m_table_ville.update(p_ville);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const ville & p_ville)
 {
+  m_modified = true;
   m_table_ville.remove(p_ville);
 }
 
@@ -233,18 +258,21 @@ void fichier_client_db::get_ville_by_code_postal(const std::string & p_date,std:
 //------------------------------------------------------------------------------
 void fichier_client_db::create( marque & p_marque)
 {
+  m_modified = true;
   m_table_marque.create(p_marque);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const marque & p_marque)
 {
+  m_modified = true;
   m_table_marque.update(p_marque);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const marque & p_marque)
 {
+  m_modified = true;
   m_table_marque.remove(p_marque);
 }
 
@@ -269,18 +297,21 @@ void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vecto
 //------------------------------------------------------------------------------
 void fichier_client_db::create( type_achat & p_type_achat)
 {
+  m_modified = true;
   m_table_type_achat.create(p_type_achat);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const type_achat & p_type_achat)
 {
+  m_modified = true;
   m_table_type_achat.update(p_type_achat);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const type_achat & p_type_achat)
 {
+  m_modified = true;
   m_table_type_achat.remove(p_type_achat);
 }
 
@@ -305,18 +336,21 @@ void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::v
 //------------------------------------------------------------------------------
 void fichier_client_db::create( facture_status & p_facture_status)
 {
+  m_modified = true;
   m_table_facture_status.create(p_facture_status);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const facture_status & p_facture_status)
 {
+  m_modified = true;
   m_table_facture_status.update(p_facture_status);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const facture_status & p_facture_status)
 {
+  m_modified = true;
   m_table_facture_status.remove(p_facture_status);
 }
 
@@ -341,18 +375,21 @@ void fichier_client_db::get_facture_status_by_name(const std::string & p_name,st
 //------------------------------------------------------------------------------
 void fichier_client_db::create( achat & p_achat)
 {
+  m_modified = true;
   m_table_achat.create(p_achat);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const achat & p_achat)
 {
+  m_modified = true;
   m_table_achat.update(p_achat);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const achat & p_achat)
 {
+  m_modified = true;
   m_table_achat.remove(p_achat);
 }
 
@@ -377,18 +414,21 @@ void fichier_client_db::get_by_facture_id(uint32_t p_facture_id,std::vector<acha
 //------------------------------------------------------------------------------
 void fichier_client_db::create( client & p_client)
 {
+  m_modified = true;
   m_table_client.create(p_client);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::update(const client & p_client)
 {
+  m_modified = true;
   m_table_client.update(p_client);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client_db::remove(const client & p_client)
 {
+  m_modified = true;
   m_table_client.remove(p_client);
 }
 
