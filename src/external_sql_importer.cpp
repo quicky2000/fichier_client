@@ -39,6 +39,8 @@ namespace external_sql_importer
 
     string l_line = "";
     uint32_t l_line_nb = 0;
+    facture_status l_facture_status("Non_vérifiée");
+    p_db.create(l_facture_status);
     do
       {
 	getline(l_input_file,l_line);
@@ -92,7 +94,7 @@ namespace external_sql_importer
 
 		if(l_facture_result.size()==0)
 		  {
-		    facture l_facture(0,l_client_id,l_date,0,0);
+		    facture l_facture(0,l_client_id,l_date,0,l_facture_status.get_id());
 		    p_db.create(l_facture);
 		    l_facture_id = l_facture.get_id();
 		  }
