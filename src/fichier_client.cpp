@@ -43,6 +43,41 @@ void fichier_client::get_achat_by_client_id(uint32_t p_client_id,std::vector<sea
 }
 
 //------------------------------------------------------------------------------
+uint32_t fichier_client::get_livre_facture(uint32_t p_id,livre_facture & p_data)
+{
+  assert(m_db);
+  return m_db->get_livre_facture(p_id,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::get_all_livre_facture(std::vector<livre_facture> & p_list)
+{
+  assert(m_db);
+  m_db->get_all_livre_facture(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::remove(const livre_facture & p_livre_facture)
+{
+  assert(m_db);
+  m_db->remove(p_livre_facture);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::update(const livre_facture & p_livre_facture)
+{
+  assert(m_db);
+  m_db->update(p_livre_facture);
+}
+ 
+//------------------------------------------------------------------------------
+void fichier_client::create( livre_facture & p_livre_facture)
+{
+  assert(m_db);
+  m_db->create(p_livre_facture);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client::import_external_sql(const std::string & p_name)
 {
   assert(m_db == NULL);

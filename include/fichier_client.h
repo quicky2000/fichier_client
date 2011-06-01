@@ -2,6 +2,7 @@
 #define FICHIER_CLIENT_H
 #include "search_client_item.h"
 #include "search_achat_item.h"
+#include "livre_facture.h"
 #include "achat.h"
 #include <string>
 #include <vector>
@@ -29,6 +30,15 @@ class fichier_client
 
   void get_achat_by_client_id(uint32_t p_client_id,
 			      std::vector<search_achat_item> & p_result);
+
+  uint32_t get_livre_facture(uint32_t p_id,livre_facture & p_data);
+  void get_all_livre_facture(std::vector<livre_facture> & p_list);
+
+  void create( livre_facture & p_livre_facture);
+  void remove(const livre_facture & p_livre_facture);
+  void update(const livre_facture & p_livre_facture);
+ 
+
  private:
   void remove_tmp_db(void);
   void open_tmp_db(void);
