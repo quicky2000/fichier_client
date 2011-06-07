@@ -211,6 +211,12 @@ void fichier_client_db::get_by_livre_facture_and_ref(uint32_t p_facture_ref, uin
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::get_by_livre_facture(uint32_t p_livre_facture_id,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_livre_facture(p_livre_facture_id,p_result);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client_db::create( ville & p_ville)
 {
   m_modified = true;

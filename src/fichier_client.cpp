@@ -66,7 +66,13 @@ void fichier_client::get_all_livre_facture(std::vector<livre_facture> & p_list)
 void fichier_client::remove(const livre_facture & p_livre_facture)
 {
   assert(m_db);
-  m_db->remove(p_livre_facture);
+  uint32_t l_livre_facture_id = p_livre_facture.get_id();
+  vector<facture> l_result;
+  m_db->get_by_livre_facture(l_livre_facture_id,l_result);
+  if(l_result.size() == 0)
+    {
+      m_db->remove(p_livre_facture);
+    }
 }
 
 //------------------------------------------------------------------------------

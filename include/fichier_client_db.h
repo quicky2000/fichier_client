@@ -53,6 +53,7 @@ class fichier_client_db
   void get_all_facture(std::vector<facture> & p_list);
   void get_by_date(const std::string & p_date,std::vector<facture> & p_result);
   void get_by_date_and_client_id(const std::string & p_date,uint32_t p_client_id,std::vector<facture> & p_result);
+  void get_by_livre_facture(uint32_t p_livre_facture_id,std::vector<facture> & p_result);
   void get_by_livre_facture_and_ref(uint32_t p_facture_ref, uint32_t p_livre_facture_id,std::vector<facture> & p_result);
 
   //Management of ville table
