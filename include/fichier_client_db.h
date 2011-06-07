@@ -13,6 +13,7 @@
 #include "information_table.h"
 #include "search_client_item.h"
 #include "search_achat_item.h"
+#include "search_facture_item.h"
 
 #include <string>
 #include <vector>
@@ -107,6 +108,7 @@ class fichier_client_db
   //Mangement of jointures
   void search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, std::vector<search_client_item> & p_result);
   void get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result);
+  void get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result);
 
   void check_db_coherency(void);
   
@@ -124,6 +126,7 @@ class fichier_client_db
   sqlite3 *m_db;
   sqlite3_stmt *m_search_client_stmt;
   sqlite3_stmt *m_search_achat_stmt;
+  sqlite3_stmt *m_search_facture_by_client_id_stmt;
   static const std::string m_schema_version;
 };
 

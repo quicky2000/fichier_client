@@ -10,7 +10,8 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   m_modified(false),
   m_db(NULL),
   m_search_client_stmt(NULL),
-  m_search_achat_stmt(NULL)
+  m_search_achat_stmt(NULL),
+  m_search_facture_by_client_id_stmt(NULL)
 {
   // Opening the database
   int l_status = sqlite3_open(p_name.c_str(), &m_db);
@@ -63,6 +64,15 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       exit(-1);
     }
 
+  // Preparing search_facture_by_client_id statements
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<facture>::getClassType() + ".Id, "+ description<facture>::getClassType() +".FactureRef,"+ description<facture>::getClassType() + ".Date,"+description<facture>::getClassType()+".LivreFactureId, "+description<facture_status>::getClassType()+".Name FROM " + description<facture>::getClassType() + ","+ description<facture_status>::getClassType() + " WHERE "+ description<facture>::getClassType() + ".Status = " + description<facture_status>::getClassType() + ".Id AND "+description<facture>::getClassType()+".ClientId == $client_id").c_str(),-1,&m_search_facture_by_client_id_stmt,NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement get_facture_by_client_id : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -81,6 +91,7 @@ bool fichier_client_db::is_modified(void)const
 fichier_client_db::~fichier_client_db(void)
 {
   cout << "Closing db" << endl ;
+  sqlite3_finalize(m_search_facture_by_client_id_stmt);
   sqlite3_finalize(m_search_achat_stmt);
   sqlite3_finalize(m_search_client_stmt);
   sqlite3_close(m_db);
@@ -523,6 +534,7 @@ void fichier_client_db::search_client(const std::string & p_name, const std::str
 
 }
 
+//------------------------------------------------------------------------------
 void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result)
 {
   // Binding values to statement
@@ -567,7 +579,50 @@ void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<
     }
 }
 
+//------------------------------------------------------------------------------
+void fichier_client_db::get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_search_facture_by_client_id_stmt,sqlite3_bind_parameter_index(m_search_facture_by_client_id_stmt,"$client_id"),p_client_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of client_id parameter for search_facture_by_client_id statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_search_facture_by_client_id_stmt)) == SQLITE_ROW)
+    {
+      p_result.push_back(search_facture_item(m_search_facture_by_client_id_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of search_facture_by_client_id result : " << m_db << endl ;
+      exit(-1);
+    }
 
+  cout << "Facture for client_id " << p_client_id << " successfully listed" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_search_facture_by_client_id_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of search_facture_by_client_id statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_search_facture_by_client_id_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of search_facture_by_client_id statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+}
 
 //------------------------------------------------------------------------------
 void fichier_client_db::check_db_coherency(void)
