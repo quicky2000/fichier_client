@@ -12,9 +12,12 @@ class facture_status: public named_item
   inline facture_status(uint32_t p_id, const std::string &p_name);
   inline const std::string getType(void)const;
   inline static const std::string getClassType(void);
-
+  inline static const std::string & get_ok_status(void);
+  inline static const std::string & get_non_checked_status(void);
  private:
-  
+  static const std::string m_class_type;
+  static const std::string m_ok_status;
+  static const std::string m_non_checked_status;
 };
 
 //------------------------------------------------------------------------------
@@ -38,13 +41,24 @@ facture_status::facture_status(uint32_t p_id, const std::string &p_name):
 //------------------------------------------------------------------------------
 const std::string facture_status::getType(void)const
 {
-  return "Facture_status";
+  return m_class_type;
 }
 
 //------------------------------------------------------------------------------
 const std::string facture_status::getClassType(void)
 {
-  return "Facture_status";
+  return m_class_type;
 }
 
+//------------------------------------------------------------------------------
+const std::string & facture_status::get_ok_status(void)
+{
+  return m_ok_status;
+}
+
+//------------------------------------------------------------------------------
+const std::string & facture_status::get_non_checked_status(void)
+{
+  return m_non_checked_status;
+}
 #endif

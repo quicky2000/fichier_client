@@ -39,8 +39,10 @@ namespace external_sql_importer
 
     string l_line = "";
     uint32_t l_line_nb = 0;
-    facture_status l_facture_status("Non_vérifiée");
-    p_db.create(l_facture_status);
+    vector<facture_status> l_result_facture_status;
+    p_db.get_facture_status_by_name(facture_status::get_non_checked_status(),l_result_facture_status);
+    assert(l_result_facture_status.size()==1);
+    facture_status l_facture_status = l_result_facture_status[0];
     do
       {
 	getline(l_input_file,l_line);

@@ -3,6 +3,7 @@
 
 #include "table_livre_facture.h"
 #include "table_facture.h"
+#include "table_facture_status.h"
 #include "table_ville.h"
 #include "named_table.h"
 #include "description_marque.h"
@@ -119,7 +120,7 @@ class fichier_client_db
   table_ville m_table_ville;
   named_table<marque> m_table_marque;
   named_table<type_achat> m_table_type_achat;
-  named_table<facture_status> m_table_facture_status;
+  table_facture_status m_table_facture_status;
   table_achat m_table_achat;
   table_client m_table_client;
   information_table m_information_table;
