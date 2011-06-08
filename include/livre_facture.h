@@ -17,7 +17,7 @@ class livre_facture: public item
 
   inline void setStartDate(const std::string & p_start_date);
   inline void setEndDate(const std::string & p_end_date);
-
+  inline uint32_t get_nb_max_facture(void)const;
 
   /**
      Return type of object. This is used to name the corresponding table in database
@@ -96,4 +96,9 @@ std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_facture)
   return s;
 }
 
+//------------------------------------------------------------------------------
+uint32_t livre_facture::get_nb_max_facture(void)const
+{
+  return 50;
+}
 #endif
