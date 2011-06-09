@@ -11,7 +11,8 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   m_db(NULL),
   m_search_client_stmt(NULL),
   m_search_achat_stmt(NULL),
-  m_search_facture_by_client_id_stmt(NULL)
+  m_search_facture_by_client_id_stmt(NULL),
+  m_search_facture_by_livre_facture_id_stmt(NULL)
 {
   // Opening the database
   int l_status = sqlite3_open(p_name.c_str(), &m_db);
@@ -57,7 +58,14 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 
   // Preparing search achat statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<achat>::getClassType() + ".Id, "+ description<facture>::getClassType() +".Date,"+ description<marque>::getClassType() + ".Name,"+description<type_achat>::getClassType()+".Name,Reference,PrixEuro, PrixFranc,Garantie, "+description<facture>::getClassType()+".LivreFactureId FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + ","+ description<facture>::getClassType()+" WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " + 
+				      description<achat>::getClassType() + ".Id, " + 
+				      description<facture>::getClassType() +".Date, " + 
+				      description<marque>::getClassType() + ".Name, " + 
+				      description<type_achat>::getClassType()+".Name, " +
+				      "Reference, " + 
+				      "PrixEuro, " +
+				      "PrixFranc,Garantie, "+description<facture>::getClassType()+".LivreFactureId FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + ","+ description<facture>::getClassType()+" WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get search_client_achat : " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -66,10 +74,75 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 
   // Preparing search_facture_by_client_id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT " + description<facture>::getClassType() + ".Id, "+ description<facture>::getClassType() +".FactureRef,"+ description<facture>::getClassType() + ".Date,"+description<facture>::getClassType()+".LivreFactureId, "+description<facture_status>::getClassType()+".Name FROM " + description<facture>::getClassType() + ","+ description<facture_status>::getClassType() + " WHERE "+ description<facture>::getClassType() + ".Status = " + description<facture_status>::getClassType() + ".Id AND "+description<facture>::getClassType()+".ClientId == $client_id").c_str(),-1,&m_search_facture_by_client_id_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,
+				("SELECT " + 
+				 description<facture>::getClassType() + ".Id, " + 
+				 description<facture>::getClassType() +".FactureRef," + 
+				 description<facture>::getClassType() + ".Date," + 
+				 description<facture>::getClassType()+".LivreFactureId, " + 
+				 description<facture_status>::getClassType()+".Name" + 
+				 " FROM " + 
+				 description<facture>::getClassType() + "," + 
+				 description<facture_status>::getClassType() + 
+				 " WHERE " + 
+				 description<facture>::getClassType() + ".Status" + 
+				 " == " + 
+				 description<facture_status>::getClassType() + ".Id" + 
+				 " AND " + 
+				 description<facture>::getClassType()+".ClientId" + 
+				 " == " + 
+				 "$client_id"
+				 ).c_str(),
+				-1,
+				&m_search_facture_by_client_id_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement get_facture_by_client_id : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
+  // Preparing search_facture_by_livre_id statements
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,
+				("SELECT " + 
+				 description<facture>::getClassType() + ".Id, " +
+				 description<facture>::getClassType() + ".FactureRef, " +
+				 description<facture>::getClassType() + ".Date, " +
+				 description<facture>::getClassType() + ".LivreFactureId, " +
+				 description<facture_status>::getClassType() + ".Name, " +
+				 description<client>::getClassType() + ".Id, " +
+				 description<client>::getClassType() + ".Name, " +
+				 description<client>::getClassType() + ".FirstName, " +
+				 description<client>::getClassType() + ".Address, " +
+				 description<ville>::getClassType() + ".Name " +
+				 " FROM " + 
+				 description<facture>::getClassType() + ", " + 
+				 description<facture_status>::getClassType() + ", " +
+				 description<client>::getClassType() + ", " +
+				 description<ville>::getClassType() +
+				 " WHERE " + 
+				 description<client>::getClassType() + ".Id" +
+				 " == " +
+				 description<facture>::getClassType() + ".ClientId" +
+				 " AND " +
+				 description<facture>::getClassType() + ".Status" + 
+				 " == " + 
+				 description<facture_status>::getClassType() + ".Id"  +
+				 " AND " + 
+				 description<client>::getClassType() + ".VilleId" + 
+				 " == " + 
+				 description<ville>::getClassType() + ".Id" +
+				 " AND " + 
+				 description<facture>::getClassType()+".LivreFactureId" + 
+				 " == " + 
+				 "$livre_facture_id"
+				 ).c_str()
+				,-1,
+				&m_search_facture_by_livre_facture_id_stmt,
+				NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement get_facture_by_livre_facture_id : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -91,6 +164,7 @@ bool fichier_client_db::is_modified(void)const
 fichier_client_db::~fichier_client_db(void)
 {
   cout << "Closing db" << endl ;
+  sqlite3_finalize(m_search_facture_by_livre_facture_id_stmt);
   sqlite3_finalize(m_search_facture_by_client_id_stmt);
   sqlite3_finalize(m_search_achat_stmt);
   sqlite3_finalize(m_search_client_stmt);
@@ -620,6 +694,52 @@ void fichier_client_db::get_facture_by_client_id(uint32_t p_client_id,std::vecto
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during reset of bindings of search_facture_by_client_id statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_search_facture_by_livre_facture_id_stmt,sqlite3_bind_parameter_index(m_search_facture_by_livre_facture_id_stmt,"$livre_facture_id"),p_livre_facture_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of livre_facture_id parameter for search_facture_by_livre_facture_id statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_search_facture_by_livre_facture_id_stmt)) == SQLITE_ROW)
+    {
+      cout << "result siwe = " << p_result.size() << endl ;
+      p_result.push_back(search_facture_client_item(m_search_facture_by_livre_facture_id_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of search_facture_by_livre_facture_id result : " << m_db << endl ;
+      exit(-1);
+    }
+
+  cout << "Facture for livre_facture_id " << p_livre_facture_id << " successfully listed" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_search_facture_by_livre_facture_id_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of search_facture_by_livre_facture_id statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_search_facture_by_livre_facture_id_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of search_facture_by_livre_facture_id statement : " << sqlite3_errmsg(m_db) << endl ;     
       exit(-1);
     }
 }

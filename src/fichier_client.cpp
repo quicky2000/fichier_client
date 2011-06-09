@@ -57,6 +57,14 @@ void fichier_client::get_facture_by_client_id(uint32_t p_client_id,
 }
 
 //------------------------------------------------------------------------------
+void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,
+					      std::vector<search_facture_client_item> & p_result)
+{
+  assert(m_db);
+  m_db->get_facture_by_livre_facture_id(p_livre_facture_id,p_result);
+}
+
+//------------------------------------------------------------------------------
 uint32_t fichier_client::get_livre_facture(uint32_t p_id,livre_facture & p_data)
 {
   assert(m_db);

@@ -9,7 +9,7 @@ class search_client_item
 {
   friend std::ostream& operator<<(std::ostream& s, const search_client_item & p_client);
  public:
-  inline search_client_item(sqlite3_stmt* p_stmt);
+  inline search_client_item(sqlite3_stmt* p_stmt,uint32_t p_offset=0);
   inline uint32_t get_id(void)const;
   inline const std::string & get_name(void)const;
   inline const std::string & get_first_name(void)const;
@@ -30,12 +30,12 @@ inline std::ostream& operator<<(std::ostream& s, const search_client_item & p_it
 
 #include "sqlite3.h"
 
-search_client_item::search_client_item(sqlite3_stmt* p_stmt):
-  m_id(sqlite3_column_int(p_stmt,0)),
-  m_name((const char*)sqlite3_column_text(p_stmt,1)),
-  m_first_name((const char*)sqlite3_column_text(p_stmt,2)),
-  m_address((const char*)sqlite3_column_text(p_stmt,3)),
-  m_city((const char*)sqlite3_column_text(p_stmt,4))
+search_client_item::search_client_item(sqlite3_stmt* p_stmt,uint32_t p_offset):
+  m_id(sqlite3_column_int(p_stmt,p_offset + 0)),
+  m_name((const char*)sqlite3_column_text(p_stmt,p_offset + 1)),
+  m_first_name((const char*)sqlite3_column_text(p_stmt,p_offset + 2)),
+  m_address((const char*)sqlite3_column_text(p_stmt,p_offset + 3)),
+  m_city((const char*)sqlite3_column_text(p_stmt,p_offset + 4))
 {
 }
 
