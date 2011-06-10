@@ -79,6 +79,49 @@ void fichier_client::get_all_livre_facture(std::vector<livre_facture> & p_list)
 }
 
 //------------------------------------------------------------------------------
+void fichier_client::create( facture_status & p_facture_status)
+{
+  assert(m_db);
+  m_db->create(p_facture_status);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::update(const facture_status & p_facture_status)
+{
+  assert(m_db);
+  m_db->update(p_facture_status);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::remove(const facture_status & p_facture_status)
+{
+  assert(m_db);
+  m_db->remove(p_facture_status);
+}
+
+
+//------------------------------------------------------------------------------
+uint32_t fichier_client::get_facture_status(uint32_t p_id,facture_status & p_data)
+{
+  assert(m_db);
+  return m_db->get_facture_status(p_id,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::get_all_facture_status(std::vector<facture_status> & p_list)
+{
+  assert(m_db);
+  m_db->get_all_facture_status(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result)
+{
+  assert(m_db);
+  m_db->get_facture_status_by_name(p_name,p_result);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client::remove(const livre_facture & p_livre_facture)
 {
   assert(m_db);

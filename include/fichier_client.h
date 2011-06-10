@@ -5,6 +5,7 @@
 #include "search_facture_item.h"
 #include "search_facture_client_item.h"
 #include "livre_facture.h"
+#include "facture_status.h"
 #include "achat.h"
 #include <string>
 #include <vector>
@@ -26,25 +27,39 @@ class fichier_client
 
   // Operations on database
   void check_db_coherency(void);
+
+  // Client related operqtions
   void search_client(const std::string & p_name,
 		     const std::string & p_first_name,
 		     const std::string & p_city,
 		     std::vector<search_client_item> & p_result);
 
+  // Achat related operations
   void get_achat_by_client_id(uint32_t p_client_id,
 			      std::vector<search_achat_item> & p_result);
 
+  // Facture related operations
   void get_facture_by_client_id(uint32_t p_client_id,
 				std::vector<search_facture_item> & p_result);
 
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
 
-  uint32_t get_livre_facture(uint32_t p_id,livre_facture & p_data);
-  void get_all_livre_facture(std::vector<livre_facture> & p_list);
-
+  // Livre facture related operations
   void create( livre_facture & p_livre_facture);
   void remove(const livre_facture & p_livre_facture);
   void update(const livre_facture & p_livre_facture);
+  uint32_t get_livre_facture(uint32_t p_id,livre_facture & p_data);
+  void get_all_livre_facture(std::vector<livre_facture> & p_list);
+
+  // Facture status related operations
+  void create( facture_status & p_facture_status);
+  void update(const facture_status & p_facture_status);
+  void remove(const facture_status & p_facture_status);
+  uint32_t get_facture_status(uint32_t p_id,facture_status & p_data);
+  void get_all_facture_status(std::vector<facture_status> & p_list);
+  void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result);
+
+
  
 
  private:
