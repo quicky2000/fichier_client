@@ -9,6 +9,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 fichier_client::fichier_client(void):
+  m_user_interface(NULL),
   m_db(NULL),
   m_db_name("")
 {
@@ -19,6 +20,13 @@ fichier_client::fichier_client(void):
 fichier_client::~fichier_client(void)
 {
   if(m_db)delete m_db; 
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
+{
+  assert(p_user_interface);
+  m_user_interface = p_user_interface;
 }
 
 //------------------------------------------------------------------------------

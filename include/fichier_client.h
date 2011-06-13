@@ -9,13 +9,17 @@
 #include "achat.h"
 #include <string>
 #include <vector>
+
 class fichier_client_db;
+class fichier_client_UI_if;
 
 class fichier_client
 {
  public:
   fichier_client(void);
   ~fichier_client(void);
+
+  void set_user_interface(fichier_client_UI_if * p_user_interface);
 
   // Database file manipulation
   void import_external_sql(const std::string & p_name);
@@ -68,6 +72,7 @@ class fichier_client
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
 
+  fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;
   std::string m_db_name;
   static const std::string m_tmp_db_name;
