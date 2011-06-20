@@ -1,6 +1,7 @@
 #include "fichier_client.h"
 #include "fichier_client_db.h"
 #include "external_sql_importer.h"
+#include "fichier_client_UI_if.h"
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
@@ -27,6 +28,81 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
 {
   assert(p_user_interface);
   m_user_interface = p_user_interface;
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::create_non_attributed_facture(uint32_t p_livre_facture_id)
+{
+  // Check if there are some "non attributed" status available
+  vector<facture_status> l_facture_status_list;
+  assert(m_db);
+  m_db->get_all_facture_status(l_facture_status_list);
+
+  vector<facture_status> l_tmp_status_list;
+  m_db->get_facture_status_by_name(facture_status::get_ok_status(),l_tmp_status_list,true);
+  assert(l_tmp_status_list.size() == 1);
+  uint32_t l_ok_id = l_tmp_status_list[0].get_id();
+  l_tmp_status_list.clear();
+  m_db->get_facture_status_by_name(facture_status::get_non_checked_status(),l_tmp_status_list,true);
+  assert(l_tmp_status_list.size() == 1);
+  uint32_t l_non_checked_id = l_tmp_status_list[0].get_id();
+
+
+  vector<facture_status> l_invalid_facture_status_list;
+
+  vector<facture_status>::const_iterator l_iter = l_facture_status_list.begin();
+  vector<facture_status>::const_iterator l_iter_end = l_facture_status_list.end();
+  while(l_iter != l_iter_end)
+    {
+      if(l_iter->get_id() != l_ok_id && l_iter->get_id() != l_non_checked_id)
+	{
+	  l_invalid_facture_status_list.push_back(*l_iter);
+	}
+      ++l_iter;
+    }
+
+  if(l_invalid_facture_status_list.size())
+    {
+      facture l_facture;
+      bool l_status = m_user_interface->create_non_attributed_facture(l_invalid_facture_status_list,l_facture);
+      if(l_status)
+	{
+	  l_facture.set_livre_facture_id(p_livre_facture_id);
+	  cout << l_facture << endl ;
+	  m_db->create(l_facture);
+	  m_user_interface->refresh_list_facture_of_livre_facture();
+	}
+    }
+  else
+    {
+      assert(m_user_interface);
+      m_user_interface->display_warning_message("Missing \"non attributed\" status","First defined a non attributed_status in facture tab");
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::livre_facture_selected(uint32_t p_id)
+{
+  vector<facture> l_result;
+  assert(m_db);
+  m_db->get_by_livre_facture(p_id,l_result);
+  livre_facture l_selected_livre;
+  m_db->get_livre_facture(p_id,l_selected_livre);
+  if(l_result.size() < l_selected_livre.get_nb_max_facture())
+    {
+      m_user_interface->set_facture_creation_for_selected_livre_enabled(true);
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::livre_facture_selection_changed(bool p_empty_selection)
+{
+  if(p_empty_selection)
+    {
+      m_user_interface->set_delete_livre_facture_enabled(false);
+      m_user_interface->set_modify_livre_facture_enabled(false);
+      m_user_interface->set_facture_creation_for_selected_livre_enabled(false);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -66,10 +142,30 @@ void fichier_client::get_facture_by_client_id(uint32_t p_client_id,
 
 //------------------------------------------------------------------------------
 void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,
-					      std::vector<search_facture_client_item> & p_result)
+						     std::vector<search_facture_client_item> & p_result)
 {
   assert(m_db);
-  m_db->get_facture_by_livre_facture_id(p_livre_facture_id,p_result);
+  std::vector<search_facture_item> l_facture_result;
+  m_db->get_facture_by_livre_facture_id(p_livre_facture_id,l_facture_result);
+
+  std::vector<search_facture_item>::const_iterator l_iter = l_facture_result.begin();
+  std::vector<search_facture_item>::const_iterator l_iter_end = l_facture_result.end();
+  while(l_iter != l_iter_end)
+    {
+      uint32_t l_client_id = l_iter->get_client_id();
+      if(l_client_id)
+	{
+	  search_client_item l_client_item;
+	  m_db->get_complete_client(l_client_id,l_client_item);
+	  p_result.push_back(search_facture_client_item(*l_iter,l_client_item));
+	}
+      else
+	{
+	  p_result.push_back(search_facture_client_item(*l_iter));
+	}
+      ++l_iter;
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -126,7 +222,7 @@ void fichier_client::get_all_facture_status(std::vector<facture_status> & p_list
 void fichier_client::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result)
 {
   assert(m_db);
-  m_db->get_facture_status_by_name(p_name,p_result);
+  m_db->get_facture_status_by_name(p_name,p_result,false);
 }
 
 //------------------------------------------------------------------------------
@@ -139,6 +235,11 @@ void fichier_client::remove(const livre_facture & p_livre_facture)
   if(l_result.size() == 0)
     {
       m_db->remove(p_livre_facture);
+    }
+  else
+    {
+      assert(m_user_interface);
+      m_user_interface->display_warning_message("Cannot delete","Cannot delete this facture book because it contains some facture");
     }
 }
 

@@ -29,6 +29,10 @@ class fichier_client
   void save_as(const std::string & p_name);
   bool need_save(void)const;
 
+  void create_non_attributed_facture(uint32_t p_livre_facture_id);
+  void livre_facture_selected(uint32_t p_id);
+  void livre_facture_selection_changed(bool p_empty_selection);
+
   // Operations on database
   void check_db_coherency(void);
 

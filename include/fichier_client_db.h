@@ -90,7 +90,7 @@ class fichier_client_db
   void remove(const facture_status & p_facture_status);
   uint32_t get_facture_status(uint32_t p_id,facture_status & p_data);
   void get_all_facture_status(std::vector<facture_status> & p_list);
-  void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result);
+  void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result,bool p_exact);
   
   //Management of achat table
   void create( achat & p_achat);
@@ -108,10 +108,11 @@ class fichier_client_db
   void get_all_client(std::vector<client> & p_list );
 
   //Mangement of jointures
+  void get_complete_client(uint32_t p_id,search_client_item & p_result);
   void search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, std::vector<search_client_item> & p_result);
   void get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result);
   void get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result);
-  void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
+  void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_item> & p_result);
 
   void check_db_coherency(void);
   
@@ -127,6 +128,7 @@ class fichier_client_db
   table_client m_table_client;
   information_table m_information_table;
   sqlite3 *m_db;
+  sqlite3_stmt *m_get_complete_client_stmt;
   sqlite3_stmt *m_search_client_stmt;
   sqlite3_stmt *m_search_achat_stmt;
   sqlite3_stmt *m_search_facture_by_client_id_stmt;

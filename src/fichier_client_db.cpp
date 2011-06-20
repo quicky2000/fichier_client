@@ -9,6 +9,7 @@ using namespace std;
 fichier_client_db::fichier_client_db(const std::string &p_name):
   m_modified(false),
   m_db(NULL),
+  m_get_complete_client_stmt(NULL),
   m_search_client_stmt(NULL),
   m_search_achat_stmt(NULL),
   m_search_facture_by_client_id_stmt(NULL),
@@ -45,6 +46,37 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
     {
       cout << "Create db_schema_version" << endl ;
       create_information("db_schema_version",m_schema_version);
+    }
+
+  // Preparing get_complete_client statement
+  //--------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,
+				("SELECT " +
+				 description<client>::getClassType() + ".Id, " +
+				 description<client>::getClassType() + ".Name, " + 
+				 description<client>::getClassType() + ".FirstName, " +
+				 description<client>::getClassType() + ".Address, " +
+				 description<ville>::getClassType() + ".Name " +
+				 " FROM " +
+				 description<client>::getClassType() + ", " +
+				 description<ville>::getClassType() + 
+				 " WHERE "+
+				 description<client>::getClassType() + ".VilleId" +
+				 " == " +
+				 description<ville>::getClassType() + ".Id" +
+				 " AND " +
+				 description<client>::getClassType() + ".Id" +
+				 " == " +
+				 "$client_id"
+				 ).c_str(),
+				-1,
+				&m_get_complete_client_stmt,
+				NULL);
+
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement get_complete_client : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
     }
 
   // Preparing search client statements
@@ -110,32 +142,35 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 				 description<facture>::getClassType() + ".Date, " +
 				 description<facture>::getClassType() + ".LivreFactureId, " +
 				 description<facture_status>::getClassType() + ".Name, " +
-				 description<client>::getClassType() + ".Id, " +
-				 description<client>::getClassType() + ".Name, " +
-				 description<client>::getClassType() + ".FirstName, " +
-				 description<client>::getClassType() + ".Address, " +
-				 description<ville>::getClassType() + ".Name " +
+				 description<facture>::getClassType() + ".ClientId " +
+				 //TO DELETE				 description<client>::getClassType() + ".Id, " +
+				 //TO DELETE				 description<client>::getClassType() + ".Name, " +
+				 //TO DELETE				 description<client>::getClassType() + ".FirstName, " +
+				 //TO DELETE				 description<client>::getClassType() + ".Address, " +
+				 //TO DELETE				 description<ville>::getClassType() + ".Name " +
 				 " FROM " + 
 				 description<facture>::getClassType() + ", " + 
-				 description<facture_status>::getClassType() + ", " +
-				 description<client>::getClassType() + ", " +
-				 description<ville>::getClassType() +
+				 description<facture_status>::getClassType() + " " +
+				 //TO DELETE				 description<client>::getClassType() + ", " +
+				 //TO DELETE				 description<ville>::getClassType() +
 				 " WHERE " + 
-				 description<client>::getClassType() + ".Id" +
-				 " == " +
-				 description<facture>::getClassType() + ".ClientId" +
-				 " AND " +
+				 //TO DELETE				 description<client>::getClassType() + ".Id" +
+				 //TO DELETE				 " == " +
+				 //TO DELETE				 description<facture>::getClassType() + ".ClientId" +
+				 //TO DELETE				 " AND " +
 				 description<facture>::getClassType() + ".Status" + 
 				 " == " + 
 				 description<facture_status>::getClassType() + ".Id"  +
 				 " AND " + 
-				 description<client>::getClassType() + ".VilleId" + 
-				 " == " + 
-				 description<ville>::getClassType() + ".Id" +
-				 " AND " + 
+				 //TO DELETE				 description<client>::getClassType() + ".VilleId" + 
+				 //TO DELETE				 " == " + 
+				 //TO DELETE				 description<ville>::getClassType() + ".Id" +
+				 //TO DELETE				 " AND " + 
 				 description<facture>::getClassType()+".LivreFactureId" + 
 				 " == " + 
-				 "$livre_facture_id"
+				 "$livre_facture_id" +
+				 " ORDER BY " +
+				 description<facture>::getClassType() + ".FactureRef"
 				 ).c_str()
 				,-1,
 				&m_search_facture_by_livre_facture_id_stmt,
@@ -168,6 +203,7 @@ fichier_client_db::~fichier_client_db(void)
   sqlite3_finalize(m_search_facture_by_client_id_stmt);
   sqlite3_finalize(m_search_achat_stmt);
   sqlite3_finalize(m_search_client_stmt);
+  sqlite3_finalize(m_get_complete_client_stmt);
   sqlite3_close(m_db);
 }
 
@@ -458,9 +494,9 @@ void fichier_client_db::get_all_facture_status(std::vector<facture_status> & p_l
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result)
+void fichier_client_db::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result,bool p_exact)
 {
-  m_table_facture_status.get_by_name(p_name,p_result);
+  m_table_facture_status.get_by_name(p_name,p_result,p_exact);
 }
 
 //------------------------------------------------------------------------------
@@ -699,7 +735,7 @@ void fichier_client_db::get_facture_by_client_id(uint32_t p_client_id,std::vecto
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result)
+void fichier_client_db::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_item> & p_result)
 {
   // Binding values to statement
   //----------------------------
@@ -715,7 +751,7 @@ void fichier_client_db::get_facture_by_livre_facture_id(uint32_t p_livre_facture
   while( (l_status = sqlite3_step(m_search_facture_by_livre_facture_id_stmt)) == SQLITE_ROW)
     {
       cout << "result siwe = " << p_result.size() << endl ;
-      p_result.push_back(search_facture_client_item(m_search_facture_by_livre_facture_id_stmt));
+      p_result.push_back(search_facture_item(m_search_facture_by_livre_facture_id_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
@@ -743,6 +779,56 @@ void fichier_client_db::get_facture_by_livre_facture_id(uint32_t p_livre_facture
       exit(-1);
     }
 }
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_complete_client(uint32_t p_client_id,search_client_item & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_get_complete_client_stmt,sqlite3_bind_parameter_index(m_get_complete_client_stmt,"$client_id"),p_client_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of client_id parameter for get_complete_client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  l_status = sqlite3_step(m_get_complete_client_stmt);
+  if(l_status == SQLITE_ROW)
+    {
+      p_result = search_client_item(m_get_complete_client_stmt);
+    }
+
+  // Ensure that ID is unique
+  l_status = sqlite3_step(m_get_complete_client_stmt);
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of get_complete_client result : " << m_db << endl ;
+      exit(-1);
+    }
+
+  cout << "Complete client for client_id " << p_client_id << " successfully get" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_get_complete_client_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of get_complete_client statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_get_complete_client_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of get_complete_client statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client_db::check_db_coherency(void)

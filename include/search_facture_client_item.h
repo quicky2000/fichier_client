@@ -2,7 +2,7 @@
 #define SEARCH_FACTURE_CLIENT_ITEM_H
 #include <iostream>
 #include <stdint.h>
-
+#include <assert.h>
 class sqlite3_stmt;
 
 #include "search_facture_item.h"
@@ -11,7 +11,8 @@ class sqlite3_stmt;
 class search_facture_client_item: public search_facture_item, public search_client_item
 {
  public:
-  inline search_facture_client_item(sqlite3_stmt* p_stmt);
+  inline search_facture_client_item(const search_facture_item & p_item);
+  inline search_facture_client_item(const search_facture_item & p_facture_item,const search_client_item & p_client_item);
 
   inline uint32_t get_id(void)const;
   inline uint32_t get_client_id(void)const;
@@ -28,10 +29,17 @@ inline std::ostream& operator<<(std::ostream& s, const search_facture_client_ite
 #include "sqlite3.h"
 
 //------------------------------------------------------------------------------
-search_facture_client_item::search_facture_client_item(sqlite3_stmt* p_stmt):
-  search_facture_item(p_stmt),
-  search_client_item(p_stmt,5)
+search_facture_client_item::search_facture_client_item(const search_facture_item & p_item):
+  search_facture_item(p_item)
 {
+}
+
+//------------------------------------------------------------------------------
+search_facture_client_item::search_facture_client_item(const search_facture_item & p_facture_item,const search_client_item & p_client_item):
+  search_facture_item(p_facture_item),
+  search_client_item(p_client_item)
+{
+  assert(search_facture_item::get_client_id() == search_client_item::get_id());
 }
 
 //------------------------------------------------------------------------------

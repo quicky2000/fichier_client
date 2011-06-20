@@ -9,6 +9,7 @@ class search_client_item
 {
   friend std::ostream& operator<<(std::ostream& s, const search_client_item & p_client);
  public:
+  inline search_client_item(void);
   inline search_client_item(sqlite3_stmt* p_stmt,uint32_t p_offset=0);
   inline uint32_t get_id(void)const;
   inline const std::string & get_name(void)const;
@@ -30,6 +31,18 @@ inline std::ostream& operator<<(std::ostream& s, const search_client_item & p_it
 
 #include "sqlite3.h"
 
+//------------------------------------------------------------------------------
+search_client_item::search_client_item(void):
+  m_id(0),
+  m_name(""),
+  m_first_name(""),
+  m_address(""),
+  m_city("")
+{
+}
+
+
+//------------------------------------------------------------------------------
 search_client_item::search_client_item(sqlite3_stmt* p_stmt,uint32_t p_offset):
   m_id(sqlite3_column_int(p_stmt,p_offset + 0)),
   m_name((const char*)sqlite3_column_text(p_stmt,p_offset + 1)),
@@ -39,33 +52,39 @@ search_client_item::search_client_item(sqlite3_stmt* p_stmt,uint32_t p_offset):
 {
 }
 
+//------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const search_client_item & p_client)
 {
   s << "{" << p_client.m_id << "," << p_client.m_name << "," << p_client.m_first_name << "," << p_client.m_address << "," << p_client.m_city << "}";
   return s;
 }
 
+//------------------------------------------------------------------------------
 uint32_t search_client_item::get_id(void)const
 {
   return m_id;
 }
 
+//------------------------------------------------------------------------------
 const std::string & search_client_item::get_name(void)const
 {
   return m_name;
 }
 
+//------------------------------------------------------------------------------
 const std::string & search_client_item::get_first_name(void)const
 {
   return m_first_name;
 }
 
+//------------------------------------------------------------------------------
 const std::string & search_client_item::get_address(void)const
 {
   return m_address;
 }
 
 
+//------------------------------------------------------------------------------
 const std::string & search_client_item::get_city(void)const
 {
   return m_city;
