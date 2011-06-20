@@ -12,7 +12,7 @@ template <class T> class named_table:public base_table<T>
   ~named_table(void);
   void set_db(sqlite3 *p_db);
 
-  void get_by_name(const std::string & p_name,std::vector<T> & p_list);
+  void get_by_name(const std::string & p_name,std::vector<T> & p_list, bool p_exact=false);
 
  private:
   sqlite3_stmt *m_get_by_name_stmt;
@@ -49,10 +49,13 @@ template <class T> void named_table<T>::set_db(sqlite3 *p_db)
 }
 
 //------------------------------------------------------------------------------
-template <class T> void named_table<T>::get_by_name(const std::string & p_name,std::vector<T> &p_result)
+template <class T> void named_table<T>::get_by_name(const std::string & p_name,std::vector<T> &p_result,bool p_exact)
 {
-  std::string l_param_value("%");
-  l_param_value += p_name + "%";
+  std::string l_param_value(p_exact ? p_name : "%");
+  if(!p_exact)
+    {
+      l_param_value += p_name + "%";
+    }
 
   // Binding values to statement
   //----------------------------
