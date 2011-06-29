@@ -14,7 +14,6 @@ class fichier_client_UI_if
   virtual void set_facture_creation_for_selected_livre_enabled( bool p_enabled)=0;
   virtual void set_delete_livre_facture_enabled(bool p_enabled)=0;
   virtual void set_modify_livre_facture_enabled(bool p_enabled)=0;
-  virtual bool create_non_attributed_facture(std::vector<facture_status> & p_status_list, facture & p_facture)=0;
   virtual void refresh_list_facture_of_livre_facture(void)=0;
   virtual void set_non_attributed_allowed_facture_references(const std::vector<uint32_t> & p_remaining_refs)=0;
   virtual void set_non_attributed_facture_allowed_livre_ids(const std::vector<uint32_t> & p_livre_ids)=0;
