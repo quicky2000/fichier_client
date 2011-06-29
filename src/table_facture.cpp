@@ -47,7 +47,19 @@ void table_facture::set_db(sqlite3 *p_db)
 
   // Preparing livre facture get by livre facture id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(base_table<facture>::get_db(),("SELECT Id,"+description<facture>::getTableFields()+" FROM " + description<facture>::getClassType() + " WHERE LivreFactureId = $livre_facture_id").c_str(),-1,&m_get_by_livre_facture_stmt,NULL);
+  l_status = sqlite3_prepare_v2(base_table<facture>::get_db(),
+				("SELECT Id," + 
+				 description<facture>::getTableFields() + 
+				 " FROM " + 
+				 description<facture>::getClassType() + 
+				 " WHERE " +
+				 "LivreFactureId = $livre_facture_id" + 
+				 " ORDER BY " + 
+				 description<facture>::getClassType() + ".FactureRef"
+				 ).c_str(),
+				-1,
+				&m_get_by_livre_facture_stmt,
+				NULL);
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during preparation of statement to get " << description<facture>::getClassType() << " item by livre id : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
