@@ -29,9 +29,18 @@ class fichier_client
   void save_as(const std::string & p_name);
   bool need_save(void)const;
 
-  void create_non_attributed_facture(uint32_t p_livre_facture_id);
+  // Livre facture related events
+  bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
   void livre_facture_selected(uint32_t p_id);
-  void livre_facture_selection_changed(bool p_empty_selection);
+  void no_more_livre_facture_selected(void);
+
+  // Non attributed facture related events
+  void create_non_attributed_facture(uint32_t p_livre_facture_id);
+  void refresh_non_attributed_facture_status_list(void);
+  void non_attributed_facture_date_entered(void);
+  void non_attributed_facture_reference_selected(void);
+  void non_attributed_facture_status_selected(void);
+  void non_attributed_facture_livre_facture_selected(void);
 
   // Operations on database
   void check_db_coherency(void);
@@ -75,6 +84,10 @@ class fichier_client
   void open_tmp_db(void);
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
+
+  void get_non_attributed_status_list(std::vector<facture_status> & p_result);
+  void check_non_attributed_facture(void);
+  void refresh_non_attributed_facture_list(void);
 
   fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;
