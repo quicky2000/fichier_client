@@ -143,29 +143,14 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 				 description<facture>::getClassType() + ".LivreFactureId, " +
 				 description<facture_status>::getClassType() + ".Name, " +
 				 description<facture>::getClassType() + ".ClientId " +
-				 //TO DELETE				 description<client>::getClassType() + ".Id, " +
-				 //TO DELETE				 description<client>::getClassType() + ".Name, " +
-				 //TO DELETE				 description<client>::getClassType() + ".FirstName, " +
-				 //TO DELETE				 description<client>::getClassType() + ".Address, " +
-				 //TO DELETE				 description<ville>::getClassType() + ".Name " +
 				 " FROM " + 
 				 description<facture>::getClassType() + ", " + 
 				 description<facture_status>::getClassType() + " " +
-				 //TO DELETE				 description<client>::getClassType() + ", " +
-				 //TO DELETE				 description<ville>::getClassType() +
 				 " WHERE " + 
-				 //TO DELETE				 description<client>::getClassType() + ".Id" +
-				 //TO DELETE				 " == " +
-				 //TO DELETE				 description<facture>::getClassType() + ".ClientId" +
-				 //TO DELETE				 " AND " +
 				 description<facture>::getClassType() + ".Status" + 
 				 " == " + 
 				 description<facture_status>::getClassType() + ".Id"  +
 				 " AND " + 
-				 //TO DELETE				 description<client>::getClassType() + ".VilleId" + 
-				 //TO DELETE				 " == " + 
-				 //TO DELETE				 description<ville>::getClassType() + ".Id" +
-				 //TO DELETE				 " AND " + 
 				 description<facture>::getClassType()+".LivreFactureId" + 
 				 " == " + 
 				 "$livre_facture_id" +
