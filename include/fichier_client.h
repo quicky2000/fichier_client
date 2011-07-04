@@ -31,8 +31,13 @@ class fichier_client
 
   // Livre facture related events
   bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
-  void livre_facture_selected(uint32_t p_id);
-  void no_more_livre_facture_selected(void);
+  void treat_livre_facture_selected_event(void);
+  void treat_no_more_livre_facture_selected_event(void);
+  void treat_livre_facture_id_modif_event(void);
+  void treat_livre_facture_content_modif_event(void);
+  void treat_delete_livre_facture_event(void);
+  void treat_modify_livre_facture_event(void);
+  void treat_create_livre_facture_event(void);
 
   // Non attributed facture related events
   void create_non_attributed_facture(uint32_t p_livre_facture_id);
@@ -59,14 +64,6 @@ class fichier_client
   void get_facture_by_client_id(uint32_t p_client_id,
 				std::vector<search_facture_item> & p_result);
 
-  void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
-
-  // Livre facture related operations
-  void create( livre_facture & p_livre_facture);
-  void remove(const livre_facture & p_livre_facture);
-  void update(const livre_facture & p_livre_facture);
-  uint32_t get_livre_facture(uint32_t p_id,livre_facture & p_data);
-  void get_all_livre_facture(std::vector<livre_facture> & p_list);
 
   // Facture status related operations
   void create( facture_status & p_facture_status);
@@ -76,9 +73,6 @@ class fichier_client
   void get_all_facture_status(std::vector<facture_status> & p_list);
   void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result);
 
-
- 
-
  private:
   void remove_tmp_db(void);
   void open_tmp_db(void);
@@ -87,7 +81,11 @@ class fichier_client
 
   void get_non_attributed_status_list(std::vector<facture_status> & p_result);
   void check_non_attributed_facture(void);
+  void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);
+  void refresh_livre_facture_list(void);
+
+  void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
 
   fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;

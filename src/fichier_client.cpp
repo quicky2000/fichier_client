@@ -30,6 +30,112 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
   m_user_interface = p_user_interface;
 }
 
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_delete_livre_facture_event(void)
+{
+  std::cout << "Fichier_cient Event::delete_livre_facture event" << std::endl;
+  assert(m_user_interface);
+  // Get selected livre facture id
+  uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+
+  assert(l_livre_facture_id);
+  assert(m_db);
+
+  // Ensure there are no related factures
+  std::vector<facture> l_related_factures;
+  m_db->get_by_livre_facture(l_livre_facture_id,l_related_factures);
+  assert(!l_related_factures.size());
+
+  // Remove livre facture
+  livre_facture l_selected;
+  m_db->get_livre_facture(l_livre_facture_id,l_selected);
+  m_db->remove(l_selected);
+  
+  // Clear related information in UI
+  m_user_interface->set_delete_livre_facture_enabled(false);
+  m_user_interface->set_modify_livre_facture_enabled(false);
+  m_user_interface->set_create_livre_facture_enabled(false);
+  m_user_interface->clear_livre_facture_information();
+
+  // Update livre facture list
+  refresh_livre_facture_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_modify_livre_facture_event(void)
+{
+  std::cout << "Fichier_cient Event::modify_livre_facture event" << std::endl;
+
+  assert(m_user_interface);
+  assert(m_user_interface->is_livre_facture_start_date_complete());
+  assert(m_user_interface->is_livre_facture_end_date_complete());
+  std::string l_start_date = m_user_interface->get_livre_facture_start_date();
+  std::string l_end_date = m_user_interface->get_livre_facture_end_date();
+  assert(l_start_date < l_end_date);
+
+  // Get selected livre facture id
+  uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+  
+  assert(l_livre_facture_id);
+  assert(m_db);
+
+  // Get selected livre facture
+  livre_facture l_selected;
+  m_db->get_livre_facture(l_livre_facture_id,l_selected);
+
+  // Update livre_facture
+  l_selected.setStartDate(l_start_date);
+  l_selected.setEndDate(l_end_date);
+  m_db->update(l_selected);
+
+  // Update UI
+  m_user_interface->set_livre_facture_start_date("");
+  m_user_interface->set_livre_facture_end_date("");
+  refresh_livre_facture_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_create_livre_facture_event(void)
+{
+  std::cout << "Fichier_cient Event::Create livre_facture event" << std::endl;
+  assert(m_user_interface);
+  assert(m_user_interface->get_livre_facture_id().size()==6);
+  assert(m_user_interface->is_livre_facture_start_date_complete());
+  assert(m_user_interface->is_livre_facture_end_date_complete());
+  std::string l_start_date = m_user_interface->get_livre_facture_start_date();
+  std::string l_end_date = m_user_interface->get_livre_facture_end_date();
+  assert(l_start_date < l_end_date);
+
+  uint32_t l_livre_facture_id = strtol(m_user_interface->get_livre_facture_id().c_str(),NULL,10);
+
+  livre_facture l_dummy_livre;
+  assert(m_db);
+  assert(m_db->get_livre_facture(l_livre_facture_id,l_dummy_livre)==0);
+
+  // Create livre
+  livre_facture l_livre(l_livre_facture_id,
+			l_start_date,
+			l_end_date);
+  m_db->create(l_livre);
+
+  // Update UI
+  m_user_interface->set_create_livre_facture_enabled(false);
+  m_user_interface->set_livre_facture_start_date("");
+  m_user_interface->set_livre_facture_end_date("");
+  m_user_interface->set_livre_facture_id("");
+  refresh_livre_facture_list();
+}
+
+
+//------------------------------------------------------------------------------
+void fichier_client::refresh_livre_facture_list(void)
+{
+  std::vector<livre_facture> l_list;
+  m_db->get_all_livre_facture(l_list);
+  m_user_interface->refresh_livre_facture_list(l_list);
+}
+
 //------------------------------------------------------------------------------
 void fichier_client::refresh_non_attributed_facture_status_list(void)
 {
@@ -74,8 +180,6 @@ void fichier_client::get_non_attributed_status_list(std::vector<facture_status> 
 	}
       ++l_iter;
     }
-
-
 }
 
 //------------------------------------------------------------------------------
@@ -93,54 +197,8 @@ void fichier_client::create_non_attributed_facture(uint32_t p_livre_facture_id)
 		    );
   cout << l_facture << endl ;
   m_db->create(l_facture);
-  m_user_interface->refresh_list_facture_of_livre_facture();
+  m_user_interface->set_delete_livre_facture_enabled(false);
   refresh_non_attributed_facture_list();
-		    
-  //TO DELETE  // Check if there are some "non attributed" status available
-  //TO DELETE  vector<facture_status> l_facture_status_list;
-  //TO DELETE  assert(m_db);
-  //TO DELETE  m_db->get_all_facture_status(l_facture_status_list);
-  //TO DELETE
-  //TO DELETE  vector<facture_status> l_tmp_status_list;
-  //TO DELETE  m_db->get_facture_status_by_name(facture_status::get_ok_status(),l_tmp_status_list,true);
-  //TO DELETE  assert(l_tmp_status_list.size() == 1);
-  //TO DELETE  uint32_t l_ok_id = l_tmp_status_list[0].get_id();
-  //TO DELETE  l_tmp_status_list.clear();
-  //TO DELETE  m_db->get_facture_status_by_name(facture_status::get_non_checked_status(),l_tmp_status_list,true);
-  //TO DELETE  assert(l_tmp_status_list.size() == 1);
-  //TO DELETE  uint32_t l_non_checked_id = l_tmp_status_list[0].get_id();
-  //TO DELETE
-  //TO DELETE
-  //TO DELETE  vector<facture_status> l_invalid_facture_status_list;
-  //TO DELETE
-  //TO DELETE  vector<facture_status>::const_iterator l_iter = l_facture_status_list.begin();
-  //TO DELETE  vector<facture_status>::const_iterator l_iter_end = l_facture_status_list.end();
-  //TO DELETE  while(l_iter != l_iter_end)
-  //TO DELETE    {
-  //TO DELETE      if(l_iter->get_id() != l_ok_id && l_iter->get_id() != l_non_checked_id)
-  //TO DELETE	{
-  //TO DELETE	  l_invalid_facture_status_list.push_back(*l_iter);
-  //TO DELETE	}
-  //TO DELETE      ++l_iter;
-  //TO DELETE    }
-  //TO DELETE
-  //TO DELETE  if(l_invalid_facture_status_list.size())
-  //TO DELETE    {
-  //TO DELETE      facture l_facture;
-  //TO DELETE      bool l_status = m_user_interface->create_non_attributed_facture(l_invalid_facture_status_list,l_facture);
-  //TO DELETE      if(l_status)
-  //TO DELETE	{
-  //TO DELETE	  l_facture.set_livre_facture_id(p_livre_facture_id);
-  //TO DELETE	  cout << l_facture << endl ;
-  //TO DELETE	  m_db->create(l_facture);
-  //TO DELETE	  m_user_interface->refresh_list_facture_of_livre_facture();
-  //TO DELETE	}
-  //TO DELETE    }
-  //TO DELETE  else
-  //TO DELETE    {
-  //TO DELETE      assert(m_user_interface);
-  //TO DELETE      m_user_interface->display_warning_message("Missing \"non attributed\" status","First defined a non attributed_status in facture tab");
-  //TO DELETE    }
 }
 
 
@@ -174,26 +232,42 @@ bool fichier_client::check_new_facture_id(uint32_t p_facture_id, uint32_t p_livr
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::livre_facture_selected(uint32_t p_id)
+void fichier_client::treat_livre_facture_selected_event(void)
 {
-  std::cout << "Fichier_cient Event :: Livre_facture selected " << p_id << std::endl;
-  vector<facture> l_result;
+ std::cout << "Fichier_client Event :: Livre_facture selected " << std::endl;
+ assert(m_user_interface);
+ assert(!m_user_interface->is_livre_facture_selection_empty());
+ uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+
+ vector<facture> l_list_facture;
   assert(m_db);
   // Get factures related to selected livre_facture
-  m_db->get_by_livre_facture(p_id,l_result);
+  m_db->get_by_livre_facture(l_livre_facture_id,l_list_facture);
+
+  // Allowed delete button if there are no factures
+  m_user_interface->set_delete_livre_facture_enabled(!l_list_facture.size());
 
   // Get livre_facture object
   livre_facture l_selected_livre;
-  m_db->get_livre_facture(p_id,l_selected_livre);
+  m_db->get_livre_facture(l_livre_facture_id,l_selected_livre);
+
+  // Set lvire facture inforamtion with information of selected livre
+  stringstream l_livre_id_str;
+  l_livre_id_str << l_selected_livre.get_id();
+  m_user_interface->set_livre_facture_id(l_livre_id_str.str());
+  m_user_interface->set_livre_facture_start_date(l_selected_livre.getStartDate());
+  m_user_interface->set_livre_facture_end_date(l_selected_livre.getEndDate());
+
+  refresh_non_attributed_facture_list();
 
   // Check if livre facture is complete or not
-  if(l_result.size() < l_selected_livre.get_nb_max_facture())
+  if(l_list_facture.size() < l_selected_livre.get_nb_max_facture())
     {
 
       // Computing remaining references
       std::vector<uint32_t> l_remaining_refs;
-      std::vector<facture>::const_iterator l_iter = l_result.begin();
-      std::vector<facture>::const_iterator l_iter_end = l_result.end();
+      std::vector<facture>::const_iterator l_iter = l_list_facture.begin();
+      std::vector<facture>::const_iterator l_iter_end = l_list_facture.end();
       for(uint32_t l_index = 1 ; l_index <= l_selected_livre.get_nb_max_facture(); ++l_index)
 	{
 	  //Check if there are still defined factures
@@ -221,7 +295,7 @@ void fichier_client::livre_facture_selected(uint32_t p_id)
       m_user_interface->clear_non_attributed_facture_date();
       m_user_interface->set_non_attributed_allowed_facture_references(l_remaining_refs);
       vector<uint32_t> l_allowed_books;
-      l_allowed_books.push_back(p_id);
+      l_allowed_books.push_back(l_livre_facture_id);
       m_user_interface->set_non_attributed_facture_allowed_livre_ids(l_allowed_books);
       m_user_interface->enable_non_attributed_facture_fields(true);      
     }
@@ -236,16 +310,134 @@ void fichier_client::livre_facture_selected(uint32_t p_id)
 //------------------------------------------------------------------------------
 void fichier_client::refresh_non_attributed_facture_list(void)
 {
-  
+    vector<search_facture_client_item> l_list_facture;
+    assert(m_user_interface);
+    if(!m_user_interface->is_livre_facture_selection_empty())
+      {
+	uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+	assert(m_db);
+	get_facture_by_livre_facture_id(l_livre_facture_id,l_list_facture);
+      }
+    m_user_interface->refresh_list_facture_of_livre_facture(l_list_facture);
 }
 
 
 //------------------------------------------------------------------------------
-void fichier_client::no_more_livre_facture_selected(void)
+void fichier_client::treat_no_more_livre_facture_selected_event(void)
 {
   std::cout << "Fichier_cient Event :: No more livre_facture selected " << std::endl;
   m_user_interface->set_delete_livre_facture_enabled(false);
   m_user_interface->set_modify_livre_facture_enabled(false);
+  m_user_interface->set_create_livre_facture_enabled(false);
+  refresh_non_attributed_facture_list();
+  // Set lvire facture inforamtion with information of selected livre
+  m_user_interface->set_livre_facture_id("");
+  m_user_interface->set_livre_facture_start_date("");
+  m_user_interface->set_livre_facture_end_date("");
+  m_user_interface->clear_non_attributed_facture_date();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_livre_facture_id_modif_event(void)
+{
+  std::cout << "Fichier_cient Event :: Livre_facture Id modif event" << std::endl;
+  assert(m_user_interface);
+  m_user_interface->set_create_livre_facture_enabled(false);
+  std::string l_livre_id = m_user_interface->get_livre_facture_id();
+  std::vector<livre_facture> l_list_livre_facture;
+  assert(m_db);
+  if(l_livre_id.length() == 6)
+    {
+      livre_facture l_list_facture ;
+      uint32_t l_status = m_db->get_livre_facture(strtol(l_livre_id.c_str(),NULL,10),l_list_facture);
+      if(l_status == 1)
+	{
+	  l_list_livre_facture.push_back(l_list_facture); 
+	}
+      else
+	{
+	  m_user_interface->display_information_message("Recherche livre facture",std::string("Pas de livre de facture avec l'Id ")+l_livre_id+"\nVous pourrez le créer en cliquant sur le bouton \"Créer\" après avoir renseigné les dates");
+	  m_user_interface->set_livre_facture_start_date("");
+	  m_user_interface->set_livre_facture_end_date("");
+	}
+    }
+  else
+    {
+      m_db->get_all_livre_facture(l_list_livre_facture);
+    }
+  m_user_interface->refresh_livre_facture_list(l_list_livre_facture);
+  
+  check_livre_facture_information();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_livre_facture_content_modif_event(void)
+{
+    std::cout << "Fichier_client Event :: Livre_facture content modif event" << std::endl;
+    check_livre_facture_information(); 
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::check_livre_facture_information(void)
+{
+
+  bool l_date_ok = false;
+  bool l_creation_ok = false;
+  bool l_modification_ok = false;
+  assert(m_user_interface);
+  string l_start_date;
+  string l_end_date;
+  if(m_user_interface->is_livre_facture_start_date_complete() && m_user_interface->is_livre_facture_end_date_complete())
+    {
+      l_start_date = m_user_interface->get_livre_facture_start_date();
+      l_end_date = m_user_interface->get_livre_facture_end_date();      
+      if(l_start_date < l_end_date)
+	{
+	  l_date_ok = true;
+	}
+      else
+	{
+	  m_user_interface->display_warning_message("Problème de date","La date de fin est postérieure à la date de départ");
+	}
+
+    }
+
+  std::string l_livre_id_str = m_user_interface->get_livre_facture_id();
+  if(l_livre_id_str.length() == 6)
+    {
+      if(l_date_ok)
+	{
+	  assert(m_db);
+	  livre_facture l_result ;
+	  uint32_t l_livre_id = strtol(l_livre_id_str.c_str(),NULL,10);
+	  uint32_t l_status = m_db->get_livre_facture(l_livre_id,l_result);
+	  if(!l_status)
+	    {
+	      l_creation_ok = true;
+	    }
+	  else
+	    {	   
+	      if(!m_user_interface->is_livre_facture_selection_empty())
+		{
+		  std::pair<std::string,std::string> l_min_max_date = m_db->get_min_max_date(l_livre_id);
+		  if(l_start_date > l_min_max_date.first)
+		    {
+		      l_date_ok = false;
+		      m_user_interface->display_warning_message("Problème de date","La facture la plus ancienne du livre est plus ancienne que la nouvelle date de début : " + l_min_max_date.first + " < " + l_start_date); 
+		    }
+		  if(l_end_date < l_min_max_date.second)
+		    {
+		      l_date_ok = false;
+		      m_user_interface->display_warning_message("Problème de date","La facture la plus récente du livre est plus ancienne que la nouvelle date de fin : " + l_min_max_date.second + " > " + l_end_date); 
+		    }
+		  l_modification_ok = (l_date_ok && (l_start_date != l_result.getStartDate() || l_end_date != l_result.getEndDate()));
+		}
+	    }
+	  
+	}
+    }
+  m_user_interface->set_create_livre_facture_enabled(l_creation_ok);
+  m_user_interface->set_modify_livre_facture_enabled(l_modification_ok);
 }
 
 //------------------------------------------------------------------------------
@@ -361,48 +553,6 @@ void fichier_client::get_facture_by_client_id(uint32_t p_client_id,
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,
-						     std::vector<search_facture_client_item> & p_result)
-{
-  assert(m_db);
-  std::vector<search_facture_item> l_facture_result;
-  m_db->get_facture_by_livre_facture_id(p_livre_facture_id,l_facture_result);
-
-  std::vector<search_facture_item>::const_iterator l_iter = l_facture_result.begin();
-  std::vector<search_facture_item>::const_iterator l_iter_end = l_facture_result.end();
-  while(l_iter != l_iter_end)
-    {
-      uint32_t l_client_id = l_iter->get_client_id();
-      if(l_client_id)
-	{
-	  search_client_item l_client_item;
-	  m_db->get_complete_client(l_client_id,l_client_item);
-	  p_result.push_back(search_facture_client_item(*l_iter,l_client_item));
-	}
-      else
-	{
-	  p_result.push_back(search_facture_client_item(*l_iter));
-	}
-      ++l_iter;
-    }
-
-}
-
-//------------------------------------------------------------------------------
-uint32_t fichier_client::get_livre_facture(uint32_t p_id,livre_facture & p_data)
-{
-  assert(m_db);
-  return m_db->get_livre_facture(p_id,p_data);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::get_all_livre_facture(std::vector<livre_facture> & p_list)
-{
-  assert(m_db);
-  m_db->get_all_livre_facture(p_list);
-}
-
-//------------------------------------------------------------------------------
 void fichier_client::create( facture_status & p_facture_status)
 {
   assert(m_db);
@@ -443,38 +593,6 @@ void fichier_client::get_facture_status_by_name(const std::string & p_name,std::
 {
   assert(m_db);
   m_db->get_facture_status_by_name(p_name,p_result,false);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::remove(const livre_facture & p_livre_facture)
-{
-  assert(m_db);
-  uint32_t l_livre_facture_id = p_livre_facture.get_id();
-  vector<facture> l_result;
-  m_db->get_by_livre_facture(l_livre_facture_id,l_result);
-  if(l_result.size() == 0)
-    {
-      m_db->remove(p_livre_facture);
-    }
-  else
-    {
-      assert(m_user_interface);
-      m_user_interface->display_warning_message("Cannot delete","Cannot delete this facture book because it contains some facture");
-    }
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::update(const livre_facture & p_livre_facture)
-{
-  assert(m_db);
-  m_db->update(p_livre_facture);
-}
- 
-//------------------------------------------------------------------------------
-void fichier_client::create( livre_facture & p_livre_facture)
-{
-  assert(m_db);
-  m_db->create(p_livre_facture);
 }
 
 //------------------------------------------------------------------------------
@@ -570,6 +688,34 @@ void fichier_client::copy(const std::string & p_src,const std::string & p_dest)
     }
   l_input_file.close();
   l_output_file.close();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,
+						     std::vector<search_facture_client_item> & p_result)
+{
+  assert(m_db);
+  std::vector<search_facture_item> l_facture_result;
+  m_db->get_facture_by_livre_facture_id(p_livre_facture_id,l_facture_result);
+
+  std::vector<search_facture_item>::const_iterator l_iter = l_facture_result.begin();
+  std::vector<search_facture_item>::const_iterator l_iter_end = l_facture_result.end();
+  while(l_iter != l_iter_end)
+    {
+      uint32_t l_client_id = l_iter->get_client_id();
+      if(l_client_id)
+	{
+	  search_client_item l_client_item;
+	  m_db->get_complete_client(l_client_id,l_client_item);
+	  p_result.push_back(search_facture_client_item(*l_iter,l_client_item));
+	}
+      else
+	{
+	  p_result.push_back(search_facture_client_item(*l_iter));
+	}
+      ++l_iter;
+    }
+
 }
 
 const std::string fichier_client::m_tmp_db_name = "tmp_db";
