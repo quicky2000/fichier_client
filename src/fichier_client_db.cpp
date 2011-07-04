@@ -317,6 +317,33 @@ void fichier_client_db::get_by_livre_facture_and_ref(uint32_t p_facture_ref, uin
 }
 
 //------------------------------------------------------------------------------
+std::pair<std::string,std::string> fichier_client_db::get_min_max_date(uint32_t p_livre_facture_id)
+{
+  std::string l_min_date("9999-99-99");
+  std::string l_max_date("0000-00-00");
+  std::vector<facture> l_facture_list;
+  get_by_livre_facture(p_livre_facture_id,l_facture_list);
+  std::vector<facture>::const_iterator l_iter = l_facture_list.begin();
+  std::vector<facture>::const_iterator l_iter_end = l_facture_list.end();
+  while(l_iter != l_iter_end)
+    {
+      if(l_iter->get_date() != "")
+	{
+	  if(l_iter->get_date() < l_min_date)
+	    {
+	      l_min_date = l_iter->get_date();
+	    }
+	  if(l_iter->get_date() > l_max_date)
+	    {
+	      l_max_date = l_iter->get_date();
+	    }
+	}
+      ++l_iter;
+    }
+  return std::pair<std::string,std::string>(l_min_date,l_max_date);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client_db::get_by_livre_facture(uint32_t p_livre_facture_id,std::vector<facture> & p_result)
 {
   m_table_facture.get_by_livre_facture(p_livre_facture_id,p_result);
