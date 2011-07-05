@@ -90,7 +90,6 @@ class fichier_client
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
 
-  //TO DELETE  void get_non_attributed_status_list(std::vector<facture_status> & p_result);
   void check_non_attributed_facture(void);
   void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);

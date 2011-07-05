@@ -143,8 +143,7 @@ void fichier_client::refresh_non_attributed_facture_status_list(void)
   std::vector<facture_status> l_non_attributed_facture_status_list;
   assert(m_db);
   m_db->get_all_facture_status(l_non_attributed_facture_status_list);
-  //TO DELETE  get_non_attributed_status_list(l_non_attributed_facture_status_list);
-    m_user_interface->set_non_attributed_facture_status_list(l_non_attributed_facture_status_list);
+  m_user_interface->set_non_attributed_facture_status_list(l_non_attributed_facture_status_list);
   if(!l_non_attributed_facture_status_list.size())
     {
       m_user_interface->display_warning_message("Status de facture manquants","Aucun statut n'a été défini pour les factures non attribuées");
@@ -164,37 +163,6 @@ void fichier_client::refresh_non_attributed_facture_reason_list(void)
       m_user_interface->display_warning_message("Raison de facture non attribuee manquante","Aucune raison n'a été définie pour les factures non attribuées");
     }
 }
-
-
-
-//------------------------------------------------------------------------------
-//TO DELETEvoid fichier_client::get_non_attributed_status_list(std::vector<facture_status> & p_result)
-//TO DELETE{
-//TO DELETE  vector<facture_status> l_facture_status_list;
-//TO DELETE  assert(m_db);
-//TO DELETE  m_db->get_all_facture_status(l_facture_status_list);
-//TO DELETE
-//TO DELETE  vector<facture_status> l_tmp_status_list;
-//TO DELETE  m_db->get_facture_status_by_name(facture_status::get_ok_status(),l_tmp_status_list,true);
-//TO DELETE  assert(l_tmp_status_list.size() == 1);
-//TO DELETE  uint32_t l_ok_id = l_tmp_status_list[0].get_id();
-//TO DELETE  l_tmp_status_list.clear();
-//TO DELETE  m_db->get_facture_status_by_name(facture_status::get_non_checked_status(),l_tmp_status_list,true);
-//TO DELETE  assert(l_tmp_status_list.size() == 1);
-//TO DELETE  uint32_t l_non_checked_id = l_tmp_status_list[0].get_id();
-//TO DELETE
-//TO DELETE
-//TO DELETE  vector<facture_status>::const_iterator l_iter = l_facture_status_list.begin();
-//TO DELETE  vector<facture_status>::const_iterator l_iter_end = l_facture_status_list.end();
-//TO DELETE  while(l_iter != l_iter_end)
-//TO DELETE    {
-//TO DELETE      if(l_iter->get_id() != l_ok_id && l_iter->get_id() != l_non_checked_id)
-//TO DELETE	{
-//TO DELETE	  p_result.push_back(*l_iter);
-//TO DELETE	}
-//TO DELETE      ++l_iter;
-//TO DELETE    }
-//TO DELETE}
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_create_non_attributed_facture_event(void)
