@@ -1,4 +1,5 @@
 #include "fichier_client_db.h"
+#include "compatibility_db.h"
 #include <sqlite3.h>
 #include <iostream>
 #include <stdlib.h>
@@ -15,6 +16,10 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   m_search_facture_by_client_id_stmt(NULL),
   m_search_facture_by_livre_facture_id_stmt(NULL)
 {
+  // Opening the database in compatibility mode
+  compatibility_db * l_compatibility_db = new compatibility_db(p_name,m_schema_version);
+  delete l_compatibility_db;
+
   // Opening the database
   int l_status = sqlite3_open(p_name.c_str(), &m_db);
   if(l_status == SQLITE_OK)
@@ -962,6 +967,6 @@ void fichier_client_db::check_db_coherency(void)
   cout << "End of database coherency checking" << endl ;
 }
 
-const std::string fichier_client_db::m_schema_version = "1.0";
+const std::string fichier_client_db::m_schema_version = "1.1";
 
 //EOF
