@@ -618,20 +618,22 @@ void fichier_client::treat_facture_status_name_modif_event(void)
    std::string l_status_name = m_user_interface->get_facture_status_name();
 
     vector<facture_status> l_facture_status_list;
+    vector<facture_status> l_facture_status_filtered_list;
     assert(m_db);
     if(l_status_name != "")
       {
-	m_db->get_facture_status_by_name(l_status_name,l_facture_status_list,false);
+	m_db->get_facture_status_by_name(l_status_name,l_facture_status_list,true);
+	m_db->get_facture_status_by_name(l_status_name,l_facture_status_filtered_list,false);
       }
     else
       {
-	m_db->get_all_facture_status(l_facture_status_list);
+	m_db->get_all_facture_status(l_facture_status_filtered_list);
       }
 
     if(!m_facture_status_pending_modif)
     {
-      m_user_interface->set_create_facture_status_enabled(l_facture_status_list.size()==0);
-      m_user_interface->refresh_facture_status_list(l_facture_status_list);
+      m_user_interface->set_create_facture_status_enabled(l_facture_status_list.size()==0 && l_status_name != "");
+      m_user_interface->refresh_facture_status_list(l_facture_status_filtered_list);
     }
   else
     {
@@ -645,9 +647,7 @@ void fichier_client::treat_facture_status_name_modif_event(void)
       // Check if modified value is acceptable
       if(l_name_ok)
 	{
-	  std::vector<facture_status> l_already;
-	  m_db->get_facture_status_by_name(l_status_name,l_already,true);
-	  l_name_ok = l_already.size()==0;
+	  l_name_ok = l_facture_status_list.size() == 0;
 	}
       m_user_interface->set_modify_facture_status_enabled(l_name_ok);
     }  
@@ -815,20 +815,22 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
    std::string l_reason_name = m_user_interface->get_facture_reason_name();
 
     vector<facture_reason> l_facture_reason_list;
+    vector<facture_reason> l_facture_reason_filtered_list;
     assert(m_db);
     if(l_reason_name != "")
       {
-	m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_list,false);
+	m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_list,true);
+	m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_filtered_list,false);
       }
     else
       {
-	m_db->get_all_facture_reason(l_facture_reason_list);
+	m_db->get_all_facture_reason(l_facture_reason_filtered_list);
       }
 
     if(!m_facture_reason_pending_modif)
     {
-      m_user_interface->set_create_facture_reason_enabled(l_facture_reason_list.size()==0);
-      m_user_interface->refresh_facture_reason_list(l_facture_reason_list);
+      m_user_interface->set_create_facture_reason_enabled(l_facture_reason_list.size()==0 && l_reason_name != "");
+      m_user_interface->refresh_facture_reason_list(l_facture_reason_filtered_list);
     }
   else
     {
@@ -842,9 +844,7 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
       // Check if modified value is acceptable
       if(l_name_ok)
 	{
-	  std::vector<facture_reason> l_already;
-	  m_db->get_facture_reason_by_name(l_reason_name,l_already,true);
-	  l_name_ok = l_already.size()==0;
+	  l_name_ok = l_facture_reason_list.size()==0;
 	}
       m_user_interface->set_modify_facture_reason_enabled(l_name_ok);
     }  
