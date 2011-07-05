@@ -33,7 +33,7 @@ class fichier_client_UI_if
   virtual void set_modify_livre_facture_enabled(bool p_enabled)=0;
   virtual void set_create_livre_facture_enabled(bool p_enabled)=0;
 
-  // Interactions with non attribtued facture information
+  // Interactions with non attributed facture information
   virtual void set_non_attributed_allowed_facture_references(const std::vector<uint32_t> & p_remaining_refs)=0;
   virtual void set_non_attributed_facture_allowed_livre_ids(const std::vector<uint32_t> & p_livre_ids)=0;
   virtual void set_non_attributed_facture_status_list(const std::vector<facture_status> & p_status_list)=0;
@@ -52,6 +52,22 @@ class fichier_client_UI_if
   // Interactions with non attributed facture buttons
   virtual void set_facture_creation_for_selected_livre_enabled( bool p_enabled)=0;
 
+  // Interactions with facture status information
+  virtual void clear_facture_status_information(void)=0;
+  virtual void set_facture_status_name(const std::string & p_name)=0;  
+  virtual const std::string get_facture_status_name(void)const=0;
+
+  // Interactions with facture status list
+  virtual bool is_facture_status_selection_empty(void)const=0;
+  virtual uint32_t get_selected_facture_status_id(void)const=0;
+  virtual void refresh_facture_status_list(std::vector<facture_status> & p_list)=0;
+  virtual void set_facture_status_list_enabled(bool p_enable)=0;
+
+  // Interactions with facture status actions
+  virtual void set_create_facture_status_enabled(bool p_enable)=0;
+  virtual void set_delete_facture_status_enabled(bool p_enable)=0;
+  virtual void set_modify_facture_status_enabled(bool p_enable)=0;
+  virtual void set_modify_facture_status_action_name(const std::string & p_name)=0;
 };
 
 #endif

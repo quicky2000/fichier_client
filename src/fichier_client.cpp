@@ -10,6 +10,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 fichier_client::fichier_client(void):
+  m_facture_status_pending_modif(false),
   m_user_interface(NULL),
   m_db(NULL),
   m_db_name("")
@@ -141,11 +142,8 @@ void fichier_client::refresh_non_attributed_facture_status_list(void)
 {
   std::vector<facture_status> l_non_attributed_facture_status_list;
   get_non_attributed_status_list(l_non_attributed_facture_status_list);
-  if(l_non_attributed_facture_status_list.size())
-    {
-      m_user_interface->set_non_attributed_facture_status_list(l_non_attributed_facture_status_list);
-    }
-  else
+  m_user_interface->set_non_attributed_facture_status_list(l_non_attributed_facture_status_list);
+  if(!l_non_attributed_facture_status_list.size())
     {
       m_user_interface->display_warning_message("Status de facture manquants","Aucun statut n'a été défini pour les factures non attribuées");
     }
@@ -197,8 +195,9 @@ void fichier_client::create_non_attributed_facture(uint32_t p_livre_facture_id)
 		    );
   cout << l_facture << endl ;
   m_db->create(l_facture);
-  m_user_interface->set_delete_livre_facture_enabled(false);
-  refresh_non_attributed_facture_list();
+  
+  treat_facture_status_selected_event();
+  treat_livre_facture_selected_event();
 }
 
 
@@ -335,6 +334,7 @@ void fichier_client::treat_no_more_livre_facture_selected_event(void)
   m_user_interface->set_livre_facture_start_date("");
   m_user_interface->set_livre_facture_end_date("");
   m_user_interface->clear_non_attributed_facture_date();
+  m_user_interface->set_facture_creation_for_selected_livre_enabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -517,6 +517,203 @@ void fichier_client::non_attributed_facture_status_selected(void)
   check_non_attributed_facture();
 }
 
+// Facture status related events
+//--------------------------------
+//------------------------------------------------------------------------------
+void fichier_client::treat_no_more_facture_status_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::no more facture_status selected" << std::endl;
+  assert(m_user_interface);
+  m_user_interface->set_delete_facture_status_enabled(false);
+  m_user_interface->set_modify_facture_status_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_delete_facture_status_event(void)
+{
+  std::cout << "Fichier_ClientEvent::facture status delete event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
+  
+  // Get selected status
+  assert(m_db);
+  facture_status l_facture_status;
+  m_db->get_facture_status(l_facture_status_id,l_facture_status);
+
+  // Check this is not predefined status
+  string l_name = l_facture_status.getName();
+  assert(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status());
+
+  // Check that no facture are using this status
+  std::vector<facture> l_facture_list;
+  m_db->get_by_status(l_facture_status_id,l_facture_list);
+  assert(l_facture_list.size()==0);
+
+  // Remove the status
+  m_db->remove(l_facture_status);
+
+  // Update user interface
+  m_user_interface->set_delete_facture_status_enabled(false);
+  m_user_interface->set_modify_facture_status_enabled(false);
+  m_user_interface->clear_facture_status_information();
+  refresh_facture_status_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_modify_facture_status_event(void)
+{
+  std::cout << "Fichier_ClientEvent::facture status modify event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
+  
+  // Get selected status
+  assert(m_db);
+  facture_status l_facture_status;
+  m_db->get_facture_status(l_facture_status_id,l_facture_status);
+
+  // Check this is not predefined status
+  string l_name = l_facture_status.getName();
+  assert(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status());
+
+  m_user_interface->set_delete_facture_status_enabled(false);
+  if(!m_facture_status_pending_modif)
+    {
+      m_facture_status_pending_modif = true;
+      m_user_interface->set_facture_status_name(l_facture_status.getName());
+      m_user_interface->set_modify_facture_status_action_name("Annuler");
+      m_user_interface->set_facture_status_list_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_facture_status_list_enabled(true);
+      m_user_interface->set_modify_facture_status_action_name("Modifier");
+      std::string l_new_name = m_user_interface->get_facture_status_name();
+      assert(l_new_name != "");
+
+      if(l_new_name != l_name)
+	{
+	  std::vector<facture_status> l_list_facture_status;
+	  m_db->get_facture_status_by_name(l_new_name,l_list_facture_status,true);
+	  assert(l_list_facture_status.size()==0);
+      
+	  l_facture_status.setName(l_new_name);
+	  m_db->update(l_facture_status);
+	}
+      m_facture_status_pending_modif = false;
+      
+      m_user_interface->clear_facture_status_information();
+      refresh_facture_status_list();
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_facture_status_name_modif_event(void)
+{
+   std::cout << "Fichier_ClientEvent::facture status name modify event" << std::endl;
+   assert(m_user_interface);
+   std::string l_status_name = m_user_interface->get_facture_status_name();
+
+    vector<facture_status> l_facture_status_list;
+    assert(m_db);
+    if(l_status_name != "")
+      {
+	m_db->get_facture_status_by_name(l_status_name,l_facture_status_list,false);
+      }
+    else
+      {
+	m_db->get_all_facture_status(l_facture_status_list);
+      }
+
+    if(!m_facture_status_pending_modif)
+    {
+      m_user_interface->set_create_facture_status_enabled(l_facture_status_list.size()==0);
+      m_user_interface->refresh_facture_status_list(l_facture_status_list);
+    }
+  else
+    {
+      facture_status l_facture_status;
+      uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
+      m_db->get_facture_status(l_facture_status_id,l_facture_status);
+      
+      bool l_name_ok = l_status_name != "" && l_status_name != facture_status::get_ok_status() && l_status_name != facture_status::get_non_checked_status();
+      m_user_interface->set_modify_facture_status_action_name(l_facture_status.getName() != l_status_name ? "Appliquer" : "Annuler");
+
+      // Check if modified value is acceptable
+      if(l_name_ok)
+	{
+	  std::vector<facture_status> l_already;
+	  m_db->get_facture_status_by_name(l_status_name,l_already,true);
+	  l_name_ok = l_already.size()==0;
+	}
+      m_user_interface->set_modify_facture_status_enabled(l_name_ok);
+    }  
+ 
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_create_facture_status_event(void)
+{
+   std::cout << "Fichier_ClientEvent::facture status name create event" << std::endl;
+   assert(m_user_interface);
+   std::string l_status_name = m_user_interface->get_facture_status_name();
+   
+   assert(m_db);
+   std::vector<facture_status> l_already;
+   m_db->get_facture_status_by_name(l_status_name,l_already,true);
+   assert(l_already.size()==0);
+
+  m_user_interface->set_create_facture_status_enabled(false);
+  facture_status l_status(l_status_name);
+
+  m_db->create(l_status);
+  m_user_interface->clear_facture_status_information();
+  refresh_facture_status_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_facture_status_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::facture status selection event" << std::endl;  
+   assert(m_user_interface);
+
+   uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
+  
+   // Get selected status
+   assert(m_db);
+   facture_status l_facture_status;
+   m_db->get_facture_status(l_facture_status_id,l_facture_status);
+
+   string l_name = l_facture_status.getName();
+   
+   if(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status())
+     {
+       // Check that no facture are using this status
+       std::vector<facture> l_facture_list;
+       m_db->get_by_status(l_facture_status_id,l_facture_list);
+       m_user_interface->set_delete_facture_status_enabled(l_facture_list.size()==0);
+       m_user_interface->set_modify_facture_status_enabled(true);
+     }
+   else
+     {
+       m_user_interface->set_delete_facture_status_enabled(false);
+       m_user_interface->set_modify_facture_status_enabled(false);
+     }
+   
+
+}
+
+
+//------------------------------------------------------------------------------
+void fichier_client::refresh_facture_status_list(void)
+{
+   vector<facture_status> l_facture_status_list;
+   assert(m_db);
+   m_db->get_all_facture_status(l_facture_status_list);
+   assert(m_user_interface);
+   m_user_interface->refresh_facture_status_list(l_facture_status_list);
+   refresh_non_attributed_facture_status_list();
+}
+
 //------------------------------------------------------------------------------
 bool fichier_client::need_save(void)const
 {
@@ -550,49 +747,6 @@ void fichier_client::get_facture_by_client_id(uint32_t p_client_id,
 {
   assert(m_db);
   m_db->get_facture_by_client_id(p_client_id,p_result);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::create( facture_status & p_facture_status)
-{
-  assert(m_db);
-  m_db->create(p_facture_status);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::update(const facture_status & p_facture_status)
-{
-  assert(m_db);
-  m_db->update(p_facture_status);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::remove(const facture_status & p_facture_status)
-{
-  assert(m_db);
-  m_db->remove(p_facture_status);
-}
-
-
-//------------------------------------------------------------------------------
-uint32_t fichier_client::get_facture_status(uint32_t p_id,facture_status & p_data)
-{
-  assert(m_db);
-  return m_db->get_facture_status(p_id,p_data);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::get_all_facture_status(std::vector<facture_status> & p_list)
-{
-  assert(m_db);
-  m_db->get_all_facture_status(p_list);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result)
-{
-  assert(m_db);
-  m_db->get_facture_status_by_name(p_name,p_result,false);
 }
 
 //------------------------------------------------------------------------------

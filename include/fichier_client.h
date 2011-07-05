@@ -47,6 +47,14 @@ class fichier_client
   void non_attributed_facture_status_selected(void);
   void non_attributed_facture_livre_facture_selected(void);
 
+  // Facture status related events
+  void treat_no_more_facture_status_selected_event(void);
+  void treat_delete_facture_status_event(void);
+  void treat_modify_facture_status_event(void);
+  void treat_facture_status_name_modif_event(void);
+  void treat_create_facture_status_event(void);
+  void treat_facture_status_selected_event(void);
+
   // Operations on database
   void check_db_coherency(void);
 
@@ -65,14 +73,6 @@ class fichier_client
 				std::vector<search_facture_item> & p_result);
 
 
-  // Facture status related operations
-  void create( facture_status & p_facture_status);
-  void update(const facture_status & p_facture_status);
-  void remove(const facture_status & p_facture_status);
-  uint32_t get_facture_status(uint32_t p_id,facture_status & p_data);
-  void get_all_facture_status(std::vector<facture_status> & p_list);
-  void get_facture_status_by_name(const std::string & p_name,std::vector<facture_status> & p_result);
-
  private:
   void remove_tmp_db(void);
   void open_tmp_db(void);
@@ -84,9 +84,11 @@ class fichier_client
   void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);
   void refresh_livre_facture_list(void);
+  void refresh_facture_status_list(void);
 
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
 
+  bool m_facture_status_pending_modif;
   fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;
   std::string m_db_name;
