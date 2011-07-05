@@ -17,7 +17,7 @@ class search_facture_item
   inline uint32_t get_livre_facture_id(void)const;
   inline const std::string & get_facture_status(void)const;
   inline uint32_t get_client_id(void)const;
-
+  inline uint32_t get_reason_id(void)const;
  private:
   uint32_t m_id;
   uint32_t m_facture_ref;
@@ -25,6 +25,7 @@ class search_facture_item
   uint32_t m_livre_facture_id;
   std::string m_facture_status;
   uint32_t m_client_id;
+  uint32_t m_reason_id;
 };
 
 inline std::ostream& operator<<(std::ostream& s, const search_facture_item & p_item);
@@ -38,14 +39,15 @@ search_facture_item::search_facture_item(sqlite3_stmt* p_stmt):
   m_date((const char*)sqlite3_column_text(p_stmt,2)),
   m_livre_facture_id(sqlite3_column_int(p_stmt,3)),
   m_facture_status((const char*)sqlite3_column_text(p_stmt,4)),
-  m_client_id(sqlite3_column_int(p_stmt,5))
+  m_client_id(sqlite3_column_int(p_stmt,5)),
+  m_reason_id(sqlite3_column_int(p_stmt,6))
 {
 }
 
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const search_facture_item & p_item)
 {
-  s << "{" << p_item.m_id << "," << p_item.m_facture_ref << ", \"" << p_item.m_date << "\"," << p_item.m_livre_facture_id << ", \"" << p_item.m_facture_status << "\", " << p_item.m_client_id <<"}";
+  s << "{" << p_item.m_id << "," << p_item.m_facture_ref << ", \"" << p_item.m_date << "\"," << p_item.m_livre_facture_id << ", \"" << p_item.m_facture_status << "\", " << p_item.m_client_id <<", "<< p_item.m_reason_id << "}";
   return s;
 }
 
@@ -84,6 +86,12 @@ const std::string & search_facture_item::get_facture_status(void)const
 uint32_t search_facture_item::get_client_id(void)const
 {
   return m_client_id;
+}
+
+//------------------------------------------------------------------------------
+uint32_t search_facture_item::get_reason_id(void)const
+{
+  return m_reason_id;
 }
 
 #endif

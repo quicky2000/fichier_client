@@ -29,6 +29,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
       m_table_ville.set_db(m_db);
       m_table_marque.set_db(m_db);
       m_table_type_achat.set_db(m_db);
+      m_table_facture_reason.set_db(m_db);
       m_table_facture_status.set_db(m_db);
       m_table_achat.set_db(m_db);
       m_table_client.set_db(m_db);
@@ -147,7 +148,8 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 				 description<facture>::getClassType() + ".Date, " +
 				 description<facture>::getClassType() + ".LivreFactureId, " +
 				 description<facture_status>::getClassType() + ".Name, " +
-				 description<facture>::getClassType() + ".ClientId " +
+				 description<facture>::getClassType() + ".ClientId, " +
+				 description<facture>::getClassType() + ".ReasonId " +
 				 " FROM " + 
 				 description<facture>::getClassType() + ", " + 
 				 description<facture_status>::getClassType() + " " +
@@ -328,6 +330,12 @@ void fichier_client_db::get_by_status(uint32_t p_facture_status_id,std::vector<f
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::get_by_reason(uint32_t p_facture_reason_id,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_reason(p_facture_reason_id,p_result);
+}
+
+//------------------------------------------------------------------------------
 std::pair<std::string,std::string> fichier_client_db::get_min_max_date(uint32_t p_livre_facture_id)
 {
   std::string l_min_date("9999-99-99");
@@ -442,6 +450,45 @@ void fichier_client_db::get_all_marque(std::vector<marque> & p_list)
 void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result)
 {
   m_table_marque.get_by_name(p_name,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::create( facture_reason & p_facture_reason)
+{
+  m_modified = true;
+  m_table_facture_reason.create(p_facture_reason);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::update(const facture_reason & p_facture_reason)
+{
+  m_modified = true;
+  m_table_facture_reason.update(p_facture_reason);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::remove(const facture_reason & p_facture_reason)
+{
+  m_modified = true;
+  m_table_facture_reason.remove(p_facture_reason);
+}
+
+//------------------------------------------------------------------------------
+uint32_t fichier_client_db::get_facture_reason(uint32_t p_id,facture_reason & p_data)
+{
+  return m_table_facture_reason.get(p_id,p_data);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_all_facture_reason(std::vector<facture_reason> & p_list)
+{
+  m_table_facture_reason.get_all(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_facture_reason_by_name(const std::string & p_name,std::vector<facture_reason> & p_result, bool p_exact)
+{
+  m_table_facture_reason.get_by_name(p_name,p_result,p_exact);
 }
 
 //------------------------------------------------------------------------------

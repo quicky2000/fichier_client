@@ -9,6 +9,7 @@
 #include "description_marque.h"
 #include "description_type_achat.h"
 #include "description_facture_status.h"
+#include "description_facture_reason.h"
 #include "table_achat.h"
 #include "table_client.h"
 #include "information_table.h"
@@ -59,6 +60,7 @@ class fichier_client_db
   void get_by_livre_facture(uint32_t p_livre_facture_id,std::vector<facture> & p_result);
   void get_by_livre_facture_and_ref(uint32_t p_facture_ref, uint32_t p_livre_facture_id,std::vector<facture> & p_result);
   void get_by_status(uint32_t p_facture_status_id,std::vector<facture> & p_result);
+  void get_by_reason(uint32_t p_facture_reason_id,std::vector<facture> & p_result);
   std::pair<std::string,std::string> get_min_max_date(uint32_t p_livre_facture_id);
 
   //Management of ville table
@@ -77,6 +79,14 @@ class fichier_client_db
   uint32_t get_marque(uint32_t p_id,marque & p_data);
   void get_all_marque(std::vector<marque> & p_list);
   void get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result);
+  
+  //Management of facture_reason table
+  void create( facture_reason & p_facture_reason);
+  void update(const facture_reason & p_facture_reason);
+  void remove(const facture_reason & p_facture_reason);
+  uint32_t get_facture_reason(uint32_t p_id,facture_reason & p_data);
+  void get_all_facture_reason(std::vector<facture_reason> & p_list);
+  void get_facture_reason_by_name(const std::string & p_name,std::vector<facture_reason> & p_result,bool p_exact);
   
   //Management of type_achat table
   void create( type_achat & p_type_achat);
@@ -125,6 +135,7 @@ class fichier_client_db
   table_ville m_table_ville;
   named_table<marque> m_table_marque;
   named_table<type_achat> m_table_type_achat;
+  named_table<facture_reason> m_table_facture_reason;
   table_facture_status m_table_facture_status;
   table_achat m_table_achat;
   table_client m_table_client;

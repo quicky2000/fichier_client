@@ -11,7 +11,7 @@ class sqlite3_stmt;
 class search_facture_client_item: public search_facture_item, public search_client_item
 {
  public:
-  inline search_facture_client_item(const search_facture_item & p_item);
+  inline search_facture_client_item(const search_facture_item & p_item,const std::string & p_reason);
   inline search_facture_client_item(const search_facture_item & p_facture_item,const search_client_item & p_client_item);
 
   inline uint32_t get_id(void)const;
@@ -20,8 +20,9 @@ class search_facture_client_item: public search_facture_item, public search_clie
   inline const std::string & get_client_first_name(void)const;
   inline const std::string & get_client_address(void)const;
   inline const std::string & get_client_city(void)const;
-
+  inline const std::string & get_reason(void)const;
  private:
+  std::string m_reason;
 };
 
 inline std::ostream& operator<<(std::ostream& s, const search_facture_client_item & p_item);
@@ -29,8 +30,9 @@ inline std::ostream& operator<<(std::ostream& s, const search_facture_client_ite
 #include "sqlite3.h"
 
 //------------------------------------------------------------------------------
-search_facture_client_item::search_facture_client_item(const search_facture_item & p_item):
-  search_facture_item(p_item)
+search_facture_client_item::search_facture_client_item(const search_facture_item & p_item,const std::string & p_reason):
+  search_facture_item(p_item),
+  m_reason(p_reason)
 {
 }
 
@@ -95,6 +97,12 @@ const std::string & search_facture_client_item::get_client_address(void)const
 const std::string & search_facture_client_item::get_client_city(void)const
 {
   return get_city();
+}
+
+//------------------------------------------------------------------------------
+const std::string & search_facture_client_item::get_reason(void)const
+{
+  return m_reason;
 }
 
 

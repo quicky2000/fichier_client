@@ -131,11 +131,11 @@ namespace test
 
     // Testing facture management
     //-----------------------------
-    facture l_facture(1,13,"20110519",200,0);
+    facture l_facture(1,13,"20110519",200,0,255);
     cout << "Insert in db " << l_facture << endl ;
     l_fichier_client.create(l_facture);
     cout << l_facture << endl ;
-    facture l_facture2(2,23,"20110519",400,0);
+    facture l_facture2(2,23,"20110519",400,0,128);
     cout << "Insert in db "<< l_facture2 << endl ;
     l_fichier_client.create(l_facture2);
     cout << l_facture2 << endl ;

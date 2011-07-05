@@ -96,7 +96,7 @@ namespace external_sql_importer
 
 		if(l_facture_result.size()==0)
 		  {
-		    facture l_facture(0,l_client_id,l_date,0,l_facture_status.get_id());
+		    facture l_facture(0,l_client_id,l_date,0,l_facture_status.get_id(),0);
 		    p_db.create(l_facture);
 		    l_facture_id = l_facture.get_id();
 		  }

@@ -29,25 +29,25 @@ const std::string description<facture>::getClassType(void)
 //------------------------------------------------------------------------------
 const std::string description<facture>::getTableFieldsDeclaration(void)
 {
-  return "FactureRef INTEGER, ClientId INTEGER, Date TEXT, LivreFactureId INTEGER, Status INTEGER";
+  return "FactureRef INTEGER, ClientId INTEGER, Date TEXT, LivreFactureId INTEGER, Status INTEGER, ReasonId INTEGER";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::getTableFields(void)
 {
-  return "FactureRef, ClientId, Date, LivreFactureId, Status";
+  return "FactureRef, ClientId, Date, LivreFactureId, Status, ReasonId";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::getUpdateFields(void)
 {
-  return "FactureRef = $facture_ref, ClientId = $client_id, Date = $date, LivreFactureId = $livre_facture_id, Status = $status";
+  return "FactureRef = $facture_ref, ClientId = $client_id, Date = $date, LivreFactureId = $livre_facture_id, Status = $status, ReasonId = $reason_id";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::getFieldValues(void)
 {
-  return "$facture_ref, $client_id, $date, $livre_facture_id, $status";
+  return "$facture_ref, $client_id, $date, $livre_facture_id, $status, $reason_id";
 }
 
 //------------------------------------------------------------------------------
@@ -88,17 +88,25 @@ void description<facture>::bind_item_values(const facture & p_facture,sqlite3_st
       exit(-1);
     }
   
+  l_status = sqlite3_bind_int(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$reason_id"),p_facture.get_reason_id());
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during binding of reason_id parameter for update statement of " << getClassType() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
+      exit(-1);
+    }
+  
 }
 
 //------------------------------------------------------------------------------
 facture description<facture>::getItemFromRow(sqlite3_stmt* p_stmt)
 {
   return facture(sqlite3_column_int(p_stmt,0),//Facture Id
-	       sqlite3_column_int(p_stmt,1),//FactureRef
-	       sqlite3_column_int(p_stmt,2),//ClientId
-	       (const char*)sqlite3_column_text(p_stmt,3),//Date
-	       sqlite3_column_int(p_stmt,4),//LivreFactureId
-	       sqlite3_column_int(p_stmt,5)//Status
+		 sqlite3_column_int(p_stmt,1),//FactureRef
+		 sqlite3_column_int(p_stmt,2),//ClientId
+		 (const char*)sqlite3_column_text(p_stmt,3),//Date
+		 sqlite3_column_int(p_stmt,4),//LivreFactureId
+		 sqlite3_column_int(p_stmt,5),//Status
+		 sqlite3_column_int(p_stmt,6)//ReasonId
 	       );
 }
 

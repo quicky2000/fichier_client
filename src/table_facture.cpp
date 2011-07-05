@@ -9,13 +9,15 @@ table_facture::table_facture(void):
   m_get_by_date_and_client_id_stmt(NULL),
   m_get_by_livre_facture_stmt(NULL),
   m_get_by_livre_facture_and_ref_stmt(NULL),
-  m_get_by_status_stmt(NULL)
+  m_get_by_status_stmt(NULL),
+  m_get_by_reason_stmt(NULL)
 {
 }
 
 //------------------------------------------------------------------------------
 table_facture::~table_facture(void)
 {
+  sqlite3_finalize(m_get_by_reason_stmt);
   sqlite3_finalize(m_get_by_status_stmt);
   sqlite3_finalize(m_get_by_livre_facture_and_ref_stmt);
   sqlite3_finalize(m_get_by_livre_facture_stmt);
@@ -122,6 +124,27 @@ void table_facture::set_db(sqlite3 *p_db)
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during preparation of statement to get " << description<facture>::getClassType() << " item by status : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
+      exit(-1);
+    }
+
+  // Preparing livre facture get by reason statements
+  //-------------------------------------------------------------
+  l_status = sqlite3_prepare_v2(base_table<facture>::get_db(),
+				("SELECT Id," + 
+				 description<facture>::getTableFields() + 
+				 " FROM " + 
+				 description<facture>::getClassType() + 
+				 " WHERE " +
+				 "ReasonId = $reason_id" + 
+				 " ORDER BY " + 
+				 description<facture>::getClassType() + ".FactureRef"
+				 ).c_str(),
+				-1,
+				&m_get_by_reason_stmt,
+				NULL);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during preparation of statement to get " << description<facture>::getClassType() << " item by reason : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
       exit(-1);
     }
 }
@@ -375,6 +398,53 @@ void table_facture::get_by_status(uint32_t p_facture_status_id,std::vector<factu
   // Reset bindings because they are now useless
   //--------------------------------------------
   l_status = sqlite3_clear_bindings(m_get_by_status_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of " << description<facture>::getClassType() << " containing_date statement : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
+      exit(-1);
+    }
+
+}
+
+//------------------------------------------------------------------------------
+void table_facture::get_by_reason(uint32_t p_facture_reason_id,std::vector<facture> & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_get_by_reason_stmt,sqlite3_bind_parameter_index(m_get_by_reason_stmt,"$reason_id"),p_facture_reason_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of reason_id parameter for get_by_facture_reason of " << description<facture>::getClassType() << " : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
+      exit(-1);
+    }
+    
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_get_by_reason_stmt)) == SQLITE_ROW)
+    {
+      p_result.push_back(description<facture>::getItemFromRow(m_get_by_reason_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of " << description<facture>::getClassType() << " : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;
+      exit(-1);
+    }
+
+  cout << description<facture>::getClassType() << " get_by_facture_reason successfully listed" << endl ;
+
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_get_by_reason_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of " << description<facture>::getClassType() << " containing_date statement : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_get_by_reason_stmt);
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during reset of bindings of " << description<facture>::getClassType() << " containing_date statement : " << sqlite3_errmsg(base_table<facture>::get_db()) << endl ;     
