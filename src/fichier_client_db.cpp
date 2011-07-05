@@ -317,6 +317,12 @@ void fichier_client_db::get_by_livre_facture_and_ref(uint32_t p_facture_ref, uin
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::get_by_status(uint32_t p_facture_status_id,std::vector<facture> & p_result)
+{
+  m_table_facture.get_by_status(p_facture_status_id,p_result);
+}
+
+//------------------------------------------------------------------------------
 std::pair<std::string,std::string> fichier_client_db::get_min_max_date(uint32_t p_livre_facture_id)
 {
   std::string l_min_date("9999-99-99");
