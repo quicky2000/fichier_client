@@ -1139,10 +1139,10 @@ void fichier_client::check_db_coherency(void)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, std::vector<search_client_item> & p_result)
+void fichier_client::search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, std::vector<search_client_item> & p_result)
 {
   assert(m_db);
-  m_db->search_client(p_name,p_first_name,p_city,p_result);
+  m_db->search_client(p_name,p_first_name,p_address,p_city,p_result);
 }
 
 //------------------------------------------------------------------------------

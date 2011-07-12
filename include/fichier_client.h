@@ -75,6 +75,7 @@ class fichier_client
   // Client related operqtions
   void search_client(const std::string & p_name,
 		     const std::string & p_first_name,
+		     const std::string & p_address,
 		     const std::string & p_city,
 		     std::vector<search_client_item> & p_result);
 

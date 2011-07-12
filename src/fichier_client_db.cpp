@@ -87,7 +87,29 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 
   // Preparing search client statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,"SELECT Client.Id,Client.Name,FirstName,Address,Ville.Name FROM Client,Ville WHERE Client.VilleId = Ville.Id AND Client.Name LIKE @client_name AND FirstName LIKE @client_first_name AND Ville.Name LIKE @ville_name",-1,&m_search_client_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " +
+				      description<client>::getClassType() + ".Id, " +
+				      description<client>::getClassType() + ".Name, "+
+				      "FirstName, " +
+				      "Address, " +
+				      "Ville.Name " +
+				      "FROM " + 
+				      description<client>::getClassType() + ", " + 
+				      description<ville>::getClassType() +
+				      " WHERE " +
+				      description<client>::getClassType() + ".VilleId = Ville.Id "+ 
+				      " AND " +
+				      description<client>::getClassType() + ".Name LIKE @client_name" +
+				      " AND " +
+				      "FirstName LIKE @client_first_name" +
+				      " AND " +
+				      "Address LIKE @client_address"+
+				      " AND "+
+				      description<ville>::getClassType() + ".Name LIKE @ville_name"
+				      ).c_str(),
+				-1,
+				&m_search_client_stmt,
+				NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get search_client_item: " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -642,7 +664,7 @@ void fichier_client_db::get_all_client(std::vector<client> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name, const std::string & p_city, vector<search_client_item> & p_result)
+void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, vector<search_client_item> & p_result)
 {
   //Preparing search criteria
   string l_client_name_criteria("%");
@@ -651,6 +673,10 @@ void fichier_client_db::search_client(const std::string & p_name, const std::str
   //Preparing search criteria
   string l_client_first_name_criteria("%");
   l_client_first_name_criteria += p_first_name + "%";
+
+  //Preparing search criteria
+  string l_client_address_criteria("%");
+  l_client_address_criteria += p_address + "%";
 
   //Preparing search criteria
   string l_city_criteria("%");
@@ -666,6 +692,13 @@ void fichier_client_db::search_client(const std::string & p_name, const std::str
     }
   
   l_status = sqlite3_bind_text(m_search_client_stmt,sqlite3_bind_parameter_index(m_search_client_stmt,"@client_first_name"),l_client_first_name_criteria.c_str(),-1,SQLITE_STATIC);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of Client first name for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  l_status = sqlite3_bind_text(m_search_client_stmt,sqlite3_bind_parameter_index(m_search_client_stmt,"@client_address"),l_client_address_criteria.c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during binding of Client first name for search client statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
