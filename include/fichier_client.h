@@ -5,6 +5,7 @@
 #include "search_facture_item.h"
 #include "search_facture_client_item.h"
 #include "livre_facture.h"
+#include "facture.h"
 #include "facture_status.h"
 #include "facture_reason.h"
 #include "achat.h"
@@ -47,6 +48,10 @@ class fichier_client
   void non_attributed_facture_status_selected(void);
   void non_attributed_facture_reason_selected(void);
   void non_attributed_facture_livre_facture_selected(void);
+  void treat_facture_selected_event(void);
+  void treat_no_more_facture_selected_event(void);
+  void treat_delete_non_attributed_facture_event(void);
+  void treat_modify_non_attributed_facture_event(void);
 
   // Facture status related events
   void treat_no_more_facture_status_selected_event(void);
@@ -98,6 +103,7 @@ class fichier_client
   void refresh_facture_reason_list(void);
 
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
+  void get_remaining_refs(const livre_facture & p_livre,std::vector<facture> & l_facture_list,std::vector<uint32_t> & p_remaining_refs);
 
   bool m_facture_status_pending_modif;
   bool m_facture_reason_pending_modif;

@@ -132,6 +132,7 @@ void fichier_client::treat_create_livre_facture_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::refresh_livre_facture_list(void)
 {
+  assert(m_user_interface);
   std::vector<livre_facture> l_list;
   m_db->get_all_livre_facture(l_list);
   m_user_interface->refresh_livre_facture_list(l_list);
@@ -217,18 +218,18 @@ bool fichier_client::check_new_facture_id(uint32_t p_facture_id, uint32_t p_livr
       l_max_sstr << l_livre_facture.get_nb_max_facture();
       m_user_interface->display_warning_message("Facture référence invalide",string("La référénce de la facture doit être comprise entre 1 et ")+l_max_sstr.str());
     }
-      return l_result;
+  return l_result;
 }
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_livre_facture_selected_event(void)
 {
- std::cout << "Fichier_client Event :: Livre_facture selected " << std::endl;
- assert(m_user_interface);
- assert(!m_user_interface->is_livre_facture_selection_empty());
- uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+  std::cout << "Fichier_client Event :: Livre_facture selected " << std::endl;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_livre_facture_selection_empty());
+  uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
 
- vector<facture> l_list_facture;
+  vector<facture> l_list_facture;
   assert(m_db);
   // Get factures related to selected livre_facture
   m_db->get_by_livre_facture(l_livre_facture_id,l_list_facture);
@@ -255,31 +256,34 @@ void fichier_client::treat_livre_facture_selected_event(void)
 
       // Computing remaining references
       std::vector<uint32_t> l_remaining_refs;
-      std::vector<facture>::const_iterator l_iter = l_list_facture.begin();
-      std::vector<facture>::const_iterator l_iter_end = l_list_facture.end();
-      for(uint32_t l_index = 1 ; l_index <= l_selected_livre.get_nb_max_facture(); ++l_index)
-	{
-	  //Check if there are still defined factures
-	  std::cout << "Facture " << l_index << " check if there are still defined factures" << std::endl ;
-	  if(l_iter != l_iter_end)
-	    {
-	      // Check if currently tested facture is before current defined facture
-	      std::cout << "Check if currently tested facture " << l_index << " is before current defined facture " << l_iter->get_facture_ref() << std::endl ;
-	      if(l_index < l_iter->get_facture_ref())
-		{
-		  l_remaining_refs.push_back(l_index);
-		}
-	      else if(l_index == l_iter->get_facture_ref())
-		{
-		  std::cout << "Going to next defined facture" << std::endl ;
-		  ++l_iter;
-		}
-	    }
-	  else
-	    {
-	      l_remaining_refs.push_back(l_index);
-	    }
-	}
+      get_remaining_refs(l_selected_livre,l_list_facture,l_remaining_refs);
+
+      //TO DELETE      std::vector<facture>::const_iterator l_iter = l_list_facture.begin();
+      //TO DELETE      std::vector<facture>::const_iterator l_iter_end = l_list_facture.end();
+      //TO DELETE      for(uint32_t l_index = 1 ; l_index <= l_selected_livre.get_nb_max_facture(); ++l_index)
+      //TO DELETE	{
+      //TO DELETE	  //Check if there are still defined factures
+      //TO DELETE	  std::cout << "Facture " << l_index << " check if there are still defined factures" << std::endl ;
+      //TO DELETE	  if(l_iter != l_iter_end)
+      //TO DELETE	    {
+      //TO DELETE	      // Check if currently tested facture is before current defined facture
+      //TO DELETE	      std::cout << "Check if currently tested facture " << l_index << " is before current defined facture " << l_iter->get_facture_ref() << std::endl ;
+      //TO DELETE	      if(l_index < l_iter->get_facture_ref())
+      //TO DELETE		{
+      //TO DELETE		  l_remaining_refs.push_back(l_index);
+      //TO DELETE		}
+      //TO DELETE	      else if(l_index == l_iter->get_facture_ref())
+      //TO DELETE		{
+      //TO DELETE		  std::cout << "Going to next defined facture" << std::endl ;
+      //TO DELETE	  ++l_iter;
+      //TO DELETE		}
+      //TO DELETE	    }
+      //TO DELETE	  else
+      //TO DELETE	    {
+      //TO DELETE	      l_remaining_refs.push_back(l_index);
+      //TO DELETE	    }
+      //TO DELETE	}
+
       // Update UI according to collected data
       m_user_interface->clear_non_attributed_facture_date();
       m_user_interface->set_non_attributed_allowed_facture_references(l_remaining_refs);
@@ -299,15 +303,15 @@ void fichier_client::treat_livre_facture_selected_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::refresh_non_attributed_facture_list(void)
 {
-    vector<search_facture_client_item> l_list_facture;
-    assert(m_user_interface);
-    if(!m_user_interface->is_livre_facture_selection_empty())
-      {
-	uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
-	assert(m_db);
-	get_facture_by_livre_facture_id(l_livre_facture_id,l_list_facture);
-      }
-    m_user_interface->refresh_list_facture_of_livre_facture(l_list_facture);
+  vector<search_facture_client_item> l_list_facture;
+  assert(m_user_interface);
+  if(!m_user_interface->is_livre_facture_selection_empty())
+    {
+      uint32_t l_livre_facture_id = m_user_interface->get_selected_livre_facture_id();
+      assert(m_db);
+      get_facture_by_livre_facture_id(l_livre_facture_id,l_list_facture);
+    }
+  m_user_interface->refresh_list_facture_of_livre_facture(l_list_facture);
 }
 
 
@@ -363,8 +367,8 @@ void fichier_client::treat_livre_facture_id_modif_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::treat_livre_facture_content_modif_event(void)
 {
-    std::cout << "Fichier_client Event :: Livre_facture content modif event" << std::endl;
-    check_livre_facture_information(); 
+  std::cout << "Fichier_client Event :: Livre_facture content modif event" << std::endl;
+  check_livre_facture_information(); 
 }
 
 //------------------------------------------------------------------------------
@@ -433,6 +437,12 @@ void fichier_client::check_livre_facture_information(void)
 //------------------------------------------------------------------------------
 void fichier_client::check_non_attributed_facture(void)
 {
+
+    if(!m_user_interface->is_list_facture_of_livre_facture_selection_empty())
+    {
+      m_user_interface->set_facture_creation_for_selected_livre_enabled(false);
+    }
+
   bool l_valid = true;
   assert(m_user_interface);
   std::string l_date = "";
@@ -461,9 +471,12 @@ void fichier_client::check_non_attributed_facture(void)
   std::cout << "Facture reference is " << l_facture_reference << std::endl ;
   if(l_facture_reference)
     {
-      std::vector<facture> l_facture_result;
-      m_db->get_by_livre_facture_and_ref(l_facture_reference, l_livre_id,l_facture_result);
-      assert(l_facture_result.size()==0);
+      if(m_user_interface->is_list_facture_of_livre_facture_selection_empty())
+	{
+	  std::vector<facture> l_facture_result;
+	  m_db->get_by_livre_facture_and_ref(l_facture_reference, l_livre_id,l_facture_result);
+	  assert(l_facture_result.size()==0);
+	}
     }
   else
     {
@@ -482,8 +495,29 @@ void fichier_client::check_non_attributed_facture(void)
     {
       l_valid = false;
     }
-  
-  m_user_interface->set_facture_creation_for_selected_livre_enabled(l_valid);  
+
+  if(m_user_interface->is_list_facture_of_livre_facture_selection_empty())
+    {
+      m_user_interface->set_facture_creation_for_selected_livre_enabled(l_valid);  
+    }
+  else if(l_valid)
+    {
+      assert(l_status);
+      assert(l_reason);
+      facture l_ref_facture;
+      m_db->get_facture(m_user_interface->get_list_facture_of_livre_facture_selected_id(),l_ref_facture);
+      bool l_different = l_date != l_ref_facture.get_date() || 
+	l_livre_id != l_ref_facture.get_livre_facture_id() || 
+	l_facture_reference != l_ref_facture.get_facture_ref() || 
+	l_status->get_id() != l_ref_facture.get_status() || 
+	l_reason->get_id() != l_ref_facture.get_reason_id();
+
+      m_user_interface->set_facture_modification_for_selected_livre_enabled(l_different);
+    }
+  else
+    {
+      m_user_interface->set_facture_modification_for_selected_livre_enabled(l_valid);  
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -519,6 +553,150 @@ void fichier_client::non_attributed_facture_reason_selected(void)
 {
   std::cout << "Fichier_CientEvent::non_attributed_facture_reason_selected" << std::endl;
   check_non_attributed_facture();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_facture_selected_event(void)
+{
+  std::cout << "Fichier_CientEvent:: facture selected" << std::endl;
+  check_non_attributed_facture();
+  assert(m_user_interface);
+  assert(!m_user_interface->is_list_facture_of_livre_facture_selection_empty());
+  uint32_t l_facture_id = m_user_interface->get_list_facture_of_livre_facture_selected_id();
+
+  assert(m_db);
+
+  // Check if there are related achats
+  std::vector<achat> l_related_achats;
+  m_db->get_by_facture_id(l_facture_id,l_related_achats);
+  std::cout << l_related_achats.size() << " related achats" << std::endl ;
+  m_user_interface->set_facture_deletion_for_selected_livre_enabled(!l_related_achats.size());
+
+  facture l_facture;
+  m_db->get_facture(l_facture_id,l_facture);
+
+  uint32_t l_client_id = l_facture.get_client_id();
+  uint32_t l_reason_id = l_facture.get_reason_id();
+  assert(l_reason_id || l_client_id);
+  assert(l_reason_id == 0 || l_client_id == 0);
+  if(l_client_id)
+    {
+      m_user_interface->set_facture_modification_for_selected_livre_enabled(true);      
+      m_user_interface->set_non_attributed_facture_date("");
+      std::vector<uint32_t> l_empty_int_vector;
+      m_user_interface->set_non_attributed_facture_allowed_livre_ids(l_empty_int_vector);
+      m_user_interface->set_non_attributed_allowed_facture_references(l_empty_int_vector);
+      std::vector<facture_status> l_empty_vector_status;
+      m_user_interface->set_non_attributed_facture_status_list(l_empty_vector_status);
+      std::vector<facture_reason> l_empty_vector_reason;
+      m_user_interface->set_non_attributed_facture_reason_list(l_empty_vector_reason);
+    }
+  else
+    {
+      m_user_interface->set_facture_modification_for_selected_livre_enabled(false);
+      m_user_interface->set_non_attributed_facture_date(l_facture.get_date());
+
+      uint32_t l_livre_id = l_facture.get_livre_facture_id();
+      
+
+      std::vector<uint32_t> l_livre_ids;
+      l_livre_ids.push_back(l_livre_id);
+      m_user_interface->set_non_attributed_facture_allowed_livre_ids(l_livre_ids);
+
+      vector<facture> l_list_facture;
+      assert(m_db);
+      // Get factures related to selected livre_facture
+      m_db->get_by_livre_facture(l_livre_id,l_list_facture);
+
+      // Get livre_facture object
+      livre_facture l_related_livre;
+      m_db->get_livre_facture(l_livre_id,l_related_livre);
+    
+      // Computing remaining references
+      std::vector<uint32_t> l_remaining_refs;
+      get_remaining_refs(l_related_livre,l_list_facture,l_remaining_refs);
+      std::vector<uint32_t>::iterator l_iter = l_remaining_refs.begin();
+      std::vector<uint32_t>::iterator l_iter_end = l_remaining_refs.end();
+      while(l_iter != l_iter_end && *l_iter < l_facture.get_facture_ref())
+	{
+	  ++l_iter;
+	}
+      l_remaining_refs.insert(l_iter,l_facture.get_facture_ref());
+      m_user_interface->set_non_attributed_allowed_facture_references(l_remaining_refs);
+      m_user_interface->set_non_attributed_facture_reference(l_facture.get_facture_ref());
+
+      std::vector<facture_status> l_facture_status_list;
+      m_db->get_all_facture_status(l_facture_status_list);
+      m_user_interface->set_non_attributed_facture_status_list(l_facture_status_list);
+      m_user_interface->set_non_attributed_facture_status(l_facture.get_status());
+       
+      std::vector<facture_reason> l_facture_reason_list;
+      m_db->get_all_facture_reason(l_facture_reason_list);
+      m_user_interface->set_non_attributed_facture_reason_list(l_facture_reason_list);
+      m_user_interface->set_non_attributed_facture_reason(l_facture.get_reason_id());
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_no_more_facture_selected_event(void)
+{
+  std::cout << "Fichier_CientEvent:: no more facture selected" << std::endl;
+  refresh_non_attributed_facture_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_delete_non_attributed_facture_event(void)
+{
+  std::cout << "Fichier_CientEvent:: delete non attributed facture required" << std::endl;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_list_facture_of_livre_facture_selection_empty());
+ 
+  uint32_t l_facture_id = m_user_interface->get_list_facture_of_livre_facture_selected_id();
+
+  assert(m_db);
+
+  facture l_facture;
+  m_db->get_facture(l_facture_id,l_facture);
+
+  // Check if there are related achats
+  std::vector<achat> l_related_achats;
+  m_db->get_by_facture_id(l_facture_id,l_related_achats);
+  assert(!l_related_achats.size());
+  m_db->remove(l_facture);
+  refresh_non_attributed_facture_list();
+  refresh_livre_facture_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_modify_non_attributed_facture_event(void)
+{
+  std::cout << "Fichier_CientEvent:: modify non attributed facture required" << std::endl;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_livre_facture_selection_empty());
+
+  const facture_status * l_status = m_user_interface->get_non_attributed_facture_status();
+  // Create facture event is possible because all values have been checked !!
+  assert(l_status);
+  const facture_reason * l_reason = m_user_interface->get_non_attributed_facture_reason();
+  assert(l_reason);
+  std::string l_date = (m_user_interface->is_non_attributed_facture_date_complete() ? m_user_interface->get_non_attributed_facture_date() : "");
+
+  facture l_facture;
+  m_db->get_facture(m_user_interface->get_list_facture_of_livre_facture_selected_id(),l_facture);
+
+  l_facture.set_date(l_date);
+  l_facture.set_livre_facture_id(m_user_interface->get_non_attributed_facture_livre_facture_id());
+  l_facture.set_facture_ref(m_user_interface->get_non_attributed_facture_reference());
+  l_facture.set_status(l_status->get_id());
+  l_facture.set_reason_id(l_reason->get_id());
+
+  m_db->update(l_facture);
+  
+  m_user_interface->set_facture_modification_for_selected_livre_enabled(false);
+
+  refresh_non_attributed_facture_list();
+
+
 }
 
 // Facture status related events
@@ -613,24 +791,24 @@ void fichier_client::treat_modify_facture_status_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::treat_facture_status_name_modif_event(void)
 {
-   std::cout << "Fichier_ClientEvent::facture status name modify event" << std::endl;
-   assert(m_user_interface);
-   std::string l_status_name = m_user_interface->get_facture_status_name();
+  std::cout << "Fichier_ClientEvent::facture status name modify event" << std::endl;
+  assert(m_user_interface);
+  std::string l_status_name = m_user_interface->get_facture_status_name();
 
-    vector<facture_status> l_facture_status_list;
-    vector<facture_status> l_facture_status_filtered_list;
-    assert(m_db);
-    if(l_status_name != "")
-      {
-	m_db->get_facture_status_by_name(l_status_name,l_facture_status_list,true);
-	m_db->get_facture_status_by_name(l_status_name,l_facture_status_filtered_list,false);
-      }
-    else
-      {
-	m_db->get_all_facture_status(l_facture_status_filtered_list);
-      }
+  vector<facture_status> l_facture_status_list;
+  vector<facture_status> l_facture_status_filtered_list;
+  assert(m_db);
+  if(l_status_name != "")
+    {
+      m_db->get_facture_status_by_name(l_status_name,l_facture_status_list,true);
+      m_db->get_facture_status_by_name(l_status_name,l_facture_status_filtered_list,false);
+    }
+  else
+    {
+      m_db->get_all_facture_status(l_facture_status_filtered_list);
+    }
 
-    if(!m_facture_status_pending_modif)
+  if(!m_facture_status_pending_modif)
     {
       m_user_interface->set_create_facture_status_enabled(l_facture_status_list.size()==0 && l_status_name != "");
       m_user_interface->refresh_facture_status_list(l_facture_status_filtered_list);
@@ -657,14 +835,14 @@ void fichier_client::treat_facture_status_name_modif_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::treat_create_facture_status_event(void)
 {
-   std::cout << "Fichier_ClientEvent::facture status name create event" << std::endl;
-   assert(m_user_interface);
-   std::string l_status_name = m_user_interface->get_facture_status_name();
+  std::cout << "Fichier_ClientEvent::facture status name create event" << std::endl;
+  assert(m_user_interface);
+  std::string l_status_name = m_user_interface->get_facture_status_name();
    
-   assert(m_db);
-   std::vector<facture_status> l_already;
-   m_db->get_facture_status_by_name(l_status_name,l_already,true);
-   assert(l_already.size()==0);
+  assert(m_db);
+  std::vector<facture_status> l_already;
+  m_db->get_facture_status_by_name(l_status_name,l_already,true);
+  assert(l_already.size()==0);
 
   m_user_interface->set_create_facture_status_enabled(false);
   facture_status l_status(l_status_name);
@@ -678,30 +856,30 @@ void fichier_client::treat_create_facture_status_event(void)
 void fichier_client::treat_facture_status_selected_event(void)
 {
   std::cout << "Fichier_ClientEvent::facture status selection event" << std::endl;  
-   assert(m_user_interface);
+  assert(m_user_interface);
 
-   uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
+  uint32_t l_facture_status_id = m_user_interface->get_selected_facture_status_id();
   
-   // Get selected status
-   assert(m_db);
-   facture_status l_facture_status;
-   m_db->get_facture_status(l_facture_status_id,l_facture_status);
+  // Get selected status
+  assert(m_db);
+  facture_status l_facture_status;
+  m_db->get_facture_status(l_facture_status_id,l_facture_status);
 
-   string l_name = l_facture_status.getName();
+  string l_name = l_facture_status.getName();
    
-   if(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status())
-     {
-       // Check that no facture are using this status
-       std::vector<facture> l_facture_list;
-       m_db->get_by_status(l_facture_status_id,l_facture_list);
-       m_user_interface->set_delete_facture_status_enabled(l_facture_list.size()==0);
-       m_user_interface->set_modify_facture_status_enabled(true);
-     }
-   else
-     {
-       m_user_interface->set_delete_facture_status_enabled(false);
-       m_user_interface->set_modify_facture_status_enabled(false);
-     }
+  if(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status())
+    {
+      // Check that no facture are using this status
+      std::vector<facture> l_facture_list;
+      m_db->get_by_status(l_facture_status_id,l_facture_list);
+      m_user_interface->set_delete_facture_status_enabled(l_facture_list.size()==0);
+      m_user_interface->set_modify_facture_status_enabled(true);
+    }
+  else
+    {
+      m_user_interface->set_delete_facture_status_enabled(false);
+      m_user_interface->set_modify_facture_status_enabled(false);
+    }
    
 
 }
@@ -710,12 +888,12 @@ void fichier_client::treat_facture_status_selected_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::refresh_facture_status_list(void)
 {
-   vector<facture_status> l_facture_status_list;
-   assert(m_db);
-   m_db->get_all_facture_status(l_facture_status_list);
-   assert(m_user_interface);
-   m_user_interface->refresh_facture_status_list(l_facture_status_list);
-   refresh_non_attributed_facture_status_list();
+  vector<facture_status> l_facture_status_list;
+  assert(m_db);
+  m_db->get_all_facture_status(l_facture_status_list);
+  assert(m_user_interface);
+  m_user_interface->refresh_facture_status_list(l_facture_status_list);
+  refresh_non_attributed_facture_status_list();
 }
 
 
@@ -810,24 +988,24 @@ void fichier_client::treat_modify_facture_reason_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::treat_facture_reason_name_modif_event(void)
 {
-   std::cout << "Fichier_ClientEvent::facture reason name modify event" << std::endl;
-   assert(m_user_interface);
-   std::string l_reason_name = m_user_interface->get_facture_reason_name();
+  std::cout << "Fichier_ClientEvent::facture reason name modify event" << std::endl;
+  assert(m_user_interface);
+  std::string l_reason_name = m_user_interface->get_facture_reason_name();
 
-    vector<facture_reason> l_facture_reason_list;
-    vector<facture_reason> l_facture_reason_filtered_list;
-    assert(m_db);
-    if(l_reason_name != "")
-      {
-	m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_list,true);
-	m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_filtered_list,false);
-      }
-    else
-      {
-	m_db->get_all_facture_reason(l_facture_reason_filtered_list);
-      }
+  vector<facture_reason> l_facture_reason_list;
+  vector<facture_reason> l_facture_reason_filtered_list;
+  assert(m_db);
+  if(l_reason_name != "")
+    {
+      m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_list,true);
+      m_db->get_facture_reason_by_name(l_reason_name,l_facture_reason_filtered_list,false);
+    }
+  else
+    {
+      m_db->get_all_facture_reason(l_facture_reason_filtered_list);
+    }
 
-    if(!m_facture_reason_pending_modif)
+  if(!m_facture_reason_pending_modif)
     {
       m_user_interface->set_create_facture_reason_enabled(l_facture_reason_list.size()==0 && l_reason_name != "");
       m_user_interface->refresh_facture_reason_list(l_facture_reason_filtered_list);
@@ -854,14 +1032,14 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
 //------------------------------------------------------------------------------
 void fichier_client::treat_create_facture_reason_event(void)
 {
-   std::cout << "Fichier_ClientEvent::facture reason name create event" << std::endl;
-   assert(m_user_interface);
-   std::string l_reason_name = m_user_interface->get_facture_reason_name();
+  std::cout << "Fichier_ClientEvent::facture reason name create event" << std::endl;
+  assert(m_user_interface);
+  std::string l_reason_name = m_user_interface->get_facture_reason_name();
    
-   assert(m_db);
-   std::vector<facture_reason> l_already;
-   m_db->get_facture_reason_by_name(l_reason_name,l_already,true);
-   assert(l_already.size()==0);
+  assert(m_db);
+  std::vector<facture_reason> l_already;
+  m_db->get_facture_reason_by_name(l_reason_name,l_already,true);
+  assert(l_already.size()==0);
 
   m_user_interface->set_create_facture_reason_enabled(false);
   facture_reason l_reason(l_reason_name);
@@ -875,34 +1053,34 @@ void fichier_client::treat_create_facture_reason_event(void)
 void fichier_client::treat_facture_reason_selected_event(void)
 {
   std::cout << "Fichier_ClientEvent::facture reason selection event" << std::endl;  
-   assert(m_user_interface);
+  assert(m_user_interface);
 
-   uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
+  uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
   
-   // Get selected reason
-   assert(m_db);
-   facture_reason l_facture_reason;
-   m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
+  // Get selected reason
+  assert(m_db);
+  facture_reason l_facture_reason;
+  m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
 
-   string l_name = l_facture_reason.getName();
+  string l_name = l_facture_reason.getName();
    
-   // Check that no facture are using this reason
-   std::vector<facture> l_facture_list;
-   m_db->get_by_reason(l_facture_reason_id,l_facture_list);
-   m_user_interface->set_delete_facture_reason_enabled(l_facture_list.size()==0);
-   m_user_interface->set_modify_facture_reason_enabled(true);
+  // Check that no facture are using this reason
+  std::vector<facture> l_facture_list;
+  m_db->get_by_reason(l_facture_reason_id,l_facture_list);
+  m_user_interface->set_delete_facture_reason_enabled(l_facture_list.size()==0);
+  m_user_interface->set_modify_facture_reason_enabled(true);
 }
 
 
 //------------------------------------------------------------------------------
 void fichier_client::refresh_facture_reason_list(void)
 {
-   vector<facture_reason> l_facture_reason_list;
-   assert(m_db);
-   m_db->get_all_facture_reason(l_facture_reason_list);
-   assert(m_user_interface);
-   m_user_interface->refresh_facture_reason_list(l_facture_reason_list);
-   refresh_non_attributed_facture_reason_list();
+  vector<facture_reason> l_facture_reason_list;
+  assert(m_db);
+  m_db->get_all_facture_reason(l_facture_reason_list);
+  assert(m_user_interface);
+  m_user_interface->refresh_facture_reason_list(l_facture_reason_list);
+  refresh_non_attributed_facture_reason_list();
 }
 
 
@@ -1109,6 +1287,38 @@ void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id
     }
 
 }
+
+//------------------------------------------------------------------------------
+void fichier_client::get_remaining_refs(const livre_facture & p_livre,std::vector<facture> & p_list_facture,std::vector<uint32_t> & p_remaining_refs)
+{
+  // Computing remaining references
+  std::vector<facture>::const_iterator l_iter = p_list_facture.begin();
+  std::vector<facture>::const_iterator l_iter_end = p_list_facture.end();
+  for(uint32_t l_index = 1 ; l_index <= p_livre.get_nb_max_facture(); ++l_index)
+    {
+      //Check if there are still defined factures
+      std::cout << "Facture " << l_index << " check if there are still defined factures" << std::endl ;
+      if(l_iter != l_iter_end)
+	{
+	  // Check if currently tested facture is before current defined facture
+	  std::cout << "Check if currently tested facture " << l_index << " is before current defined facture " << l_iter->get_facture_ref() << std::endl ;
+	  if(l_index < l_iter->get_facture_ref())
+	    {
+	      p_remaining_refs.push_back(l_index);
+	    }
+	  else if(l_index == l_iter->get_facture_ref())
+	    {
+	      std::cout << "Going to next defined facture" << std::endl ;
+	      ++l_iter;
+	    }
+	}
+      else
+	{
+	  p_remaining_refs.push_back(l_index);
+	}
+    }
+}
+
 
 const std::string fichier_client::m_tmp_db_name = "tmp_db";
 const std::string fichier_client::m_version = "0.1";
