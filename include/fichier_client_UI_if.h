@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "facture_status.h"
+#include "ville.h"
 class facture;
 
 class fichier_client_UI_if
@@ -13,6 +14,7 @@ class fichier_client_UI_if
   virtual void display_information_message(const std::string & p_title,const std::string & p_text)=0;
 
   // Interactions with customer search information
+  virtual void set_focus_on_customer_search(void)=0;
   virtual const std::string get_search_customer_name(void)const=0;
   virtual const std::string get_search_customer_first_name(void)const=0;
   virtual const std::string get_search_customer_address(void)const=0;
@@ -26,14 +28,39 @@ class fichier_client_UI_if
   virtual void set_customer_search_delete_customer_enabled(bool p_enabled)=0;
 
   // Interactions with Customer identity information
+  virtual void set_focus_on_customer_data(void)=0;
   virtual void set_customer_name(const std::string & p_name)=0;
   virtual const std::string get_customer_name(void)const=0;
   virtual void set_customer_first_name(const std::string & p_first_name)=0;
   virtual const std::string get_customer_first_name(void)const=0;
   virtual void set_customer_phone(const std::string & p_phone)=0;
   virtual const std::string get_customer_phone(void)const=0;
+  virtual bool is_customer_phone_empty(void)const=0;
+  virtual bool is_customer_phone_complete(void)const=0;
   virtual void set_customer_address(const std::string & p_address)=0;
   virtual const std::string get_customer_address(void)const=0;
+  virtual void set_customer_postal_code(const std::string & p_postal_code)=0;
+  virtual const std::string get_customer_postal_code(void)const=0;
+  virtual void set_customer_city_list(const std::vector<ville> & p_list)=0;
+  virtual const ville * get_customer_city(void)const=0;
+  virtual void set_customer_data_identity_fields_enabled(bool p_enabled)=0;
+  virtual void set_customer_data_create_customer_enabled(bool p_enabled)=0;
+  virtual void set_customer_data_modify_customer_enabled(bool p_enabled)=0;
+  virtual void set_customer_data_delete_customer_enabled(bool p_enabled)=0;
+
+  // Interactions with customer bill information
+  virtual void set_customer_bill_fields_enabled(bool p_enabled)=0;
+  virtual void set_customer_bill_list_enabled(bool p_enabled)=0;
+  virtual void set_customer_bill_creation_enabled(bool p_enabled)=0;
+  virtual void set_customer_bill_modification_enabled(bool p_enabled)=0;
+  virtual void set_customer_bill_deletion_enabled(bool p_enabled)=0;
+
+  // Interactions with customer purchase information
+  virtual void set_customer_purchase_fields_enabled(bool p_enabled)=0;
+  virtual void set_customer_purchase_list_enabled(bool p_enabled)=0;
+  virtual void set_customer_purchase_creation_enabled(bool p_enabled)=0;
+  virtual void set_customer_purchase_modification_enabled(bool p_enabled)=0;
+  virtual void set_customer_purchase_deletion_enabled(bool p_enabled)=0;
 
   // Interactions with livre facture information
   virtual void clear_livre_facture_information(void)=0;

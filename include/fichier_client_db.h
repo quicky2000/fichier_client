@@ -69,7 +69,7 @@ class fichier_client_db
   void remove(const ville & p_ville);
   uint32_t get_ville(uint32_t p_id,ville & p_data);
   void get_all_ville(std::vector<ville> & p_list);
-  void get_ville_by_name(const std::string & p_name,std::vector<ville> & p_result);
+  void get_ville_by_name(const std::string & p_name,std::vector<ville> & p_result, bool p_exact=false);
   void get_ville_by_code_postal(const std::string & p_code_postal,std::vector<ville> & p_result);
   
   //Management of marque table

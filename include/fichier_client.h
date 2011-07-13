@@ -39,6 +39,14 @@ class fichier_client
   void treat_search_customer_modify_customer_event(void);
   void treat_search_customer_delete_customer_event(void);
 
+  // Customer data related events
+  void treat_postal_code_modification_event(void);
+  void treat_city_selection_event(void);
+  void treat_identity_content_modification_event(void);
+  void treat_customer_data_create_customer_event(void);
+  void treat_customer_data_modify_customer_event(void);
+  void treat_customer_data_delete_customer_event(void);
+
   // Livre facture related events
   bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
   void treat_livre_facture_selected_event(void);
@@ -89,6 +97,8 @@ class fichier_client
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
 
+  void disable_customer_identity(void);
+  void check_customer_identity(void);
   void check_non_attributed_facture(void);
   void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);
@@ -99,6 +109,7 @@ class fichier_client
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
   void get_remaining_refs(const livre_facture & p_livre,std::vector<facture> & l_facture_list,std::vector<uint32_t> & p_remaining_refs);
 
+  uint32_t m_current_customer_id;
   bool m_facture_status_pending_modif;
   bool m_facture_reason_pending_modif;
   fichier_client_UI_if * m_user_interface;

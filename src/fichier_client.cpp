@@ -10,6 +10,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 fichier_client::fichier_client(void):
+  m_current_customer_id(0),
   m_facture_status_pending_modif(false),
   m_facture_reason_pending_modif(false),
   m_user_interface(NULL),
@@ -30,6 +31,12 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
 {
   assert(p_user_interface);
   m_user_interface = p_user_interface;
+
+  // Disable customer data identity
+  m_user_interface->set_customer_data_identity_fields_enabled(false);
+  m_user_interface->set_customer_data_create_customer_enabled(false);
+  m_user_interface->set_customer_data_modify_customer_enabled(false);
+  m_user_interface->set_customer_data_delete_customer_enabled(false);
 }
 
 // Search client related events
@@ -90,21 +97,192 @@ void fichier_client::treat_search_customer_no_more_customer_selected_event(void)
 void fichier_client::treat_search_customer_add_customer_event(void)
 {
   std::cout << "Fichier_client Event::search customer add customer event" << std::endl;
+  assert(m_user_interface);
+
+  m_current_customer_id = 0;
+
+  m_user_interface->set_customer_name(m_user_interface->get_search_customer_name());
+  m_user_interface->set_customer_first_name(m_user_interface->get_search_customer_first_name());
+  m_user_interface->set_customer_address(m_user_interface->get_search_customer_address());
+  m_user_interface->set_customer_phone("");
+  std::vector<ville> l_cities;
+  assert(m_db);
+  m_db->get_ville_by_name(m_user_interface->get_search_customer_city(),l_cities);
+
+  m_user_interface->set_customer_postal_code(l_cities.size() != 1 ? "" : l_cities.begin()->getCodePostal());
+  m_user_interface->set_customer_city_list(l_cities);
+  
+  m_user_interface->set_customer_data_identity_fields_enabled(true);
+  m_user_interface->set_customer_data_create_customer_enabled(false);
+  m_user_interface->set_customer_data_modify_customer_enabled(false);
+  m_user_interface->set_customer_data_delete_customer_enabled(false);
+
+  check_customer_identity();
+
+  // Disable bill edition
+  m_user_interface->set_customer_bill_fields_enabled(false);
+  m_user_interface->set_customer_bill_list_enabled(false);
+  m_user_interface->set_customer_bill_creation_enabled(false);
+  m_user_interface->set_customer_bill_modification_enabled(false);
+  m_user_interface->set_customer_bill_deletion_enabled(false);
+
+
+  // Disable purchase edition
+  m_user_interface->set_customer_purchase_fields_enabled(false);
+  m_user_interface->set_customer_purchase_list_enabled(false);
+  m_user_interface->set_customer_purchase_creation_enabled(false);
+  m_user_interface->set_customer_purchase_modification_enabled(false);
+  m_user_interface->set_customer_purchase_deletion_enabled(false);
+
+  m_user_interface->set_focus_on_customer_data();
 }
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_search_customer_modify_customer_event(void)
 {
   std::cout << "Fichier_client Event::search customer modify customer event" << std::endl;
+  m_user_interface->set_customer_data_identity_fields_enabled(true);
 }
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_search_customer_delete_customer_event(void)
 {
   std::cout << "Fichier_client Event::search customer delete customer event" << std::endl;
+  m_user_interface->set_customer_data_identity_fields_enabled(false);
 }
 
+// Customer data related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_postal_code_modification_event(void)
+{
+  std::cout << "Fichier_client Event::customer identity postal code modification event" << std::endl;
+  assert(m_user_interface);
+  std::string l_code_postal = m_user_interface->get_customer_postal_code();
+  assert(m_db);
+  std::vector<ville> l_city_list;
+  m_db->get_ville_by_code_postal(l_code_postal,l_city_list);
 
+  m_user_interface->set_customer_city_list(l_city_list);
+
+  treat_identity_content_modification_event();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_selection_event(void)
+{
+  std::cout << "Fichier_client Event::customer identity city selection event" << std::endl;
+
+  assert(m_user_interface);
+  const ville * l_city = m_user_interface->get_customer_city();
+  if(l_city)
+    {
+      m_user_interface->set_customer_postal_code(l_city->getCodePostal());
+    }
+  treat_identity_content_modification_event();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_identity_content_modification_event(void)
+{
+  std::cout << "Fichier_client Event::customer identity content modification event" << std::endl;
+  check_customer_identity();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_create_customer_event(void)
+{
+  std::cout << "Fichier_client Event::customer_data customer creation event" << std::endl;
+  assert(m_user_interface);
+  std::string l_name = m_user_interface->get_customer_name();
+  std::string l_first_name = m_user_interface->get_customer_first_name();
+  std::string l_phone = (m_user_interface->is_customer_phone_complete() ? m_user_interface->get_customer_phone() : "");
+  std::string l_address = m_user_interface->get_customer_address();
+  std::string l_postal_code = m_user_interface->get_customer_postal_code();
+  const ville * l_city = m_user_interface->get_customer_city();
+
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+  assert(l_complete);
+
+  std::vector<search_client_item> l_client_list ;
+  assert(m_db);
+  m_db->search_client(l_name,l_first_name,l_address,l_city->getName(),l_client_list);
+  assert(l_client_list.size()==0);
+
+  client l_client(l_name,l_first_name,l_address,l_phone,l_city->get_id());
+  m_db->create(l_client);
+  m_current_customer_id = l_client.get_id();
+  
+  m_user_interface->set_customer_data_create_customer_enabled(false);
+  m_user_interface->set_customer_data_modify_customer_enabled(false);
+  m_user_interface->set_customer_data_delete_customer_enabled(true);
+
+  // Enable bill edition
+  m_user_interface->set_customer_bill_fields_enabled(true);
+  m_user_interface->set_customer_bill_list_enabled(true);
+ 
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_modify_customer_event(void)
+{
+  std::cout << "Fichier_client Event::customer_data customer modification event" << std::endl;
+
+  std::string l_name = m_user_interface->get_customer_name();
+  std::string l_first_name = m_user_interface->get_customer_first_name();
+  std::string l_phone = (m_user_interface->is_customer_phone_complete() ? m_user_interface->get_customer_phone() : "");
+  std::string l_address = m_user_interface->get_customer_address();
+  std::string l_postal_code = m_user_interface->get_customer_postal_code();
+  const ville * l_city = m_user_interface->get_customer_city();
+
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+  assert(l_complete);
+
+  assert(m_current_customer_id);
+  assert(m_db);
+  client l_client ;
+  m_db->get_client(m_current_customer_id,l_client);
+
+  l_client.set_name(l_name);
+  l_client.set_first_name(l_first_name);
+  l_client.set_tel(l_phone);
+  l_client.set_address(l_address);
+  l_client.set_ville_id(l_city->get_id());
+  
+  m_db->update(l_client);
+  m_user_interface->set_customer_data_create_customer_enabled(false);
+  m_user_interface->set_customer_data_modify_customer_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_delete_customer_event(void)
+{
+  std::cout << "Fichier_client Event::customer_data customer deletion event" << std::endl;
+   assert(m_current_customer_id);
+   
+  assert(m_db);
+  client l_client ;
+  m_db->get_client(m_current_customer_id,l_client);
+
+   std::vector<search_achat_item> l_list_achat;
+   m_db->get_achat_by_client_id(l_client.get_id(),l_list_achat);
+   assert(l_list_achat.size()==0);
+
+  std::vector<search_facture_item> l_list_facture;
+  m_db->get_facture_by_client_id(l_client.get_id(),l_list_facture);
+   assert(l_list_facture.size()==0);
+
+   m_db->remove(l_client);
+   m_current_customer_id = 0;
+
+
+   disable_customer_identity();
+
+   assert(m_user_interface);
+   m_user_interface->set_focus_on_customer_search();
+   
+}
+
+// Livre facture related events
 //------------------------------------------------------------------------------
 void fichier_client::treat_delete_livre_facture_event(void)
 {
@@ -330,32 +508,6 @@ void fichier_client::treat_livre_facture_selected_event(void)
       std::vector<uint32_t> l_remaining_refs;
       get_remaining_refs(l_selected_livre,l_list_facture,l_remaining_refs);
 
-      //TO DELETE      std::vector<facture>::const_iterator l_iter = l_list_facture.begin();
-      //TO DELETE      std::vector<facture>::const_iterator l_iter_end = l_list_facture.end();
-      //TO DELETE      for(uint32_t l_index = 1 ; l_index <= l_selected_livre.get_nb_max_facture(); ++l_index)
-      //TO DELETE	{
-      //TO DELETE	  //Check if there are still defined factures
-      //TO DELETE	  std::cout << "Facture " << l_index << " check if there are still defined factures" << std::endl ;
-      //TO DELETE	  if(l_iter != l_iter_end)
-      //TO DELETE	    {
-      //TO DELETE	      // Check if currently tested facture is before current defined facture
-      //TO DELETE	      std::cout << "Check if currently tested facture " << l_index << " is before current defined facture " << l_iter->get_facture_ref() << std::endl ;
-      //TO DELETE	      if(l_index < l_iter->get_facture_ref())
-      //TO DELETE		{
-      //TO DELETE		  l_remaining_refs.push_back(l_index);
-      //TO DELETE		}
-      //TO DELETE	      else if(l_index == l_iter->get_facture_ref())
-      //TO DELETE		{
-      //TO DELETE		  std::cout << "Going to next defined facture" << std::endl ;
-      //TO DELETE	  ++l_iter;
-      //TO DELETE		}
-      //TO DELETE	    }
-      //TO DELETE	  else
-      //TO DELETE	    {
-      //TO DELETE	      l_remaining_refs.push_back(l_index);
-      //TO DELETE	    }
-      //TO DELETE	}
-
       // Update UI according to collected data
       m_user_interface->clear_non_attributed_facture_date();
       m_user_interface->set_non_attributed_allowed_facture_references(l_remaining_refs);
@@ -442,6 +594,69 @@ void fichier_client::treat_livre_facture_content_modif_event(void)
   std::cout << "Fichier_client Event :: Livre_facture content modif event" << std::endl;
   check_livre_facture_information(); 
 }
+
+//------------------------------------------------------------------------------
+void fichier_client::disable_customer_identity(void)
+{
+  assert(m_user_interface);
+  m_user_interface->set_customer_name("");
+  m_user_interface->set_customer_first_name("");
+  m_user_interface->set_customer_phone("");
+  m_user_interface->set_customer_address("");
+  m_user_interface->set_customer_postal_code("");
+  std::vector<ville> l_cities;
+  m_user_interface->set_customer_city_list(l_cities);
+  m_user_interface->set_customer_data_identity_fields_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::check_customer_identity(void)
+{
+  assert(m_user_interface);
+  std::string l_name = m_user_interface->get_customer_name();
+  std::string l_first_name = m_user_interface->get_customer_first_name();
+  std::string l_phone = (m_user_interface->is_customer_phone_complete() ? m_user_interface->get_customer_phone() : "");
+  std::string l_address = m_user_interface->get_customer_address();
+  std::string l_postal_code = m_user_interface->get_customer_postal_code();
+  const ville * l_city = m_user_interface->get_customer_city();
+
+  std::cout << "Phone \"" << l_phone << "\"" << std::endl ;
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+
+  std::vector<search_client_item> l_client_list ;
+  assert(m_db);
+  if(l_complete)
+    {
+      std::cout << "CLient identity is complete" << std::endl ; 
+      m_db->search_client(l_name,l_first_name,l_address,l_city->getName(),l_client_list);
+      std::cout << "Corresponding list size " << l_client_list.size() << std::endl ;
+    }
+
+  if(m_current_customer_id)
+    {
+      std::cout << "Existing customer" << std::endl;
+      if(l_client_list.size()==0 && l_complete)
+	{
+	  std::cout << "Compelte and no conflicts" << std::endl;
+	  client l_client;  
+	  m_db->get_client(m_current_customer_id,l_client);
+
+	  bool l_modified = l_client.get_name() != l_name || 
+	    l_client.get_first_name() != l_first_name || 
+	    l_client.get_tel() != l_phone ||
+	    l_client.get_address() != l_address ||
+	    l_client.get_ville_id() != l_city->get_id();
+	  m_user_interface->set_customer_data_modify_customer_enabled(l_modified);
+	}
+      m_user_interface->set_customer_data_create_customer_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_customer_data_create_customer_enabled(l_client_list.size() == 0 && l_complete);
+      m_user_interface->set_customer_data_modify_customer_enabled(false);
+    }
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client::check_livre_facture_information(void)

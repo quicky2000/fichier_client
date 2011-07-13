@@ -424,9 +424,9 @@ void fichier_client_db::get_all_ville(std::vector<ville> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_ville_by_name(const std::string & p_date,std::vector<ville> & p_result)
+void fichier_client_db::get_ville_by_name(const std::string & p_date,std::vector<ville> & p_result, bool p_exact)
 {
-  m_table_ville.get_by_name(p_date,p_result);
+  m_table_ville.get_by_name(p_date,p_result,p_exact);
 }
 
 //------------------------------------------------------------------------------
