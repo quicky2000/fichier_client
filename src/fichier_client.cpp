@@ -69,7 +69,21 @@ void fichier_client::treat_search_customer_customer_selected_event(void)
 
   std::vector<search_facture_item> l_list_facture;
   m_db->get_facture_by_client_id(l_client_id,l_list_facture);
-  m_user_interface->update_search_customer_list_facture(l_list_facture);  
+  m_user_interface->update_search_customer_list_facture(l_list_facture);
+
+  m_user_interface->set_customer_search_delete_customer_enabled(l_list_facture.size() == 0 && l_list_achat.size() == 0);
+  m_user_interface->set_customer_search_modify_customer_enabled(true);
+  
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_no_more_customer_selected_event(void)
+{
+  std::cout << "Fichier_client Event::search customer no more customer selected event" << std::endl;
+  assert(m_user_interface);
+  m_user_interface->set_customer_search_add_customer_enabled(false);  
+  m_user_interface->set_customer_search_delete_customer_enabled(false);
+  m_user_interface->set_customer_search_modify_customer_enabled(false);
 }
 
 //------------------------------------------------------------------------------

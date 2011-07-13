@@ -34,6 +34,7 @@ class fichier_client
   // Search client related events
   void treat_search_customer_criteria_modification_event(void);
   void treat_search_customer_customer_selected_event(void);
+  void treat_search_customer_no_more_customer_selected_event(void);
   void treat_search_customer_add_customer_event(void);
   void treat_search_customer_modify_customer_event(void);
   void treat_search_customer_delete_customer_event(void);
