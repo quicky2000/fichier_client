@@ -31,6 +31,13 @@ class fichier_client
   void save_as(const std::string & p_name);
   bool need_save(void)const;
 
+  // Search client related events
+  void treat_search_customer_criteria_modification_event(void);
+  void treat_search_customer_customer_selected_event(void);
+  void treat_search_customer_add_customer_event(void);
+  void treat_search_customer_modify_customer_event(void);
+  void treat_search_customer_delete_customer_event(void);
+
   // Livre facture related events
   bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
   void treat_livre_facture_selected_event(void);
@@ -71,21 +78,6 @@ class fichier_client
 
   // Operations on database
   void check_db_coherency(void);
-
-  // Client related operqtions
-  void search_client(const std::string & p_name,
-		     const std::string & p_first_name,
-		     const std::string & p_address,
-		     const std::string & p_city,
-		     std::vector<search_client_item> & p_result);
-
-  // Achat related operations
-  void get_achat_by_client_id(uint32_t p_client_id,
-			      std::vector<search_achat_item> & p_result);
-
-  // Facture related operations
-  void get_facture_by_client_id(uint32_t p_client_id,
-				std::vector<search_facture_item> & p_result);
 
   void refresh_non_attributed_facture_status_list(void);
   void refresh_non_attributed_facture_reason_list(void);

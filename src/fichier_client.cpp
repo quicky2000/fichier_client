@@ -32,6 +32,64 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
   m_user_interface = p_user_interface;
 }
 
+// Search client related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_criteria_modification_event(void)
+{
+  std::cout << "Fichier_client Event::search customer criteria modification event" << std::endl;
+  assert(m_user_interface);
+  std::string l_name = m_user_interface->get_search_customer_name();
+  std::string l_first_name = m_user_interface->get_search_customer_first_name();
+  std::string l_address = m_user_interface->get_search_customer_address();
+  std::string l_city = m_user_interface->get_search_customer_city();
+  std::cout << "Name = \"" << l_name << "\"\tFirst name = \"" << l_first_name << "\"\tAddress = \"" << l_address << "\"\tCity = \"" << l_city << "\"" << std::endl ;
+
+  std::vector<search_client_item> l_result ;
+  assert(m_db);
+  m_db->search_client(l_name,l_first_name,l_address,l_city,l_result);
+  m_user_interface->update_search_customer_list(l_result);
+  
+  m_user_interface->set_customer_search_add_customer_enabled(l_result.size()==0);
+  m_user_interface->set_customer_search_modify_customer_enabled(false);
+  m_user_interface->set_customer_search_delete_customer_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_customer_selected_event(void)
+{
+  std::cout << "Fichier_client Event::search customer customer selected event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_client_id = m_user_interface->get_selected_customer();
+  assert(l_client_id);
+  std::cout << "Id of selected client " << l_client_id << std::endl;
+ 
+  std::vector<search_achat_item> l_list_achat;
+  m_db->get_achat_by_client_id(l_client_id,l_list_achat);
+  m_user_interface->update_search_customer_list_achat(l_list_achat);
+
+  std::vector<search_facture_item> l_list_facture;
+  m_db->get_facture_by_client_id(l_client_id,l_list_facture);
+  m_user_interface->update_search_customer_list_facture(l_list_facture);  
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_add_customer_event(void)
+{
+  std::cout << "Fichier_client Event::search customer add customer event" << std::endl;
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_modify_customer_event(void)
+{
+  std::cout << "Fichier_client Event::search customer modify customer event" << std::endl;
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_search_customer_delete_customer_event(void)
+{
+  std::cout << "Fichier_client Event::search customer delete customer event" << std::endl;
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_delete_livre_facture_event(void)
@@ -1136,28 +1194,6 @@ void fichier_client::check_db_coherency(void)
 {
   assert(m_db);
   m_db->check_db_coherency();
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, std::vector<search_client_item> & p_result)
-{
-  assert(m_db);
-  m_db->search_client(p_name,p_first_name,p_address,p_city,p_result);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result)
-{
-  assert(m_db);
-  m_db->get_achat_by_client_id(p_client_id,p_result);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::get_facture_by_client_id(uint32_t p_client_id,
-					      std::vector<search_facture_item> & p_result)
-{
-  assert(m_db);
-  m_db->get_facture_by_client_id(p_client_id,p_result);
 }
 
 //------------------------------------------------------------------------------

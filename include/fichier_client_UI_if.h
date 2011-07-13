@@ -12,6 +12,29 @@ class fichier_client_UI_if
   virtual void display_warning_message(const std::string & p_title,const std::string & p_text)=0;
   virtual void display_information_message(const std::string & p_title,const std::string & p_text)=0;
 
+  // Interactions with customer search information
+  virtual const std::string get_search_customer_name(void)const=0;
+  virtual const std::string get_search_customer_first_name(void)const=0;
+  virtual const std::string get_search_customer_address(void)const=0;
+  virtual const std::string get_search_customer_city(void)const=0;
+  virtual uint32_t get_selected_customer(void)const=0;
+  virtual void update_search_customer_list(const std::vector<search_client_item> & p_list)=0;
+  virtual void update_search_customer_list_achat(const std::vector<search_achat_item> & p_list)=0;
+  virtual void update_search_customer_list_facture(const std::vector<search_facture_item> & p_list)=0;
+  virtual void set_customer_search_add_customer_enabled(bool p_enabled)=0;
+  virtual void set_customer_search_modify_customer_enabled(bool p_enabled)=0;
+  virtual void set_customer_search_delete_customer_enabled(bool p_enabled)=0;
+
+  // Interactions with Customer identity information
+  virtual void set_customer_name(const std::string & p_name)=0;
+  virtual const std::string get_customer_name(void)const=0;
+  virtual void set_customer_first_name(const std::string & p_first_name)=0;
+  virtual const std::string get_customer_first_name(void)const=0;
+  virtual void set_customer_phone(const std::string & p_phone)=0;
+  virtual const std::string get_customer_phone(void)const=0;
+  virtual void set_customer_address(const std::string & p_address)=0;
+  virtual const std::string get_customer_address(void)const=0;
+
   // Interactions with livre facture information
   virtual void clear_livre_facture_information(void)=0;
   virtual void set_livre_facture_start_date(const std::string & p_date)=0;
