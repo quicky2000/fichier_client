@@ -97,7 +97,10 @@ class fichier_client
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
 
-  void disable_customer_identity(void);
+  void set_customer_identity_enabled(bool p_enabled);
+  void set_customer_data_bill_enabled(bool p_enabled);
+  void set_customer_data_purchase_enabled(bool p_enabled);
+
   void check_customer_identity(void);
   void check_non_attributed_facture(void);
   void check_livre_facture_information(void);

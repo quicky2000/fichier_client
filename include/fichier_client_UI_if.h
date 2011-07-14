@@ -50,6 +50,7 @@ class fichier_client_UI_if
 
   // Interactions with customer bill information
   virtual void set_customer_bill_fields_enabled(bool p_enabled)=0;
+  virtual void update_customer_data_bill_list(const std::vector<search_facture_item> & p_list)=0;
   virtual void set_customer_bill_list_enabled(bool p_enabled)=0;
   virtual void set_customer_bill_creation_enabled(bool p_enabled)=0;
   virtual void set_customer_bill_modification_enabled(bool p_enabled)=0;
@@ -57,6 +58,7 @@ class fichier_client_UI_if
 
   // Interactions with customer purchase information
   virtual void set_customer_purchase_fields_enabled(bool p_enabled)=0;
+  virtual void update_customer_data_purchase_list(const std::vector<search_achat_item> & p_list)=0;
   virtual void set_customer_purchase_list_enabled(bool p_enabled)=0;
   virtual void set_customer_purchase_creation_enabled(bool p_enabled)=0;
   virtual void set_customer_purchase_modification_enabled(bool p_enabled)=0;

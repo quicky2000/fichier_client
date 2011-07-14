@@ -32,11 +32,11 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
   assert(p_user_interface);
   m_user_interface = p_user_interface;
 
-  // Disable customer data identity
-  m_user_interface->set_customer_data_identity_fields_enabled(false);
-  m_user_interface->set_customer_data_create_customer_enabled(false);
-  m_user_interface->set_customer_data_modify_customer_enabled(false);
-  m_user_interface->set_customer_data_delete_customer_enabled(false);
+  // Disable all customer data edition
+  set_customer_identity_enabled(false);
+  set_customer_data_bill_enabled(false);
+  set_customer_data_purchase_enabled(false);
+
 }
 
 // Search client related events
@@ -70,15 +70,15 @@ void fichier_client::treat_search_customer_customer_selected_event(void)
   assert(l_client_id);
   std::cout << "Id of selected client " << l_client_id << std::endl;
  
-  std::vector<search_achat_item> l_list_achat;
-  m_db->get_achat_by_client_id(l_client_id,l_list_achat);
-  m_user_interface->update_search_customer_list_achat(l_list_achat);
+  std::vector<search_achat_item> l_purchase_list;
+  m_db->get_achat_by_client_id(l_client_id,l_purchase_list);
+  m_user_interface->update_search_customer_list_achat(l_purchase_list);
 
   std::vector<search_facture_item> l_list_facture;
   m_db->get_facture_by_client_id(l_client_id,l_list_facture);
   m_user_interface->update_search_customer_list_facture(l_list_facture);
 
-  m_user_interface->set_customer_search_delete_customer_enabled(l_list_facture.size() == 0 && l_list_achat.size() == 0);
+  m_user_interface->set_customer_search_delete_customer_enabled(l_list_facture.size() == 0 && l_purchase_list.size() == 0);
   m_user_interface->set_customer_search_modify_customer_enabled(true);
   
 }
@@ -142,13 +142,69 @@ void fichier_client::treat_search_customer_modify_customer_event(void)
 {
   std::cout << "Fichier_client Event::search customer modify customer event" << std::endl;
   m_user_interface->set_customer_data_identity_fields_enabled(true);
+
+  uint32_t l_client_id = m_user_interface->get_selected_customer();
+  assert(l_client_id);
+
+  m_current_customer_id = l_client_id;
+
+  client l_client;
+  assert(m_db);
+  m_db->get_client(l_client_id,l_client);
+
+  m_user_interface->set_customer_name(l_client.get_name());
+  m_user_interface->set_customer_first_name(l_client.get_first_name());
+  m_user_interface->set_customer_phone(l_client.get_tel());
+  m_user_interface->set_customer_address(l_client.get_address());
+
+  ville l_city;
+  m_db->get_ville(l_client.get_ville_id(),l_city);
+  m_user_interface->set_customer_postal_code(l_city.get_postal_code());
+  std::vector<ville> l_city_list;
+  l_city_list.push_back(l_city);
+  m_user_interface->set_customer_city_list(l_city_list);
+  
+  m_user_interface->set_customer_bill_fields_enabled(true);
+  m_user_interface->set_customer_bill_list_enabled(true);
+
+  std::vector<search_facture_item> l_list_facture;
+  m_db->get_facture_by_client_id(l_client_id,l_list_facture);
+  m_user_interface->update_customer_data_bill_list(l_list_facture);
+
+  if(l_list_facture.size())
+    {
+      set_customer_data_purchase_enabled(true);
+    }
+
+  std::vector<search_achat_item> l_purchase_list;
+  m_db->get_achat_by_client_id(l_client_id,l_purchase_list);
+  m_user_interface->update_customer_data_purchase_list(l_purchase_list);
+
+  check_customer_identity();
+
+  m_user_interface->set_focus_on_customer_data();
 }
 
 //------------------------------------------------------------------------------
 void fichier_client::treat_search_customer_delete_customer_event(void)
 {
   std::cout << "Fichier_client Event::search customer delete customer event" << std::endl;
-  m_user_interface->set_customer_data_identity_fields_enabled(false);
+  assert(m_user_interface);
+  uint32_t l_customer_id = m_user_interface->get_selected_customer();
+
+  assert(m_db);
+  std::vector<search_facture_item> l_bill_list;
+  m_db->get_facture_by_client_id(l_customer_id,l_bill_list);
+  std::vector<search_achat_item> l_purchase_list;
+  m_db->get_achat_by_client_id(l_customer_id,l_purchase_list);
+
+  assert(l_bill_list.size()==0 && l_purchase_list.size()==0);
+
+  client l_customer;
+  m_db->get_client(l_customer_id,l_customer);
+  m_db->remove(l_customer);
+  
+  treat_search_customer_criteria_modification_event();
 }
 
 // Customer data related events
@@ -216,10 +272,10 @@ void fichier_client::treat_customer_data_create_customer_event(void)
   m_user_interface->set_customer_data_modify_customer_enabled(false);
   m_user_interface->set_customer_data_delete_customer_enabled(true);
 
+  treat_search_customer_criteria_modification_event();
+
   // Enable bill edition
-  m_user_interface->set_customer_bill_fields_enabled(true);
-  m_user_interface->set_customer_bill_list_enabled(true);
- 
+  set_customer_data_bill_enabled(true); 
 }
 
 //------------------------------------------------------------------------------
@@ -249,6 +305,8 @@ void fichier_client::treat_customer_data_modify_customer_event(void)
   l_client.set_ville_id(l_city->get_id());
   
   m_db->update(l_client);
+  treat_search_customer_criteria_modification_event();
+
   m_user_interface->set_customer_data_create_customer_enabled(false);
   m_user_interface->set_customer_data_modify_customer_enabled(false);
 }
@@ -263,9 +321,9 @@ void fichier_client::treat_customer_data_delete_customer_event(void)
   client l_client ;
   m_db->get_client(m_current_customer_id,l_client);
 
-   std::vector<search_achat_item> l_list_achat;
-   m_db->get_achat_by_client_id(l_client.get_id(),l_list_achat);
-   assert(l_list_achat.size()==0);
+   std::vector<search_achat_item> l_purchase_list;
+   m_db->get_achat_by_client_id(l_client.get_id(),l_purchase_list);
+   assert(l_purchase_list.size()==0);
 
   std::vector<search_facture_item> l_list_facture;
   m_db->get_facture_by_client_id(l_client.get_id(),l_list_facture);
@@ -275,9 +333,10 @@ void fichier_client::treat_customer_data_delete_customer_event(void)
    m_current_customer_id = 0;
 
 
-   disable_customer_identity();
+   set_customer_identity_enabled(false);
 
    assert(m_user_interface);
+   treat_search_customer_criteria_modification_event();
    m_user_interface->set_focus_on_customer_search();
    
 }
@@ -596,7 +655,7 @@ void fichier_client::treat_livre_facture_content_modif_event(void)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::disable_customer_identity(void)
+void fichier_client::set_customer_identity_enabled(bool p_enabled)
 {
   assert(m_user_interface);
   m_user_interface->set_customer_name("");
@@ -606,7 +665,34 @@ void fichier_client::disable_customer_identity(void)
   m_user_interface->set_customer_postal_code("");
   std::vector<ville> l_cities;
   m_user_interface->set_customer_city_list(l_cities);
-  m_user_interface->set_customer_data_identity_fields_enabled(false);
+  m_user_interface->set_customer_data_identity_fields_enabled(p_enabled);
+  m_user_interface->set_customer_data_create_customer_enabled(false);
+  m_user_interface->set_customer_data_modify_customer_enabled(false);
+  m_user_interface->set_customer_data_delete_customer_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::set_customer_data_bill_enabled(bool p_enabled)
+{
+ m_user_interface->set_customer_bill_fields_enabled(p_enabled);
+  std::vector<search_facture_item> l_bill_list;
+  m_user_interface->update_customer_data_bill_list(l_bill_list);
+  m_user_interface->set_customer_bill_list_enabled(p_enabled);
+  m_user_interface->set_customer_bill_creation_enabled(false);
+  m_user_interface->set_customer_bill_modification_enabled(false);
+  m_user_interface->set_customer_bill_deletion_enabled(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::set_customer_data_purchase_enabled(bool p_enabled)
+{
+  m_user_interface->set_customer_purchase_fields_enabled(p_enabled);
+  std::vector<search_achat_item> l_purchase_list;
+  m_user_interface->update_customer_data_purchase_list(l_purchase_list);
+  m_user_interface->set_customer_purchase_list_enabled(p_enabled);
+  m_user_interface->set_customer_purchase_creation_enabled(false);
+  m_user_interface->set_customer_purchase_modification_enabled(false);
+  m_user_interface->set_customer_purchase_deletion_enabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -637,7 +723,7 @@ void fichier_client::check_customer_identity(void)
       std::cout << "Existing customer" << std::endl;
       if(l_client_list.size()==0 && l_complete)
 	{
-	  std::cout << "Compelte and no conflicts" << std::endl;
+	  std::cout << "Complete and no conflicts" << std::endl;
 	  client l_client;  
 	  m_db->get_client(m_current_customer_id,l_client);
 
@@ -649,11 +735,19 @@ void fichier_client::check_customer_identity(void)
 	  m_user_interface->set_customer_data_modify_customer_enabled(l_modified);
 	}
       m_user_interface->set_customer_data_create_customer_enabled(false);
+
+      std::vector<search_facture_item> l_bill_list;
+      m_db->get_facture_by_client_id(m_current_customer_id,l_bill_list);
+      std::vector<search_achat_item> l_purchase_list;
+      m_db->get_achat_by_client_id(m_current_customer_id,l_purchase_list);
+      
+      m_user_interface->set_customer_data_delete_customer_enabled(l_bill_list.size()==0 && l_purchase_list.size() ==0);
     }
   else
     {
       m_user_interface->set_customer_data_create_customer_enabled(l_client_list.size() == 0 && l_complete);
       m_user_interface->set_customer_data_modify_customer_enabled(false);
+      m_user_interface->set_customer_data_delete_customer_enabled(false);
     }
 }
 
@@ -890,10 +984,10 @@ void fichier_client::treat_facture_selected_event(void)
       l_livre_ids.push_back(l_livre_id);
       m_user_interface->set_non_attributed_facture_allowed_livre_ids(l_livre_ids);
 
-      vector<facture> l_list_facture;
+      vector<facture> l_bill_list;
       assert(m_db);
       // Get factures related to selected livre_facture
-      m_db->get_by_livre_facture(l_livre_id,l_list_facture);
+      m_db->get_by_livre_facture(l_livre_id,l_bill_list);
 
       // Get livre_facture object
       livre_facture l_related_livre;
@@ -901,7 +995,7 @@ void fichier_client::treat_facture_selected_event(void)
     
       // Computing remaining references
       std::vector<uint32_t> l_remaining_refs;
-      get_remaining_refs(l_related_livre,l_list_facture,l_remaining_refs);
+      get_remaining_refs(l_related_livre,l_bill_list,l_remaining_refs);
       std::vector<uint32_t>::iterator l_iter = l_remaining_refs.begin();
       std::vector<uint32_t>::iterator l_iter_end = l_remaining_refs.end();
       while(l_iter != l_iter_end && *l_iter < l_facture.get_facture_ref())
