@@ -22,7 +22,7 @@ class livre_facture: public item
   /**
      Return type of object. This is used to name the corresponding table in database
   */
-  inline const std::string getType(void)const;
+  inline const std::string get_type(void)const;
  private:
   uint32_t m_livre_id;
   std::string m_start_date;
@@ -33,7 +33,7 @@ class livre_facture: public item
 inline std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_facture);
 
 //------------------------------------------------------------------------------
-const std::string livre_facture::getType(void)const
+const std::string livre_facture::get_type(void)const
 {
   return "LivreFacture";
 }
@@ -92,7 +92,7 @@ void livre_facture::setEndDate(const std::string & p_end_date)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const livre_facture & p_livre_facture)
 {
-  s << p_livre_facture.getType() << "{Id=" << p_livre_facture.get_id() << ",start_date=\"" << p_livre_facture.m_start_date << "\",end_date=\"" << p_livre_facture.m_end_date << "\"}" ;
+  s << p_livre_facture.get_type() << "{Id=" << p_livre_facture.get_id() << ",start_date=\"" << p_livre_facture.m_start_date << "\",end_date=\"" << p_livre_facture.m_end_date << "\"}" ;
   return s;
 }
 

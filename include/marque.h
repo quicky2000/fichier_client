@@ -10,8 +10,8 @@ class marque: public named_item
   inline marque(void);
   inline marque(const std::string &p_name);
   inline marque(uint32_t p_id, const std::string &p_name);
-  inline const std::string getType(void)const;
-  inline static const std::string getClassType(void);
+  inline const std::string get_type(void)const;
+  inline static const std::string get_class_type(void);
 
  private:
   
@@ -36,13 +36,13 @@ marque::marque(uint32_t p_id, const std::string &p_name):
 }
 
 //------------------------------------------------------------------------------
-const std::string marque::getType(void)const
+const std::string marque::get_type(void)const
 {
   return "Marque";
 }
 
 //------------------------------------------------------------------------------
-const std::string marque::getClassType(void)
+const std::string marque::get_class_type(void)
 {
   return "Marque";
 }

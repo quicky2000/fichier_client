@@ -228,7 +228,7 @@ namespace test
     l_fichier_client.get_ville_by_code_postal("7",l_result_ville);
     display(l_result_ville);
 
-    l_ville3.setName("Chamonix");
+    l_ville3.set_name("Chamonix");
     l_fichier_client.update(l_ville3);
 
     l_result_ville.clear();
@@ -265,7 +265,7 @@ namespace test
     l_fichier_client.get_all_marque(l_result_marque);
     display(l_result_marque);
 
-    l_marque2.setName("SIEMENS");
+    l_marque2.set_name("SIEMENS");
     cout << l_marque2 << endl ;
     l_fichier_client.update(l_marque2);
 
@@ -308,7 +308,7 @@ namespace test
     l_fichier_client.get_all_type_achat(l_result_type_achat);
     display(l_result_type_achat);
 
-    l_type_achat2.setName("Four");
+    l_type_achat2.set_name("Four");
     cout << l_type_achat2 << endl ;
     l_fichier_client.update(l_type_achat2);
 
@@ -374,7 +374,7 @@ namespace test
     display(l_result_facture_status);
 
     cout << "Modify status" << endl ;
-    l_facture_status2.setName("Non vérifée");
+    l_facture_status2.set_name("Non vérifée");
     cout << l_facture_status2 << endl ;
 
     cout << "Update db" << endl ;

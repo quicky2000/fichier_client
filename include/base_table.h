@@ -62,7 +62,7 @@ template <class T> base_table<T>::~base_table(void)
   sqlite3_finalize(m_delete_stmt);  
   sqlite3_finalize(m_update_stmt);  
   sqlite3_finalize(m_create_stmt);  
-  std::cout << "Table " << description<T>::getClassType() << " end of destruction" << std::endl ;
+  std::cout << "Table " << description<T>::get_class_type() << " end of destruction" << std::endl ;
 }
 
 //------------------------------------------------------------------------------
@@ -81,79 +81,79 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
 
   // Creation of table
   //--------------------
-  int l_status = sqlite3_prepare_v2(m_db,("CREATE TABLE IF NOT EXISTS " + description<T>::getClassType() + " ( Id INTEGER PRIMARY KEY AUTOINCREMENT, "+ description<T>::getTableFieldsDeclaration()+");").c_str(),-1,&l_stmt,NULL);
+  int l_status = sqlite3_prepare_v2(m_db,("CREATE TABLE IF NOT EXISTS " + description<T>::get_class_type() + " ( Id INTEGER PRIMARY KEY AUTOINCREMENT, "+ description<T>::get_table_fields_declaration()+");").c_str(),-1,&l_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of staement to create " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during preparation of staement to create " << description<T>::get_class_type() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
   
   l_status = sqlite3_step(l_stmt);
   if(!l_status == SQLITE_DONE)
     {
-      std::cout << "ERROR during creation of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during creation of " << description<T>::get_class_type() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
   sqlite3_finalize(l_stmt);  
 
   // Preparing named_item create statement
   //----------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("INSERT INTO " + description<T>::getClassType() + " (Id,"+description<T>::getTableFields()+") VALUES ($id, "+description<T>::getFieldValues()+")").c_str(),-1,&m_create_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("INSERT INTO " + description<T>::get_class_type() + " (Id,"+description<T>::get_table_fields()+") VALUES ($id, "+description<T>::get_field_values()+")").c_str(),-1,&m_create_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to create " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to create " << description<T>::get_class_type() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
   // Preparing named_item update statement
   //-------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("UPDATE " + description<T>::getClassType() + " SET " + description<T>::getUpdateFields() + " WHERE Id == $id ;").c_str(),-1,&m_update_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("UPDATE " + description<T>::get_class_type() + " SET " + description<T>::get_update_fields() + " WHERE Id == $id ;").c_str(),-1,&m_update_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to update " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to update " << description<T>::get_class_type() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
   // Preparing named_item delete statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("DELETE FROM " + description<T>::getClassType() + " WHERE Id == $id").c_str(),-1,&m_delete_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("DELETE FROM " + description<T>::get_class_type() + " WHERE Id == $id").c_str(),-1,&m_delete_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to delete " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to delete " << description<T>::get_class_type() << " item : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
   // Preparing named_item get_by_id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT Id,"+description<T>::getTableFields()+" FROM " + description<T>::getClassType() + " WHERE Id == $id").c_str(),-1,&m_get_by_id_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT Id,"+description<T>::get_table_fields()+" FROM " + description<T>::get_class_type() + " WHERE Id == $id").c_str(),-1,&m_get_by_id_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get " << description<T>::getClassType() << " item by id: " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get " << description<T>::get_class_type() << " item by id: " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
   // Preparing get_all statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT Id,"+description<T>::getTableFields()+" FROM " + description<T>::getClassType()).c_str(),-1,&m_get_all_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT Id,"+description<T>::get_table_fields()+" FROM " + description<T>::get_class_type()).c_str(),-1,&m_get_all_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get all " << description<T>::getClassType() << " items : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get all " << description<T>::get_class_type() << " items : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
   // Preparing get_max_id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(m_db,("SELECT MAX(Id) FROM " + description<T>::getClassType()).c_str(),-1,&m_get_max_id_stmt,NULL);
+  l_status = sqlite3_prepare_v2(m_db,("SELECT MAX(Id) FROM " + description<T>::get_class_type()).c_str(),-1,&m_get_max_id_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get max Id of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get max Id of " << description<T>::get_class_type() << " table : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
   std::cout << "Statements OK" << std::endl ;
 
-  std::cout << "Table " << description<T>::getClassType() << " successfully created" << std::endl ;
+  std::cout << "Table " << description<T>::get_class_type() << " successfully created" << std::endl ;
 #endif  
 }
 
@@ -173,7 +173,7 @@ template <class T> void base_table<T>::create(T & p_named_item)
   int l_status = sqlite3_bind_int(m_create_stmt,sqlite3_bind_parameter_index(m_create_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of Id parameter for create statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during binding of Id parameter for create statement of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
   
@@ -185,12 +185,12 @@ template <class T> void base_table<T>::create(T & p_named_item)
   if( l_status == SQLITE_DONE)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-      std::cout << description<T>::getClassType() << " successfully created" << std::endl ;
+      std::cout << description<T>::get_class_type() << " successfully created" << std::endl ;
 #endif
     }
   else
     {
-      std::cout << "ERROR during creation of " << description<T>::getClassType() << " item : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during creation of " << description<T>::get_class_type() << " item : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
@@ -199,7 +199,7 @@ template <class T> void base_table<T>::create(T & p_named_item)
   l_status = sqlite3_reset(m_create_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -208,7 +208,7 @@ template <class T> void base_table<T>::create(T & p_named_item)
   l_status = sqlite3_clear_bindings(m_create_stmt);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of bindings of " << description<T>::get_class_type() << " create statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -222,7 +222,7 @@ template <class T> void base_table<T>::update(const T & p_named_item)
   int l_status = sqlite3_bind_int(m_update_stmt,sqlite3_bind_parameter_index(m_update_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of Id parameter for update statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during binding of Id parameter for update statement of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
   
@@ -234,12 +234,12 @@ template <class T> void base_table<T>::update(const T & p_named_item)
   if( l_status == SQLITE_DONE)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-      std::cout << description<T>::getClassType() << " successfully updated" << std::endl ;
+      std::cout << description<T>::get_class_type() << " successfully updated" << std::endl ;
 #endif
     }
   else
     {
-      std::cout << "ERROR during update of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during update of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
@@ -248,7 +248,7 @@ template <class T> void base_table<T>::update(const T & p_named_item)
   l_status = sqlite3_reset(m_update_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " update statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " update statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -257,7 +257,7 @@ template <class T> void base_table<T>::update(const T & p_named_item)
   l_status = sqlite3_clear_bindings(m_update_stmt);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " update statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of bindings of " << description<T>::get_class_type() << " update statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -272,7 +272,7 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
   int l_status = sqlite3_bind_int(m_delete_stmt,sqlite3_bind_parameter_index(m_delete_stmt,"$id"),p_named_item.get_id());
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of Id parameter for delete statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during binding of Id parameter for delete statement of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
     
@@ -282,12 +282,12 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
   if( l_status == SQLITE_DONE)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-      std::cout << description<T>::getClassType() << " successfully deleted" << std::endl ;
+      std::cout << description<T>::get_class_type() << " successfully deleted" << std::endl ;
 #endif
     }
   else
     {
-      std::cout << "ERROR during delete of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during delete of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
@@ -296,7 +296,7 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
   l_status = sqlite3_reset(m_delete_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " delete statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " delete statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -305,7 +305,7 @@ template <class T> void base_table<T>::remove(const T & p_named_item)
   l_status = sqlite3_clear_bindings(m_delete_stmt);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " delete statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of bindings of " << description<T>::get_class_type() << " delete statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -322,7 +322,7 @@ template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
   int l_status = sqlite3_bind_int(m_get_by_id_stmt,sqlite3_bind_parameter_index(m_get_by_id_stmt,"$id"),p_id);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of Id parameter for get_by_id statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during binding of Id parameter for get_by_id statement of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
     
@@ -332,28 +332,28 @@ template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
   if( l_status == SQLITE_ROW)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-      std::cout << description<T>::getClassType() << " successfully selected" << std::endl ;
+      std::cout << description<T>::get_class_type() << " successfully selected" << std::endl ;
 #endif
-      p_data = description<T>::getItemFromRow(m_get_by_id_stmt);
+      p_data = description<T>::get_item_from_row(m_get_by_id_stmt);
 
       // Ensure that ID is unique
       l_status = sqlite3_step(m_get_by_id_stmt);
       if( l_status == SQLITE_DONE)
 	{
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-	  std::cout << description<T>::getClassType() << " successfully selected done" << std::endl ;
+	  std::cout << description<T>::get_class_type() << " successfully selected done" << std::endl ;
 #endif
 	  l_result = 1;
 	}
       else
 	{
-	  std::cout << "ERROR during selection of " << description<T>::getClassType() << " : Id " << p_id << " is not unique " << sqlite3_errmsg(m_db) << std::endl ;
+	  std::cout << "ERROR during selection of " << description<T>::get_class_type() << " : Id " << p_id << " is not unique " << sqlite3_errmsg(m_db) << std::endl ;
 	  exit(-1);
 	}
     }
   else if(l_status != SQLITE_DONE)
     {
-      std::cout << "ERROR during selection of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during selection of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
@@ -364,7 +364,7 @@ template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
   l_status = sqlite3_reset(m_get_by_id_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " get_by_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " get_by_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -373,7 +373,7 @@ template <class T> uint32_t base_table<T>::get(uint32_t p_id, T & p_data)
   l_status = sqlite3_clear_bindings(m_get_by_id_stmt);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " get_by_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of bindings of " << description<T>::get_class_type() << " get_by_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -389,16 +389,16 @@ template <class T> void base_table<T>::get_all(std::vector<T> & p_list)
   //---------------------
   while( (l_status = sqlite3_step(m_get_all_stmt)) == SQLITE_ROW)
     {
-      p_list.push_back(description<T>::getItemFromRow(m_get_all_stmt));
+      p_list.push_back(description<T>::get_item_from_row(m_get_all_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
-      std::cout << "ERROR during selection of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during selection of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-  std::cout <<  description<T>::getClassType() << " successfully listed" << std::endl ;
+  std::cout <<  description<T>::get_class_type() << " successfully listed" << std::endl ;
 #endif
 
   // Reset the statement for the next use
@@ -406,7 +406,7 @@ template <class T> void base_table<T>::get_all(std::vector<T> & p_list)
   l_status = sqlite3_reset(m_get_all_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " get_all statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " get_all statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -424,7 +424,7 @@ template <class T> uint32_t base_table<T>::get_max_id(void)
   if( l_status == SQLITE_ROW)
     {
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-      std::cout << description<T>::getClassType() << " successfully max determined" << std::endl ;
+      std::cout << description<T>::get_class_type() << " successfully max determined" << std::endl ;
 #endif
       l_result = sqlite3_column_int(m_get_max_id_stmt,0);
 
@@ -433,18 +433,18 @@ template <class T> uint32_t base_table<T>::get_max_id(void)
       if( l_status == SQLITE_DONE)
 	{
 #ifdef ENABLE_SUCCESS_STATUS_DISPLAY
-	  std::cout << description<T>::getClassType() << " successfully max done" << std::endl ;
+	  std::cout << description<T>::get_class_type() << " successfully max done" << std::endl ;
 #endif
 	}
       else
 	{
-	  std::cout << "ERROR during determination of max Id of " << description<T>::getClassType() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
+	  std::cout << "ERROR during determination of max Id of " << description<T>::get_class_type() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
 	  exit(-1);
 	}
     }
   else
     {
-      std::cout << "ERROR during dtermiantion of max Id of " << description<T>::getClassType() << " : " << sqlite3_errmsg(m_db) << std::endl ;
+      std::cout << "ERROR during dtermiantion of max Id of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
     }
 
@@ -455,7 +455,7 @@ template <class T> uint32_t base_table<T>::get_max_id(void)
   l_status = sqlite3_reset(m_get_max_id_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " get_max_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " get_max_id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 

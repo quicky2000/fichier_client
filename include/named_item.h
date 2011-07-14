@@ -16,8 +16,8 @@ class named_item: public item
   inline named_item(void);
   inline named_item(const std::string &p_name);
   inline named_item(uint32_t p_id, const std::string &p_name);
-  inline const std::string & getName(void)const;
-  inline void setName(const std::string & p_name);
+  inline const std::string & get_name(void)const;
+  inline void set_name(const std::string & p_name);
   
  private:
   std::string m_name;
@@ -48,13 +48,13 @@ named_item::named_item(uint32_t p_id, const std::string &p_name):
 }
 
 //------------------------------------------------------------------------------
-const std::string & named_item::getName(void)const
+const std::string & named_item::get_name(void)const
 {
   return m_name;
 }
 
 //------------------------------------------------------------------------------
-void named_item::setName(const std::string & p_name)
+void named_item::set_name(const std::string & p_name)
 {
   m_name = p_name;
 }
@@ -62,7 +62,7 @@ void named_item::setName(const std::string & p_name)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const named_item & p_named_item)
 {
-  s << p_named_item.getType() << "{Id=" << p_named_item.get_id() << ",Name=\"" << p_named_item.m_name << "\"}" ;
+  s << p_named_item.get_type() << "{Id=" << p_named_item.get_id() << ",Name=\"" << p_named_item.m_name << "\"}" ;
   return s;
 }
 

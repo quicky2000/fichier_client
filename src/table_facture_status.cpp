@@ -30,7 +30,7 @@ void table_facture_status::check_mandatory_status(const std::string & p_status)
   bool l_found = false;
   while(l_iter != l_iter_end && !l_found)
     {
-      l_found = (l_iter->getName() == p_status);
+      l_found = (l_iter->get_name() == p_status);
       ++l_iter;
     }
   if(!l_found)

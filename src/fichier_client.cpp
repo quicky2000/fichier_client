@@ -109,7 +109,7 @@ void fichier_client::treat_search_customer_add_customer_event(void)
   assert(m_db);
   m_db->get_ville_by_name(m_user_interface->get_search_customer_city(),l_cities);
 
-  m_user_interface->set_customer_postal_code(l_cities.size() != 1 ? "" : l_cities.begin()->getCodePostal());
+  m_user_interface->set_customer_postal_code(l_cities.size() != 1 ? "" : l_cities.begin()->get_postal_code());
   m_user_interface->set_customer_city_list(l_cities);
   
   m_user_interface->set_customer_data_identity_fields_enabled(true);
@@ -176,7 +176,7 @@ void fichier_client::treat_city_selection_event(void)
   const ville * l_city = m_user_interface->get_customer_city();
   if(l_city)
     {
-      m_user_interface->set_customer_postal_code(l_city->getCodePostal());
+      m_user_interface->set_customer_postal_code(l_city->get_postal_code());
     }
   treat_identity_content_modification_event();
 }
@@ -200,12 +200,12 @@ void fichier_client::treat_customer_data_create_customer_event(void)
   std::string l_postal_code = m_user_interface->get_customer_postal_code();
   const ville * l_city = m_user_interface->get_customer_city();
 
-  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->get_postal_code() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
   assert(l_complete);
 
   std::vector<search_client_item> l_client_list ;
   assert(m_db);
-  m_db->search_client(l_name,l_first_name,l_address,l_city->getName(),l_client_list);
+  m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list);
   assert(l_client_list.size()==0);
 
   client l_client(l_name,l_first_name,l_address,l_phone,l_city->get_id());
@@ -234,7 +234,7 @@ void fichier_client::treat_customer_data_modify_customer_event(void)
   std::string l_postal_code = m_user_interface->get_customer_postal_code();
   const ville * l_city = m_user_interface->get_customer_city();
 
-  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->get_postal_code() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
   assert(l_complete);
 
   assert(m_current_customer_id);
@@ -621,14 +621,14 @@ void fichier_client::check_customer_identity(void)
   const ville * l_city = m_user_interface->get_customer_city();
 
   std::cout << "Phone \"" << l_phone << "\"" << std::endl ;
-  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->getCodePostal() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
+  bool l_complete = l_name != "" && l_first_name != ""  && l_postal_code != "" && l_city != NULL && l_city->get_postal_code() == l_postal_code && (m_user_interface->is_customer_phone_complete() || m_user_interface->is_customer_phone_empty());
 
   std::vector<search_client_item> l_client_list ;
   assert(m_db);
   if(l_complete)
     {
       std::cout << "CLient identity is complete" << std::endl ; 
-      m_db->search_client(l_name,l_first_name,l_address,l_city->getName(),l_client_list);
+      m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list);
       std::cout << "Corresponding list size " << l_client_list.size() << std::endl ;
     }
 
@@ -770,14 +770,14 @@ void fichier_client::check_non_attributed_facture(void)
       l_valid = false;
     }
   const facture_status * l_status = m_user_interface->get_non_attributed_facture_status();
-  std::cout << "Facture status is \"" << (l_status == NULL ? "" : l_status->getName()) << "\"" << std::endl ;
+  std::cout << "Facture status is \"" << (l_status == NULL ? "" : l_status->get_name()) << "\"" << std::endl ;
   if(l_status == NULL)
     {
       l_valid = false;
     }
   
   const facture_reason * l_reason = m_user_interface->get_non_attributed_facture_reason();
-  std::cout << "Facture reason is \"" << (l_reason == NULL ? "" : l_reason->getName()) << "\"" << std::endl ;
+  std::cout << "Facture reason is \"" << (l_reason == NULL ? "" : l_reason->get_name()) << "\"" << std::endl ;
   if(l_reason == NULL)
     {
       l_valid = false;
@@ -1010,7 +1010,7 @@ void fichier_client::treat_delete_facture_status_event(void)
   m_db->get_facture_status(l_facture_status_id,l_facture_status);
 
   // Check this is not predefined status
-  string l_name = l_facture_status.getName();
+  string l_name = l_facture_status.get_name();
   assert(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status());
 
   // Check that no facture are using this status
@@ -1041,14 +1041,14 @@ void fichier_client::treat_modify_facture_status_event(void)
   m_db->get_facture_status(l_facture_status_id,l_facture_status);
 
   // Check this is not predefined status
-  string l_name = l_facture_status.getName();
+  string l_name = l_facture_status.get_name();
   assert(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status());
 
   m_user_interface->set_delete_facture_status_enabled(false);
   if(!m_facture_status_pending_modif)
     {
       m_facture_status_pending_modif = true;
-      m_user_interface->set_facture_status_name(l_facture_status.getName());
+      m_user_interface->set_facture_status_name(l_facture_status.get_name());
       m_user_interface->set_modify_facture_status_action_name("Annuler");
       m_user_interface->set_facture_status_list_enabled(false);
     }
@@ -1065,7 +1065,7 @@ void fichier_client::treat_modify_facture_status_event(void)
 	  m_db->get_facture_status_by_name(l_new_name,l_list_facture_status,true);
 	  assert(l_list_facture_status.size()==0);
       
-	  l_facture_status.setName(l_new_name);
+	  l_facture_status.set_name(l_new_name);
 	  m_db->update(l_facture_status);
 	}
       m_facture_status_pending_modif = false;
@@ -1107,7 +1107,7 @@ void fichier_client::treat_facture_status_name_modif_event(void)
       m_db->get_facture_status(l_facture_status_id,l_facture_status);
       
       bool l_name_ok = l_status_name != "" && l_status_name != facture_status::get_ok_status() && l_status_name != facture_status::get_non_checked_status();
-      m_user_interface->set_modify_facture_status_action_name(l_facture_status.getName() != l_status_name ? "Appliquer" : "Annuler");
+      m_user_interface->set_modify_facture_status_action_name(l_facture_status.get_name() != l_status_name ? "Appliquer" : "Annuler");
 
       // Check if modified value is acceptable
       if(l_name_ok)
@@ -1152,7 +1152,7 @@ void fichier_client::treat_facture_status_selected_event(void)
   facture_status l_facture_status;
   m_db->get_facture_status(l_facture_status_id,l_facture_status);
 
-  string l_name = l_facture_status.getName();
+  string l_name = l_facture_status.get_name();
    
   if(l_name != facture_status::get_ok_status() && l_name != facture_status::get_non_checked_status())
     {
@@ -1239,13 +1239,13 @@ void fichier_client::treat_modify_facture_reason_event(void)
   m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
 
   // Check this is not predefined reason
-  string l_name = l_facture_reason.getName();
+  string l_name = l_facture_reason.get_name();
 
   m_user_interface->set_delete_facture_reason_enabled(false);
   if(!m_facture_reason_pending_modif)
     {
       m_facture_reason_pending_modif = true;
-      m_user_interface->set_facture_reason_name(l_facture_reason.getName());
+      m_user_interface->set_facture_reason_name(l_facture_reason.get_name());
       m_user_interface->set_modify_facture_reason_action_name("Annuler");
       m_user_interface->set_facture_reason_list_enabled(false);
     }
@@ -1262,7 +1262,7 @@ void fichier_client::treat_modify_facture_reason_event(void)
 	  m_db->get_facture_reason_by_name(l_new_name,l_list_facture_reason,true);
 	  assert(l_list_facture_reason.size()==0);
       
-	  l_facture_reason.setName(l_new_name);
+	  l_facture_reason.set_name(l_new_name);
 	  m_db->update(l_facture_reason);
 	}
       m_facture_reason_pending_modif = false;
@@ -1304,7 +1304,7 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
       m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
       
       bool l_name_ok = l_reason_name != "";
-      m_user_interface->set_modify_facture_reason_action_name(l_facture_reason.getName() != l_reason_name ? "Appliquer" : "Annuler");
+      m_user_interface->set_modify_facture_reason_action_name(l_facture_reason.get_name() != l_reason_name ? "Appliquer" : "Annuler");
 
       // Check if modified value is acceptable
       if(l_name_ok)
@@ -1349,7 +1349,7 @@ void fichier_client::treat_facture_reason_selected_event(void)
   facture_reason l_facture_reason;
   m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
 
-  string l_name = l_facture_reason.getName();
+  string l_name = l_facture_reason.get_name();
    
   // Check that no facture are using this reason
   std::vector<facture> l_facture_list;
@@ -1546,7 +1546,7 @@ void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id
 	{
 	  facture_reason l_reason;
 	  m_db->get_facture_reason(l_reason_id,l_reason);
-	  p_result.push_back(search_facture_client_item(*l_iter,l_reason.getName()));
+	  p_result.push_back(search_facture_client_item(*l_iter,l_reason.get_name()));
 	}
       ++l_iter;
     }

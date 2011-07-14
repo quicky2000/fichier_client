@@ -29,7 +29,7 @@ template <class T> named_table<T>::named_table(void):
 template <class T> named_table<T>::~named_table(void)
 {
   sqlite3_finalize(m_get_by_name_stmt);
-  std::cout << "Table " << description<T>::getClassType() << " end of destruction" << std::endl ;
+  std::cout << "Table " << description<T>::get_class_type() << " end of destruction" << std::endl ;
 }
 
 //------------------------------------------------------------------------------
@@ -39,10 +39,10 @@ template <class T> void named_table<T>::set_db(sqlite3 *p_db)
   
   // Preparing get_by_name statements
   //--------------------------------------------
-  int l_status = sqlite3_prepare_v2(base_table<T>::get_db(),("SELECT Id,"+description<T>::getTableFields()+" FROM " + description<T>::getClassType() + " WHERE Name LIKE @name").c_str(),-1,&m_get_by_name_stmt,NULL);
+  int l_status = sqlite3_prepare_v2(base_table<T>::get_db(),("SELECT Id,"+description<T>::get_table_fields()+" FROM " + description<T>::get_class_type() + " WHERE Name LIKE @name").c_str(),-1,&m_get_by_name_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get "+description<T>::getTableFields()+" item by name : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get "+description<T>::get_table_fields()+" item by name : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
       exit(-1);
     }
 
@@ -63,7 +63,7 @@ template <class T> void named_table<T>::get_by_name(const std::string & p_name,s
   int l_status = sqlite3_bind_text(m_get_by_name_stmt,sqlite3_bind_parameter_index(m_get_by_name_stmt,"@name"),l_param_value.c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of name parameter for get_by_name statement of " << description<T>::getClassType() << " : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
+      std::cout << "ERROR during binding of name parameter for get_by_name statement of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
       exit(-1);
     }
     
@@ -71,15 +71,15 @@ template <class T> void named_table<T>::get_by_name(const std::string & p_name,s
   //---------------------
   while( (l_status = sqlite3_step(m_get_by_name_stmt)) == SQLITE_ROW)
     {
-      p_result.push_back(description<T>::getItemFromRow(m_get_by_name_stmt));
+      p_result.push_back(description<T>::get_item_from_row(m_get_by_name_stmt));
     }
   if(l_status != SQLITE_DONE)
     {
-      std::cout << "ERROR during selection of " << description<T>::getClassType() << " : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;
+      std::cout << "ERROR during selection of " << description<T>::get_class_type() << " : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;
       exit(-1);
     }
 
-  std::cout << "" << description<T>::getClassType() << " get_by_name successfully listed" << std::endl ;
+  std::cout << "" << description<T>::get_class_type() << " get_by_name successfully listed" << std::endl ;
 
 
   // Reset the statement for the next use
@@ -87,7 +87,7 @@ template <class T> void named_table<T>::get_by_name(const std::string & p_name,s
   l_status = sqlite3_reset(m_get_by_name_stmt);  
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of " << description<T>::getClassType() << " get_by_name statement : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
+      std::cout << "ERROR during reset of " << description<T>::get_class_type() << " get_by_name statement : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
       exit(-1);
     }
 
@@ -96,7 +96,7 @@ template <class T> void named_table<T>::get_by_name(const std::string & p_name,s
   l_status = sqlite3_clear_bindings(m_get_by_name_stmt);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during reset of bindings of " << description<T>::getClassType() << " get_by_name statement : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
+      std::cout << "ERROR during reset of bindings of " << description<T>::get_class_type() << " get_by_name statement : " << sqlite3_errmsg(base_table<T>::get_db()) << std::endl ;     
       exit(-1);
     }
 

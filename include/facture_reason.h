@@ -10,8 +10,8 @@ class facture_reason: public named_item
   inline facture_reason(void);
   inline facture_reason(const std::string &p_name);
   inline facture_reason(uint32_t p_id, const std::string &p_name);
-  inline const std::string getType(void)const;
-  inline static const std::string getClassType(void);
+  inline const std::string get_type(void)const;
+  inline static const std::string get_class_type(void);
 
  private:
   
@@ -36,13 +36,13 @@ facture_reason::facture_reason(uint32_t p_id, const std::string &p_name):
 }
 
 //------------------------------------------------------------------------------
-const std::string facture_reason::getType(void)const
+const std::string facture_reason::get_type(void)const
 {
   return "Facture_Reason";
 }
 
 //------------------------------------------------------------------------------
-const std::string facture_reason::getClassType(void)
+const std::string facture_reason::get_class_type(void)
 {
   return "Facture_Reason";
 }

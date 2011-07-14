@@ -16,7 +16,7 @@ class item
   inline item(uint32_t p_id);
   inline uint32_t get_id(void)const;
   inline void set_id(uint32_t p_id);
-  virtual const std::string getType(void)const=0;
+  virtual const std::string get_type(void)const=0;
   
  private:
   uint32_t m_id;
@@ -55,7 +55,7 @@ uint32_t item::get_id(void)const
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const item & p_item)
 {
-  s << p_item.getType() << "{Id=" << p_item.m_id << "}" ;
+  s << p_item.get_type() << "{Id=" << p_item.m_id << "}" ;
   return s;
 }
 

@@ -41,7 +41,7 @@ class facture:public item
   /**
      Return type of object. This is used to name the corresponding table in database
   */
-  inline const std::string getType(void)const;
+  inline const std::string get_type(void)const;
  private:
   uint32_t m_facture_ref;
   uint32_t m_client_id;
@@ -122,7 +122,7 @@ void facture::set_facture_ref(uint32_t p_facture_ref)
 
 
 //------------------------------------------------------------------------------
-const std::string facture::getType(void)const
+const std::string facture::get_type(void)const
 {
   return "Facture";
 }
@@ -179,7 +179,7 @@ void facture::set_livre_facture_id(uint32_t p_livre_facture_id)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const facture & p_facture)
 {
-  s << p_facture.getType() << "{Id=\"" << p_facture.get_id() << "\",Facture_ref=\"" << p_facture.get_facture_ref() << "\",ClientId=\"" << p_facture.m_client_id << "\",Date=\"" << p_facture.m_date << "\",LivreFactureId=\"" << p_facture.m_livre_facture_id << "\",Status=\"" << p_facture.m_status << "\",Reason_Id=\"" << p_facture.m_reason_id << "\"}" ;
+  s << p_facture.get_type() << "{Id=\"" << p_facture.get_id() << "\",Facture_ref=\"" << p_facture.get_facture_ref() << "\",ClientId=\"" << p_facture.m_client_id << "\",Date=\"" << p_facture.m_date << "\",LivreFactureId=\"" << p_facture.m_livre_facture_id << "\",Status=\"" << p_facture.m_status << "\",Reason_Id=\"" << p_facture.m_reason_id << "\"}" ;
   return s;
 }
 

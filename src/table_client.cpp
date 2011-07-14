@@ -12,7 +12,7 @@ table_client::table_client(void):
 table_client::~table_client(void)
 {
   sqlite3_finalize(m_get_by_date_stmt);
-  std::cout << "Table " << description<client>::getClassType() << " end of destruction" << std::endl ;
+  std::cout << "Table " << description<client>::get_class_type() << " end of destruction" << std::endl ;
 }
 
 //------------------------------------------------------------------------------

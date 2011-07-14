@@ -58,20 +58,20 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,
 				("SELECT " +
-				 description<client>::getClassType() + ".Id, " +
-				 description<client>::getClassType() + ".Name, " + 
-				 description<client>::getClassType() + ".FirstName, " +
-				 description<client>::getClassType() + ".Address, " +
-				 description<ville>::getClassType() + ".Name " +
+				 description<client>::get_class_type() + ".Id, " +
+				 description<client>::get_class_type() + ".Name, " + 
+				 description<client>::get_class_type() + ".FirstName, " +
+				 description<client>::get_class_type() + ".Address, " +
+				 description<ville>::get_class_type() + ".Name " +
 				 " FROM " +
-				 description<client>::getClassType() + ", " +
-				 description<ville>::getClassType() + 
+				 description<client>::get_class_type() + ", " +
+				 description<ville>::get_class_type() + 
 				 " WHERE "+
-				 description<client>::getClassType() + ".VilleId" +
+				 description<client>::get_class_type() + ".VilleId" +
 				 " == " +
-				 description<ville>::getClassType() + ".Id" +
+				 description<ville>::get_class_type() + ".Id" +
 				 " AND " +
-				 description<client>::getClassType() + ".Id" +
+				 description<client>::get_class_type() + ".Id" +
 				 " == " +
 				 "$client_id"
 				 ).c_str(),
@@ -88,24 +88,24 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   // Preparing search client statements
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,("SELECT " +
-				      description<client>::getClassType() + ".Id, " +
-				      description<client>::getClassType() + ".Name, "+
+				      description<client>::get_class_type() + ".Id, " +
+				      description<client>::get_class_type() + ".Name, "+
 				      "FirstName, " +
 				      "Address, " +
 				      "Ville.Name " +
 				      "FROM " + 
-				      description<client>::getClassType() + ", " + 
-				      description<ville>::getClassType() +
+				      description<client>::get_class_type() + ", " + 
+				      description<ville>::get_class_type() +
 				      " WHERE " +
-				      description<client>::getClassType() + ".VilleId = Ville.Id "+ 
+				      description<client>::get_class_type() + ".VilleId = Ville.Id "+ 
 				      " AND " +
-				      description<client>::getClassType() + ".Name LIKE @client_name" +
+				      description<client>::get_class_type() + ".Name LIKE @client_name" +
 				      " AND " +
 				      "FirstName LIKE @client_first_name" +
 				      " AND " +
 				      "Address LIKE @client_address"+
 				      " AND "+
-				      description<ville>::getClassType() + ".Name LIKE @ville_name"
+				      description<ville>::get_class_type() + ".Name LIKE @ville_name"
 				      ).c_str(),
 				-1,
 				&m_search_client_stmt,
@@ -119,13 +119,13 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   // Preparing search achat statements
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,("SELECT " + 
-				      description<achat>::getClassType() + ".Id, " + 
-				      description<facture>::getClassType() +".Date, " + 
-				      description<marque>::getClassType() + ".Name, " + 
-				      description<type_achat>::getClassType()+".Name, " +
+				      description<achat>::get_class_type() + ".Id, " + 
+				      description<facture>::get_class_type() +".Date, " + 
+				      description<marque>::get_class_type() + ".Name, " + 
+				      description<type_achat>::get_class_type()+".Name, " +
 				      "Reference, " + 
 				      "PrixEuro, " +
-				      "PrixFranc,Garantie, "+description<facture>::getClassType()+".LivreFactureId FROM " + description<achat>::getClassType() + ","+ description<marque>::getClassType() + ","+ description<type_achat>::getClassType() + ","+ description<facture>::getClassType()+" WHERE "+ description<marque>::getClassType() + ".Id = " + description<achat>::getClassType() + ".MarqueId AND " + description<type_achat>::getClassType()+".Id = " + description<achat>::getClassType() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
+				      "PrixFranc,Garantie, "+description<facture>::get_class_type()+".LivreFactureId FROM " + description<achat>::get_class_type() + ","+ description<marque>::get_class_type() + ","+ description<type_achat>::get_class_type() + ","+ description<facture>::get_class_type()+" WHERE "+ description<marque>::get_class_type() + ".Id = " + description<achat>::get_class_type() + ".MarqueId AND " + description<type_achat>::get_class_type()+".Id = " + description<achat>::get_class_type() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get search_client_achat : " << sqlite3_errmsg(m_db) << std::endl ;     
@@ -136,20 +136,20 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,
 				("SELECT " + 
-				 description<facture>::getClassType() + ".Id, " + 
-				 description<facture>::getClassType() +".FactureRef," + 
-				 description<facture>::getClassType() + ".Date," + 
-				 description<facture>::getClassType()+".LivreFactureId, " + 
-				 description<facture_status>::getClassType()+".Name" + 
+				 description<facture>::get_class_type() + ".Id, " + 
+				 description<facture>::get_class_type() +".FactureRef," + 
+				 description<facture>::get_class_type() + ".Date," + 
+				 description<facture>::get_class_type()+".LivreFactureId, " + 
+				 description<facture_status>::get_class_type()+".Name" + 
 				 " FROM " + 
-				 description<facture>::getClassType() + "," + 
-				 description<facture_status>::getClassType() + 
+				 description<facture>::get_class_type() + "," + 
+				 description<facture_status>::get_class_type() + 
 				 " WHERE " + 
-				 description<facture>::getClassType() + ".Status" + 
+				 description<facture>::get_class_type() + ".Status" + 
 				 " == " + 
-				 description<facture_status>::getClassType() + ".Id" + 
+				 description<facture_status>::get_class_type() + ".Id" + 
 				 " AND " + 
-				 description<facture>::getClassType()+".ClientId" + 
+				 description<facture>::get_class_type()+".ClientId" + 
 				 " == " + 
 				 "$client_id"
 				 ).c_str(),
@@ -165,26 +165,26 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   //--------------------------------------------
   l_status = sqlite3_prepare_v2(m_db,
 				("SELECT " + 
-				 description<facture>::getClassType() + ".Id, " +
-				 description<facture>::getClassType() + ".FactureRef, " +
-				 description<facture>::getClassType() + ".Date, " +
-				 description<facture>::getClassType() + ".LivreFactureId, " +
-				 description<facture_status>::getClassType() + ".Name, " +
-				 description<facture>::getClassType() + ".ClientId, " +
-				 description<facture>::getClassType() + ".ReasonId " +
+				 description<facture>::get_class_type() + ".Id, " +
+				 description<facture>::get_class_type() + ".FactureRef, " +
+				 description<facture>::get_class_type() + ".Date, " +
+				 description<facture>::get_class_type() + ".LivreFactureId, " +
+				 description<facture_status>::get_class_type() + ".Name, " +
+				 description<facture>::get_class_type() + ".ClientId, " +
+				 description<facture>::get_class_type() + ".ReasonId " +
 				 " FROM " + 
-				 description<facture>::getClassType() + ", " + 
-				 description<facture_status>::getClassType() + " " +
+				 description<facture>::get_class_type() + ", " + 
+				 description<facture_status>::get_class_type() + " " +
 				 " WHERE " + 
-				 description<facture>::getClassType() + ".Status" + 
+				 description<facture>::get_class_type() + ".Status" + 
 				 " == " + 
-				 description<facture_status>::getClassType() + ".Id"  +
+				 description<facture_status>::get_class_type() + ".Id"  +
 				 " AND " + 
-				 description<facture>::getClassType()+".LivreFactureId" + 
+				 description<facture>::get_class_type()+".LivreFactureId" + 
 				 " == " + 
 				 "$livre_facture_id" +
 				 " ORDER BY " +
-				 description<facture>::getClassType() + ".FactureRef"
+				 description<facture>::get_class_type() + ".FactureRef"
 				 ).c_str()
 				,-1,
 				&m_search_facture_by_livre_facture_id_stmt,

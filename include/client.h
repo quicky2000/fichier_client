@@ -28,7 +28,7 @@ class client: public item
   /**
      Return type of object. This is used to name the corresponding table in database
   */
-  inline const std::string getType(void)const;
+  inline const std::string get_type(void)const;
  private:
   std::string m_surname;
   std::string m_first_name;
@@ -40,7 +40,7 @@ class client: public item
 inline std::ostream& operator<<(std::ostream& s, const client & p_item);
 
 //------------------------------------------------------------------------------
-const std::string client::getType(void)const
+const std::string client::get_type(void)const
 {
   return "Client";
 }
@@ -142,7 +142,7 @@ void client::set_ville_id(uint32_t p_ville_id)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const client & p_client)
 {
-  s << p_client.getType() << "{Id=" << p_client.get_id() << "\",Name=\"" << p_client.m_surname << "\",First Name=\"" << p_client.m_first_name << "\",Tel=\"" << p_client.m_tel << "\",VilleId=\"" << p_client.m_ville_id << "\"" ;
+  s << p_client.get_type() << "{Id=" << p_client.get_id() << "\",Name=\"" << p_client.m_surname << "\",First Name=\"" << p_client.m_first_name << "\",Tel=\"" << p_client.m_tel << "\",VilleId=\"" << p_client.m_ville_id << "\"" ;
   return s;
 }
 

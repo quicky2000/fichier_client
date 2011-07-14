@@ -60,7 +60,7 @@ void compatibility_db::upgrade_from_1_0(void)
   //--------------------------------------------
   int l_status = sqlite3_prepare_v2(m_db,
 				    ("ALTER TABLE " + 
-				     description<facture>::getClassType() + 
+				     description<facture>::get_class_type() + 
 				     " ADD COLUMN ReasonId INTEGER DEFAULT 0" 
 				     ).c_str(),
 				    -1,

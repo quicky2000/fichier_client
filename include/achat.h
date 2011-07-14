@@ -57,7 +57,7 @@ class achat:public item
   /**
      Return type of object. This is used to name the corresponding table in database
   */
-  inline const std::string getType(void)const;
+  inline const std::string get_type(void)const;
  private:
   uint32_t m_facture_id;
   //  uint32_t m_client_id;
@@ -148,7 +148,7 @@ achat::achat(uint32_t p_id,
 //TO DELETE}
 
 //------------------------------------------------------------------------------
-const std::string achat::getType(void)const
+const std::string achat::get_type(void)const
 {
   return "Achat";
 }
@@ -265,8 +265,8 @@ void achat::set_garantie(bool p_garantie)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& s, const achat & p_achat)
 {
-  //TO DELETE  s << p_achat.getType() << "{Id=" << p_achat.get_id() << "\",ClientId=\"" << p_achat.m_client_id << "\",Date=\"" << p_achat.m_date << "\",LivreFactureId=\"" << p_achat.m_livre_facture_id << "\",MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
-  s << p_achat.getType() << "{Id=" << p_achat.get_id() << "\",FactureId=\"" << p_achat.m_facture_id << "\", MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
+  //TO DELETE  s << p_achat.get_type() << "{Id=" << p_achat.get_id() << "\",ClientId=\"" << p_achat.m_client_id << "\",Date=\"" << p_achat.m_date << "\",LivreFactureId=\"" << p_achat.m_livre_facture_id << "\",MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
+  s << p_achat.get_type() << "{Id=" << p_achat.get_id() << "\",FactureId=\"" << p_achat.m_facture_id << "\", MarqueId=\"" << p_achat.m_marque_id << "\",TypeId=\"" << p_achat.m_type_id << "\",Reference=\"" << p_achat.m_reference << "\",PrixFranc=\"" << p_achat.m_prix_franc << "\",PrixEuro=\"" << p_achat.m_prix_euro << "\",Garantie=\"" << (p_achat.m_garantie ? "oui" : "non" )<< "\"}" ;
   return s;
 }
 
