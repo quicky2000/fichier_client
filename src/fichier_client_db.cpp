@@ -1023,7 +1023,7 @@ void fichier_client_db::check_db_coherency(void)
   while(l_iter_client != l_iter_client_end)
     {
       // Check vile id
-      uint32_t l_ville_id = l_iter_client->get_ville_id();
+      uint32_t l_ville_id = l_iter_client->get_city_id();
       ville l_ville;
       
       if(!m_table_ville.get(l_ville_id,l_ville))

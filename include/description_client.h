@@ -74,17 +74,17 @@ void description<client>::bind_item_values(const client & p_client,sqlite3_stmt*
       exit(-1);
     }  
 
-  l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$tel"),p_client.get_tel().c_str(),-1,SQLITE_STATIC);
+  l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$tel"),p_client.get_phone().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of tel parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
+      std::cout << "ERROR during binding of phone parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
       exit(-1);
     }  
 
-  l_status = sqlite3_bind_int(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$ville_id"),p_client.get_ville_id());
+  l_status = sqlite3_bind_int(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$ville_id"),p_client.get_city_id());
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during binding of ville_id parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
+      std::cout << "ERROR during binding of city_id parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
       exit(-1);
     }  
 }
@@ -96,8 +96,8 @@ client description<client>::get_item_from_row(sqlite3_stmt* p_stmt)
 		(const char*)sqlite3_column_text(p_stmt,1),//Name
 		(const char*)sqlite3_column_text(p_stmt,2),//First Name
 		(const char*)sqlite3_column_text(p_stmt,3),//Address
-		(const char*)sqlite3_column_text(p_stmt,4),//Tel
-		sqlite3_column_int(p_stmt,5)//VilleId
+		(const char*)sqlite3_column_text(p_stmt,4),//Phone
+		sqlite3_column_int(p_stmt,5)//City Id
 		);
 }
 

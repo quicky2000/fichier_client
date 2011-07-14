@@ -154,11 +154,11 @@ void fichier_client::treat_search_customer_modify_customer_event(void)
 
   m_user_interface->set_customer_name(l_client.get_name());
   m_user_interface->set_customer_first_name(l_client.get_first_name());
-  m_user_interface->set_customer_phone(l_client.get_tel());
+  m_user_interface->set_customer_phone(l_client.get_phone());
   m_user_interface->set_customer_address(l_client.get_address());
 
   ville l_city;
-  m_db->get_ville(l_client.get_ville_id(),l_city);
+  m_db->get_ville(l_client.get_city_id(),l_city);
   m_user_interface->set_customer_postal_code(l_city.get_postal_code());
   std::vector<ville> l_city_list;
   l_city_list.push_back(l_city);
@@ -300,9 +300,9 @@ void fichier_client::treat_customer_data_modify_customer_event(void)
 
   l_client.set_name(l_name);
   l_client.set_first_name(l_first_name);
-  l_client.set_tel(l_phone);
+  l_client.set_phone(l_phone);
   l_client.set_address(l_address);
-  l_client.set_ville_id(l_city->get_id());
+  l_client.set_city_id(l_city->get_id());
   
   m_db->update(l_client);
   treat_search_customer_criteria_modification_event();
@@ -729,9 +729,9 @@ void fichier_client::check_customer_identity(void)
 
 	  bool l_modified = l_client.get_name() != l_name || 
 	    l_client.get_first_name() != l_first_name || 
-	    l_client.get_tel() != l_phone ||
+	    l_client.get_phone() != l_phone ||
 	    l_client.get_address() != l_address ||
-	    l_client.get_ville_id() != l_city->get_id();
+	    l_client.get_city_id() != l_city->get_id();
 	  m_user_interface->set_customer_data_modify_customer_enabled(l_modified);
 	}
       m_user_interface->set_customer_data_create_customer_enabled(false);

@@ -442,7 +442,7 @@ namespace test
 
     // Testing Client management
     //---------------------------
-    client l_client(1,"THEVENON","Julien","12 rue des bains","06-83-03-37-49",10);
+    client l_client(1,"THEVENON","Julien","12 rue des bains","0683033749",10);
     cout << l_client << endl ;
 
     l_fichier_client.create(l_client);
@@ -460,7 +460,7 @@ namespace test
     l_fichier_client.get_all_client(l_result_client);
     display(l_result_client);
 
-    l_client2.set_tel("06-88-77-89-00");
+    l_client2.set_phone("0688778900");
     cout << l_client2 << endl ;
     l_fichier_client.update(l_client2);
 
