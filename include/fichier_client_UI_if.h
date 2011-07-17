@@ -50,8 +50,27 @@ class fichier_client_UI_if
 
   // Interactions with customer bill information
   virtual void set_customer_bill_fields_enabled(bool p_enabled)=0;
+  virtual void set_customer_facture_date(const std::string & p_date)=0;
+  virtual void set_customer_facture_allowed_livre_ids(const std::vector<uint32_t> & p_livre_ids)=0;
+  virtual void set_customer_facture_livre_id(uint32_t p_id)=0;
+  virtual void set_customer_allowed_facture_references(const std::vector<uint32_t> & p_remaining_refs)=0;
+  virtual void set_customer_facture_reference(uint32_t p_ref)=0;
+  virtual void set_customer_facture_status_list(const std::vector<facture_status> & p_status_list)=0;
+  virtual void set_customer_facture_status(uint32_t p_id)=0;
+  virtual bool is_customer_bill_date_complete(void)const=0;
+  virtual bool is_customer_bill_date_empty(void)const=0;
+  virtual const std::string get_customer_bill_date(void)const=0;
+  virtual uint32_t get_customer_bill_book_id(void)const=0;
+  virtual uint32_t get_customer_bill_reference(void)const=0;
+  virtual const facture_status * get_customer_bill_status(void)const=0;
+
+  // Interactions with customer bill list
+  virtual bool is_customer_data_bill_selection_empty(void)const=0;
+  virtual uint32_t get_customer_data_selected_bill_id(void)const=0;
   virtual void update_customer_data_bill_list(const std::vector<search_facture_item> & p_list)=0;
   virtual void set_customer_bill_list_enabled(bool p_enabled)=0;
+
+  // Interactions with customer bill actions  
   virtual void set_customer_bill_creation_enabled(bool p_enabled)=0;
   virtual void set_customer_bill_modification_enabled(bool p_enabled)=0;
   virtual void set_customer_bill_deletion_enabled(bool p_enabled)=0;

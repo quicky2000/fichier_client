@@ -39,13 +39,30 @@ class fichier_client
   void treat_search_customer_modify_customer_event(void);
   void treat_search_customer_delete_customer_event(void);
 
-  // Customer data related events
+  // Customer data identity information related events
   void treat_postal_code_modification_event(void);
   void treat_city_selection_event(void);
   void treat_identity_content_modification_event(void);
+
+  // Customer data identity actions related events
   void treat_customer_data_create_customer_event(void);
   void treat_customer_data_modify_customer_event(void);
   void treat_customer_data_delete_customer_event(void);
+
+  // Customer data bill information related events
+  void treat_customer_data_bill_date_modification_event(void);
+  void treat_customer_data_bill_book_selection_event(void);
+  void treat_customer_data_bill_ref_selection_event(void);
+  void treat_customer_data_bill_status_selection_event(void);
+
+  // Customer data bill list related events
+  void treat_customer_data_bill_selected_event(void);
+  void treat_customer_data_no_more_bill_selected_event(void);
+
+  // Customer data bill actions related events
+  void treat_customer_data_bill_creation_event(void);
+  void treat_customer_data_bill_modification_event(void);
+  void treat_customer_data_bill_deletion_event(void);
 
   // Livre facture related events
   bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
@@ -101,7 +118,11 @@ class fichier_client
   void set_customer_data_bill_enabled(bool p_enabled);
   void set_customer_data_purchase_enabled(bool p_enabled);
 
+  void refresh_customer_data_bill_list(void);
+  void refresh_customer_data_purchase_list(void);
+
   void check_customer_identity(void);
+  void refresh_customer_bill_actions(void);
   void check_non_attributed_facture(void);
   void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);
