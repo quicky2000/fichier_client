@@ -13,6 +13,8 @@ fichier_client::fichier_client(void):
   m_current_customer_id(0),
   m_facture_status_pending_modif(false),
   m_facture_reason_pending_modif(false),
+  m_purchase_brand_pending_modif(false),
+  m_purchase_type_pending_modif(false),
   m_user_interface(NULL),
   m_db(NULL),
   m_db_name("")
@@ -1955,6 +1957,340 @@ void fichier_client::treat_facture_reason_selected_event(void)
   m_user_interface->set_modify_facture_reason_enabled(true);
 }
 
+// Brand information related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_brand_name_modif_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration brand name modif event" << std::endl;  
+  assert(m_user_interface);
+  std::string l_brand_name = m_user_interface->get_purchase_configuration_brand_name();
+
+  vector<marque> l_brand_list;
+  vector<marque> l_brand_filtered_list;
+  assert(m_db);
+  if(l_brand_name != "")
+    {
+      m_db->get_marque_by_name(l_brand_name,l_brand_list,true);
+      m_db->get_marque_by_name(l_brand_name,l_brand_filtered_list,false);
+    }
+  else
+    {
+      m_db->get_all_marque(l_brand_filtered_list);
+    }
+
+  if(!m_purchase_brand_pending_modif)
+    {
+      m_user_interface->set_purchase_configuration_create_brand_enabled(l_brand_list.size()==0 && l_brand_name != "");
+      m_user_interface->set_purchase_configuration_brand_list(l_brand_filtered_list);
+    }
+  else
+    {
+      marque l_brand;
+      uint32_t l_brand_id = m_user_interface->get_purchase_configuration_selected_brand_id();
+      m_db->get_marque(l_brand_id,l_brand);
+      
+      m_user_interface->set_purchase_configuration_modify_brand_action_name(l_brand.get_name() != l_brand_name ? "Appliquer" : "Annuler");
+
+      // Check if modified value is acceptable
+      bool l_name_ok = l_brand_name != "" && l_brand_list.size() == 0;
+      m_user_interface->set_purchase_configuration_modify_brand_enabled(l_name_ok);
+    }  
+}
+
+// Brand list related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_brand_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration brand selection event" << std::endl;  
+  assert(m_user_interface);
+
+  uint32_t l_brand_id = m_user_interface->get_purchase_configuration_selected_brand_id();
+  
+  // Get selected status
+  assert(m_db); 
+  marque l_brand;
+  m_db->get_marque(l_brand_id,l_brand);
+
+  std::string l_name = l_brand.get_name();
+   
+  // Check that no facture are using this status
+  std::vector<achat> l_purchase_list;
+  m_db->get_by_brand_id(l_brand_id,l_purchase_list);
+  m_user_interface->set_purchase_configuration_delete_brand_enabled(l_purchase_list.size()==0);
+  m_user_interface->set_purchase_configuration_modify_brand_enabled(true);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_no_more_brand_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration no more brand selected event" << std::endl;  
+  assert(m_user_interface);
+  m_user_interface->set_purchase_configuration_delete_brand_enabled(false);
+  m_user_interface->set_purchase_configuration_modify_brand_enabled(false);
+}
+
+// Brand actions related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_create_brand_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration brand creation event" << std::endl;  
+  assert(m_user_interface);
+  std::string l_brand_name = m_user_interface->get_purchase_configuration_brand_name();
+   
+  assert(m_db);
+  std::vector<marque> l_already;
+  m_db->get_marque_by_name(l_brand_name,l_already,true);
+  assert(l_already.size()==0);
+
+  m_user_interface->set_purchase_configuration_create_brand_enabled(false);
+  marque l_brand(l_brand_name);
+
+  m_db->create(l_brand);
+  m_user_interface->clear_purchase_configuration_brand_information();
+  refresh_brand_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_delete_brand_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration brand deletion event" << std::endl;  
+  assert(m_user_interface);
+  uint32_t l_brand_id = m_user_interface->get_purchase_configuration_selected_brand_id();
+  
+  // Get selected reason
+  assert(m_db);
+  marque l_brand;
+  m_db->get_marque(l_brand_id,l_brand);
+
+  // Check that no purchase are using this brand
+  std::vector<achat> l_purchase_list;
+  m_db->get_by_brand_id(l_brand_id,l_purchase_list);
+  assert(l_purchase_list.size()==0);
+
+  // Remove the reason
+  m_db->remove(l_brand);
+
+  // Update user interface
+  m_user_interface->set_purchase_configuration_delete_brand_enabled(false);
+  m_user_interface->set_purchase_configuration_modify_brand_enabled(false);
+  m_user_interface->clear_purchase_configuration_brand_information();
+  refresh_brand_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_modify_brand_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration brand modification event" << std::endl;  
+  assert(m_user_interface);
+
+  uint32_t l_brand_id = m_user_interface->get_purchase_configuration_selected_brand_id();
+  
+  // Get selected brand
+  assert(m_db);
+  marque l_brand;
+  m_db->get_marque(l_brand_id,l_brand);
+
+  // Check this is not predefined brand
+  string l_name = l_brand.get_name();
+
+  m_user_interface->set_purchase_configuration_delete_brand_enabled(false);
+  if(!m_purchase_brand_pending_modif)
+    {
+      m_purchase_brand_pending_modif = true;
+      m_user_interface->set_purchase_configuration_brand_name(l_brand.get_name());
+      m_user_interface->set_purchase_configuration_modify_brand_action_name("Annuler");
+      m_user_interface->set_purchase_configuration_brand_list_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_purchase_configuration_brand_list_enabled(true);
+      m_user_interface->set_purchase_configuration_modify_brand_action_name("Modifier");
+      std::string l_new_name = m_user_interface->get_purchase_configuration_brand_name();
+      assert(l_new_name != "");
+
+      if(l_new_name != l_name)
+	{
+	  std::vector<marque> l_list_brand;
+	  m_db->get_marque_by_name(l_new_name,l_list_brand,true);
+	  assert(l_list_brand.size()==0);
+      
+	  l_brand.set_name(l_new_name);
+	  m_db->update(l_brand);
+	}
+      m_purchase_brand_pending_modif = false;
+      
+      m_user_interface->clear_purchase_configuration_brand_information();
+      refresh_brand_list();
+    }
+
+}
+
+// Type information related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_type_name_modif_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration type name modif event" << std::endl;  
+  assert(m_user_interface);
+  std::string l_type_name = m_user_interface->get_purchase_configuration_type_name();
+
+  vector<type_achat> l_type_list;
+  vector<type_achat> l_type_filtered_list;
+  assert(m_db);
+  if(l_type_name != "")
+    {
+      m_db->get_type_achat_by_name(l_type_name,l_type_list,true);
+      m_db->get_type_achat_by_name(l_type_name,l_type_filtered_list,false);
+    }
+  else
+    {
+      m_db->get_all_type_achat(l_type_filtered_list);
+    }
+
+  if(!m_purchase_type_pending_modif)
+    {
+      m_user_interface->set_purchase_configuration_create_type_enabled(l_type_list.size()==0 && l_type_name != "");
+      m_user_interface->set_purchase_configuration_type_list(l_type_filtered_list);
+    }
+  else
+    {
+      type_achat l_type;
+      uint32_t l_type_id = m_user_interface->get_purchase_configuration_selected_type_id();
+      m_db->get_type_achat(l_type_id,l_type);
+      
+      m_user_interface->set_purchase_configuration_modify_type_action_name(l_type.get_name() != l_type_name ? "Appliquer" : "Annuler");
+
+      // Check if modified value is acceptable
+      bool l_name_ok = l_type_name != "" && l_type_list.size() == 0;
+      m_user_interface->set_purchase_configuration_modify_type_enabled(l_name_ok);
+    }  
+}
+
+// type list related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_type_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration type selection event" << std::endl;  
+  assert(m_user_interface);
+
+  uint32_t l_type_id = m_user_interface->get_purchase_configuration_selected_type_id();
+  
+  // Get selected status
+  assert(m_db); 
+  type_achat l_type;
+  m_db->get_type_achat(l_type_id,l_type);
+
+  std::string l_name = l_type.get_name();
+   
+  // Check that no facture are using this status
+  std::vector<achat> l_purchase_list;
+  m_db->get_by_type_id(l_type_id,l_purchase_list);
+  m_user_interface->set_purchase_configuration_delete_type_enabled(l_purchase_list.size()==0);
+  m_user_interface->set_purchase_configuration_modify_type_enabled(true);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_no_more_type_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration no more type selected event" << std::endl;  
+  assert(m_user_interface);
+  m_user_interface->set_purchase_configuration_delete_type_enabled(false);
+  m_user_interface->set_purchase_configuration_modify_type_enabled(false);
+}
+
+// Type actions related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_create_type_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration type creation event" << std::endl;  
+  assert(m_user_interface);
+  std::string l_type_name = m_user_interface->get_purchase_configuration_type_name();
+   
+  assert(m_db);
+  std::vector<type_achat> l_already;
+  m_db->get_type_achat_by_name(l_type_name,l_already,true);
+  assert(l_already.size()==0);
+
+  m_user_interface->set_purchase_configuration_create_type_enabled(false);
+  type_achat l_type(l_type_name);
+
+  m_db->create(l_type);
+  m_user_interface->clear_purchase_configuration_type_information();
+  refresh_purchase_type_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_delete_type_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration type deletion event" << std::endl;  
+  assert(m_user_interface);
+  uint32_t l_type_id = m_user_interface->get_purchase_configuration_selected_type_id();
+  
+  // Get selected reason
+  assert(m_db);
+  type_achat l_type;
+  m_db->get_type_achat(l_type_id,l_type);
+
+  // Check that no purchase are using this type
+  std::vector<achat> l_purchase_list;
+  m_db->get_by_type_id(l_type_id,l_purchase_list);
+  assert(l_purchase_list.size()==0);
+
+  // Remove the reason
+  m_db->remove(l_type);
+
+  // Update user interface
+  m_user_interface->set_purchase_configuration_delete_type_enabled(false);
+  m_user_interface->set_purchase_configuration_modify_type_enabled(false);
+  m_user_interface->clear_purchase_configuration_type_information();
+  refresh_purchase_type_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_purchase_configuration_modify_type_event(void)
+{
+  std::cout << "Fichier_ClientEvent::purchase_configuration type modification event" << std::endl;  
+  assert(m_user_interface);
+  uint32_t l_type_id = m_user_interface->get_purchase_configuration_selected_type_id();
+  
+  // Get selected type
+  assert(m_db);
+  type_achat l_type;
+  m_db->get_type_achat(l_type_id,l_type);
+
+  // Check this is not predefined type
+  string l_name = l_type.get_name();
+
+  m_user_interface->set_purchase_configuration_delete_type_enabled(false);
+  if(!m_purchase_type_pending_modif)
+    {
+      m_purchase_type_pending_modif = true;
+      m_user_interface->set_purchase_configuration_type_name(l_type.get_name());
+      m_user_interface->set_purchase_configuration_modify_type_action_name("Annuler");
+      m_user_interface->set_purchase_configuration_type_list_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_purchase_configuration_type_list_enabled(true);
+      m_user_interface->set_purchase_configuration_modify_type_action_name("Modifier");
+      std::string l_new_name = m_user_interface->get_purchase_configuration_type_name();
+      assert(l_new_name != "");
+
+      if(l_new_name != l_name)
+	{
+	  std::vector<type_achat> l_list_type;
+	  m_db->get_type_achat_by_name(l_new_name,l_list_type,true);
+	  assert(l_list_type.size()==0);
+      
+	  l_type.set_name(l_new_name);
+	  m_db->update(l_type);
+	}
+      m_purchase_type_pending_modif = false;
+      
+      m_user_interface->clear_purchase_configuration_type_information();
+      refresh_purchase_type_list();
+    }
+
+}
 
 //------------------------------------------------------------------------------
 void fichier_client::refresh_facture_reason_list(void)
@@ -2176,6 +2512,7 @@ void fichier_client::refresh_brand_list(void)
   // Update user interface
   assert(m_user_interface);
   m_user_interface->set_customer_purchase_brand_list(l_brand_list);
+  m_user_interface->set_purchase_configuration_brand_list(l_brand_list);
 }
 
 //------------------------------------------------------------------------------
@@ -2189,6 +2526,7 @@ void fichier_client::refresh_purchase_type_list(void)
   // Update user interface
   assert(m_user_interface);
   m_user_interface->set_customer_purchase_type_list(l_purchase_type_list);
+  m_user_interface->set_purchase_configuration_type_list(l_purchase_type_list);
 }
 
 

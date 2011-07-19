@@ -103,21 +103,48 @@ class fichier_client
   void treat_delete_non_attributed_facture_event(void);
   void treat_modify_non_attributed_facture_event(void);
 
-  // Facture status related events
+  // Facture status information related events
+  void treat_facture_status_name_modif_event(void);
+
+  // Facture status list related events
+  void treat_facture_status_selected_event(void);
   void treat_no_more_facture_status_selected_event(void);
+
+  // Facture status actions related events
   void treat_delete_facture_status_event(void);
   void treat_modify_facture_status_event(void);
-  void treat_facture_status_name_modif_event(void);
   void treat_create_facture_status_event(void);
-  void treat_facture_status_selected_event(void);
 
-  // Facture reason related events
+  // Facture reason information related events
+  void treat_facture_reason_name_modif_event(void);
+
+  // Facture reason list related events
   void treat_no_more_facture_reason_selected_event(void);
+  void treat_facture_reason_selected_event(void);
+
+  // Facture reason actions related events
   void treat_delete_facture_reason_event(void);
   void treat_modify_facture_reason_event(void);
-  void treat_facture_reason_name_modif_event(void);
   void treat_create_facture_reason_event(void);
-  void treat_facture_reason_selected_event(void);
+
+  // Brand information related events
+  void treat_purchase_configuration_brand_name_modif_event(void);
+  // Brand list related events
+  void treat_purchase_configuration_brand_selected_event(void);
+  void treat_purchase_configuration_no_more_brand_selected_event(void);
+  // Brand actions related events
+  void treat_purchase_configuration_create_brand_event(void);
+  void treat_purchase_configuration_delete_brand_event(void);
+  void treat_purchase_configuration_modify_brand_event(void);
+  // Type information related events
+  void treat_purchase_configuration_type_name_modif_event(void);
+  // type list related events
+  void treat_purchase_configuration_type_selected_event(void);
+  void treat_purchase_configuration_no_more_type_selected_event(void);
+  // Type actions related events
+  void treat_purchase_configuration_create_type_event(void);
+  void treat_purchase_configuration_delete_type_event(void);
+  void treat_purchase_configuration_modify_type_event(void);
 
   // Operations on database
   void check_db_coherency(void);
@@ -170,6 +197,8 @@ class fichier_client
   uint32_t m_current_customer_id;
   bool m_facture_status_pending_modif;
   bool m_facture_reason_pending_modif;
+  bool m_purchase_brand_pending_modif;
+  bool m_purchase_type_pending_modif;
   fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;
   std::string m_db_name;

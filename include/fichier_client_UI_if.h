@@ -188,6 +188,40 @@ class fichier_client_UI_if
   virtual void set_delete_facture_reason_enabled(bool p_enable)=0;
   virtual void set_modify_facture_reason_enabled(bool p_enable)=0;
   virtual void set_modify_facture_reason_action_name(const std::string & p_name)=0;
+
+  // Interactions with brand information
+  virtual void clear_purchase_configuration_brand_information(void)=0;
+  virtual void set_purchase_configuration_brand_name(const std::string & p_name)=0;  
+  virtual const std::string get_purchase_configuration_brand_name(void)const=0;
+
+  // Interactions with brand list
+  virtual bool is_purchase_configuration_brand_selection_empty(void)const=0;
+  virtual uint32_t get_purchase_configuration_selected_brand_id(void)const=0;
+  virtual void set_purchase_configuration_brand_list(std::vector<marque> & p_list)=0;
+  virtual void set_purchase_configuration_brand_list_enabled(bool p_enable)=0;
+
+  // Interactions with brand actions
+  virtual void set_purchase_configuration_create_brand_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_delete_brand_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_modify_brand_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_modify_brand_action_name(const std::string & p_name)=0;
+
+  // Interactions with type information
+  virtual void clear_purchase_configuration_type_information(void)=0;
+  virtual void set_purchase_configuration_type_name(const std::string & p_name)=0;  
+  virtual const std::string get_purchase_configuration_type_name(void)const=0;
+
+  // Interactions with type list
+  virtual bool is_purchase_configuration_type_selection_empty(void)const=0;
+  virtual uint32_t get_purchase_configuration_selected_type_id(void)const=0;
+  virtual void set_purchase_configuration_type_list(std::vector<type_achat> & p_list)=0;
+  virtual void set_purchase_configuration_type_list_enabled(bool p_enable)=0;
+
+  // Interactions with type actions
+  virtual void set_purchase_configuration_create_type_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_delete_type_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_modify_type_enabled(bool p_enable)=0;
+  virtual void set_purchase_configuration_modify_type_action_name(const std::string & p_name)=0;
 };
 
 #endif
