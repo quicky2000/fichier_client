@@ -13,6 +13,7 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
   m_get_complete_client_stmt(NULL),
   m_search_client_stmt(NULL),
   m_search_achat_stmt(NULL),
+  m_search_purchase_by_bill_id_stmt(NULL),
   m_search_facture_by_client_id_stmt(NULL),
   m_search_facture_by_livre_facture_id_stmt(NULL)
 {
@@ -125,10 +126,84 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 				      description<type_achat>::get_class_type()+".Name, " +
 				      "Reference, " + 
 				      "PrixEuro, " +
-				      "PrixFranc,Garantie, "+description<facture>::get_class_type()+".LivreFactureId FROM " + description<achat>::get_class_type() + ","+ description<marque>::get_class_type() + ","+ description<type_achat>::get_class_type() + ","+ description<facture>::get_class_type()+" WHERE "+ description<marque>::get_class_type() + ".Id = " + description<achat>::get_class_type() + ".MarqueId AND " + description<type_achat>::get_class_type()+".Id = " + description<achat>::get_class_type() + ".TypeId AND ClientId = $client_id AND FactureId = Facture.Id").c_str(),-1,&m_search_achat_stmt,NULL);
+				      "PrixFranc, " +
+				      "Garantie, " +
+				      description<facture>::get_class_type()+".LivreFactureId " +
+				      " FROM " + 
+				      description<achat>::get_class_type() + 
+				      "," + 
+				      description<marque>::get_class_type() + 
+				      ","+ 
+				      description<type_achat>::get_class_type() + 
+				      "," + 
+				      description<facture>::get_class_type() + 
+				      " WHERE " + 
+				      description<marque>::get_class_type() + ".Id"
+				      " = " + 
+				      description<achat>::get_class_type() + ".MarqueId" +
+				      " AND " + 
+				      description<type_achat>::get_class_type()+".Id" +
+				      " = " + 
+				      description<achat>::get_class_type() + ".TypeId" +
+				      " AND " + 
+				      "ClientId = $client_id" +
+				      " AND " +
+				      "FactureId" + 
+				      " = " +
+				      description<facture>::get_class_type() + ".Id"
+				      ).c_str(),
+				-1,
+				&m_search_achat_stmt,
+				NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get search_client_achat : " << sqlite3_errmsg(m_db) << std::endl ;     
+      exit(-1);
+    }
+
+  // Preparing search purchase by bill id statements
+  //------------------------------------------------
+  l_status = sqlite3_prepare_v2(m_db,("SELECT " + 
+				      description<achat>::get_class_type() + ".Id, " + 
+				      description<facture>::get_class_type() +".Date, " + 
+				      description<marque>::get_class_type() + ".Name, " + 
+				      description<type_achat>::get_class_type()+".Name, " +
+				      "Reference, " + 
+				      "PrixEuro, " +
+				      "PrixFranc, " +
+				      "Garantie, " +
+				      description<facture>::get_class_type()+".LivreFactureId " +
+				      " FROM " + 
+				      description<achat>::get_class_type() + 
+				      "," + 
+				      description<marque>::get_class_type() + 
+				      ","+ 
+				      description<type_achat>::get_class_type() + 
+				      "," + 
+				      description<facture>::get_class_type() + 
+				      " WHERE " + 
+				      description<marque>::get_class_type() + ".Id"
+				      " = " + 
+				      description<achat>::get_class_type() + ".MarqueId" +
+				      " AND " + 
+				      description<type_achat>::get_class_type()+".Id" +
+				      " = " + 
+				      description<achat>::get_class_type() + ".TypeId" +
+				      " AND " +
+				      "FactureId" + 
+				      " = " +
+				      description<facture>::get_class_type() + ".Id" +
+				      " AND " +
+				      "FactureId" + 
+				      " == " + 
+				      "$bill_id"
+				      ).c_str(),
+				-1,
+				&m_search_purchase_by_bill_id_stmt,
+				NULL);
+  if(l_status != SQLITE_OK)
+    {
+      std::cout << "ERROR during preparation of statement to get search purchase by bill id statement : " << sqlite3_errmsg(m_db) << std::endl ;     
       exit(-1);
     }
 
@@ -215,6 +290,7 @@ fichier_client_db::~fichier_client_db(void)
   cout << "Closing db" << endl ;
   sqlite3_finalize(m_search_facture_by_livre_facture_id_stmt);
   sqlite3_finalize(m_search_facture_by_client_id_stmt);
+  sqlite3_finalize(m_search_purchase_by_bill_id_stmt);
   sqlite3_finalize(m_search_achat_stmt);
   sqlite3_finalize(m_search_client_stmt);
   sqlite3_finalize(m_get_complete_client_stmt);
@@ -788,6 +864,51 @@ void fichier_client_db::get_achat_by_client_id(uint32_t p_client_id,std::vector<
   if(l_status != SQLITE_OK)
     {
       cout << "ERROR during reset of bindings of search achat statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_purchase_by_bill_id(uint32_t p_bill_id,std::vector<search_achat_item> & p_result)
+{
+  // Binding values to statement
+  //----------------------------
+  int l_status = sqlite3_bind_int(m_search_purchase_by_bill_id_stmt,sqlite3_bind_parameter_index(m_search_purchase_by_bill_id_stmt,"$bill_id"),p_bill_id);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during binding of bill_id parameter for search purchase by bill id statement jointure : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+  
+  // Executing statement
+  //---------------------
+  while( (l_status = sqlite3_step(m_search_purchase_by_bill_id_stmt)) == SQLITE_ROW)
+    {
+      p_result.push_back(search_achat_item(m_search_purchase_by_bill_id_stmt));
+    }
+  if(l_status != SQLITE_DONE)
+    {
+      cout << "ERROR during selection of search purchase result : " << m_db << endl ;
+      exit(-1);
+    }
+
+  cout << "Purchase for bill_id " << p_bill_id << " successfully listed" << endl ;
+
+  // Reset the statement for the next use
+  //--------------------------------------
+  l_status = sqlite3_reset(m_search_purchase_by_bill_id_stmt);  
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of search purchase by bill id statement : " << sqlite3_errmsg(m_db) << endl ;     
+      exit(-1);
+    }
+
+  // Reset bindings because they are now useless
+  //--------------------------------------------
+  l_status = sqlite3_clear_bindings(m_search_purchase_by_bill_id_stmt);
+  if(l_status != SQLITE_OK)
+    {
+      cout << "ERROR during reset of bindings of search purchase by bill id statement : " << sqlite3_errmsg(m_db) << endl ;     
       exit(-1);
     }
 }

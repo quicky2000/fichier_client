@@ -123,6 +123,7 @@ class fichier_client_db
   void get_complete_client(uint32_t p_id,search_client_item & p_result);
   void search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, std::vector<search_client_item> & p_result);
   void get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result);
+  void get_purchase_by_bill_id(uint32_t p_facture_id,std::vector<search_achat_item> & p_result);
   void get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result);
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_item> & p_result);
 
@@ -144,6 +145,7 @@ class fichier_client_db
   sqlite3_stmt *m_get_complete_client_stmt;
   sqlite3_stmt *m_search_client_stmt;
   sqlite3_stmt *m_search_achat_stmt;
+  sqlite3_stmt *m_search_purchase_by_bill_id_stmt;
   sqlite3_stmt *m_search_facture_by_client_id_stmt;
   sqlite3_stmt *m_search_facture_by_livre_facture_id_stmt;
   static const std::string m_schema_version;
