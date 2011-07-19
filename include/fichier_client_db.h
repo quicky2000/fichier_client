@@ -78,7 +78,7 @@ class fichier_client_db
   void remove(const marque & p_marque);
   uint32_t get_marque(uint32_t p_id,marque & p_data);
   void get_all_marque(std::vector<marque> & p_list);
-  void get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result);
+  void get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result, bool p_exact);
   
   //Management of facture_reason table
   void create( facture_reason & p_facture_reason);
@@ -94,7 +94,7 @@ class fichier_client_db
   void remove(const type_achat & p_type_achat);
   uint32_t get_type_achat(uint32_t p_id,type_achat & p_data);
   void get_all_type_achat(std::vector<type_achat> & p_list);
-  void get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result);
+  void get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result, bool p_exact);
   
   //Management of facture_status table
   void create( facture_status & p_facture_status);

@@ -332,7 +332,7 @@ namespace test
     display(l_result_type_achat);
 
     l_result_type_achat.clear();
-    l_fichier_client.get_type_achat_by_name("F",l_result_type_achat);
+    l_fichier_client.get_type_achat_by_name("F",l_result_type_achat,false);
     display(l_result_type_achat);
 
     // Testing facture_status management

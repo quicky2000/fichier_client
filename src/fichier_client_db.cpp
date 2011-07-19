@@ -545,9 +545,9 @@ void fichier_client_db::get_all_marque(std::vector<marque> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result)
+void fichier_client_db::get_marque_by_name(const std::string & p_name,std::vector<marque> & p_result, bool p_exact)
 {
-  m_table_marque.get_by_name(p_name,p_result);
+  m_table_marque.get_by_name(p_name,p_result,p_exact);
 }
 
 //------------------------------------------------------------------------------
@@ -623,9 +623,9 @@ void fichier_client_db::get_all_type_achat(std::vector<type_achat> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result)
+void fichier_client_db::get_type_achat_by_name(const std::string & p_name,std::vector<type_achat> & p_result,bool p_exact)
 {
-  m_table_type_achat.get_by_name(p_name,p_result);
+  m_table_type_achat.get_by_name(p_name,p_result,p_exact);
 }
 
 //------------------------------------------------------------------------------
