@@ -470,7 +470,10 @@ void fichier_client::treat_customer_data_bill_selected_event(void)
 
   m_user_interface->set_customer_facture_status(l_bill.get_status());
 
+  set_customer_data_purchase_enabled(true);
+
   refresh_customer_bill_actions();
+  refresh_customer_data_purchase_list();
 }
  
 //------------------------------------------------------------------------------
@@ -482,7 +485,9 @@ void fichier_client::treat_customer_data_no_more_bill_selected_event(void)
   std::vector<uint32_t> l_empty_list;
   m_user_interface->set_customer_facture_allowed_livre_ids(l_empty_list);
   m_user_interface->set_customer_allowed_facture_references(l_empty_list);
+  set_customer_data_purchase_enabled(false);
   refresh_customer_bill_actions();
+  refresh_customer_data_purchase_list();
 }
 
 // Customer data bill actions related events
@@ -712,6 +717,195 @@ void fichier_client::treat_create_non_attributed_facture_event(void)
   refresh_livre_facture_list();
 }
 
+// Customer data purchase information related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_brand_selection_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase brand selection event" << std::endl ;
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_type_selection_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase type selection event" << std::endl ;
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_reference_modification_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase reference modification event" << std::endl ;
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_euro_price_modification_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase euro price modification event" << std::endl ;
+  assert(m_user_interface);
+  const std::string l_euro_price_str = m_user_interface->get_customer_purchase_euro_price();
+  double l_euro_price = strtod(l_euro_price_str.c_str(),NULL);
+  std::cout << "Euro price = " << l_euro_price << std::endl;
+  double l_franc_price = ((uint32_t)(((l_euro_price * 6.55957)*100))/100.0);
+  std::cout << "Franc price = " << l_franc_price << std::endl;
+  stringstream l_franc_price_stream;
+  l_franc_price_stream << l_franc_price;
+  std::cout << "Franc price string = " << l_franc_price_stream.str() << std::endl;
+  m_user_interface->set_customer_purchase_franc_price(l_franc_price_stream.str());
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_franc_price_modification_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase franc price modification event" << std::endl ;
+  assert(m_user_interface);
+  const std::string l_franc_price_str = m_user_interface->get_customer_purchase_franc_price();
+  double l_franc_price = strtod(l_franc_price_str.c_str(),NULL);
+  std::cout << "Franc price = " << l_franc_price << std::endl;
+  double l_euro_price = ((uint32_t)(((l_franc_price / 6.55957)*100))/100.0);
+  std::cout << "Euro price = " << l_euro_price << std::endl;
+  stringstream l_euro_price_stream;
+  l_euro_price_stream << l_euro_price;
+  std::cout << "Euro price string = " << l_euro_price_stream.str() << std::endl;
+  m_user_interface->set_customer_purchase_euro_price(l_euro_price_stream.str());
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_warranty_modification_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase warranty modification event" << std::endl ;
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_selected_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase selection event" << std::endl ;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_customer_data_purchase_selection_empty());
+
+  uint32_t l_purchase_id = m_user_interface->get_customer_data_selected_purchase_id();
+  assert(m_db);
+  achat l_purchase;
+  uint32_t l_result = m_db->get_achat(l_purchase_id,l_purchase);
+  assert(l_result == 1);
+
+  m_user_interface->set_customer_purchase_brand(l_purchase.get_marque_id());
+  m_user_interface->set_customer_purchase_type(l_purchase.get_type_id());
+  m_user_interface->set_customer_purchase_reference(l_purchase.get_reference());
+  stringstream l_euro_price_str;
+  l_euro_price_str << l_purchase.get_prix_euro();
+  m_user_interface->set_customer_purchase_euro_price(l_euro_price_str.str());
+  stringstream l_franc_price_str;
+  l_franc_price_str << l_purchase.get_prix_franc();
+  m_user_interface->set_customer_purchase_franc_price(l_franc_price_str.str());
+  m_user_interface->set_customer_purchase_warranty(l_purchase.get_garantie());
+
+  refresh_customer_data_purchase_actions();
+  
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_no_more_purchase_selected_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data no more purchase selected event" << std::endl ;
+  assert(m_user_interface);
+  assert(m_user_interface->is_customer_data_purchase_selection_empty());
+  clear_purchase_informations();
+  refresh_customer_data_purchase_actions();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_creation_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase purchase creation event" << std::endl ;
+  assert(m_user_interface);
+  assert(m_user_interface->is_customer_data_purchase_selection_empty());
+
+  // Purchase should always be associated to a bill
+  assert(!m_user_interface->is_customer_data_bill_selection_empty());
+ 
+  // Getting information for current purchase
+  const type_achat * l_purchase_type = m_user_interface->get_customer_purchase_type();
+  const marque * l_purchase_brand = m_user_interface->get_customer_purchase_brand();
+  const std::string l_purchase_reference = m_user_interface->get_customer_purchase_reference();
+  double l_purchase_franc_price = strtod(m_user_interface->get_customer_purchase_franc_price().c_str(),NULL);
+  double l_purchase_euro_price = strtod(m_user_interface->get_customer_purchase_euro_price().c_str(),NULL);
+  bool l_purchase_warranty = m_user_interface->is_customer_purchase_warranty_selected();
+  
+  bool l_complete = l_purchase_type && l_purchase_brand && l_purchase_reference != "" && m_user_interface->get_customer_purchase_franc_price() != "" && m_user_interface->get_customer_purchase_euro_price() != "";
+  assert(l_complete);
+
+  achat l_purchase(m_user_interface->get_customer_data_selected_bill_id(),
+		   l_purchase_brand->get_id(),
+		   l_purchase_type->get_id(),
+		   l_purchase_reference,
+		   l_purchase_franc_price,
+		   l_purchase_euro_price,
+		   l_purchase_warranty);
+  m_db->create(l_purchase);
+  clear_purchase_informations();
+  refresh_customer_data_purchase_actions();
+  refresh_customer_data_purchase_list();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_modification_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase purchase modification event" << std::endl ;
+   assert(m_user_interface);
+  assert(!m_user_interface->is_customer_data_purchase_selection_empty());
+  uint32_t l_purchase_id = m_user_interface->get_customer_data_selected_purchase_id();
+  assert(m_db);
+  achat l_purchase;
+  uint32_t l_result = m_db->get_achat(l_purchase_id,l_purchase);
+  assert(l_result == 1);
+
+  // Getting information for current purchase 
+  const type_achat * l_purchase_type = m_user_interface->get_customer_purchase_type();
+  const marque * l_purchase_brand = m_user_interface->get_customer_purchase_brand();
+  const std::string l_purchase_reference = m_user_interface->get_customer_purchase_reference();
+  double l_purchase_franc_price = strtod(m_user_interface->get_customer_purchase_franc_price().c_str(),NULL);
+  double l_purchase_euro_price = strtod(m_user_interface->get_customer_purchase_euro_price().c_str(),NULL);
+  bool l_purchase_warranty = m_user_interface->is_customer_purchase_warranty_selected();
+ 
+  bool l_complete = l_purchase_type && l_purchase_brand && l_purchase_reference != "" && m_user_interface->get_customer_purchase_franc_price() != "" && m_user_interface->get_customer_purchase_euro_price() != "";
+  assert(l_complete);
+
+  // Updating purchase
+  l_purchase.set_type_id(l_purchase_type->get_id());
+  l_purchase.set_marque_id(l_purchase_brand->get_id());
+  l_purchase.set_reference(l_purchase_reference);
+  l_purchase.set_prix_franc(l_purchase_franc_price);
+  l_purchase.set_prix_euro(l_purchase_euro_price);
+  l_purchase.set_garantie(l_purchase_warranty);
+
+  m_db->update(l_purchase);
+  clear_purchase_informations();
+  refresh_customer_data_purchase_actions();
+  refresh_customer_data_purchase_list();  
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_customer_data_purchase_deletion_event(void)
+{
+  std::cout << "Fichier_client Event :: customer data purchase purchase deletion event" << std::endl ;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_customer_data_purchase_selection_empty());
+  uint32_t l_purchase_id = m_user_interface->get_customer_data_selected_purchase_id();
+  assert(m_db);
+  achat l_purchase;
+  uint32_t l_result = m_db->get_achat(l_purchase_id,l_purchase);
+  assert(l_result == 1);
+  m_db->remove(l_purchase);
+  clear_purchase_informations();
+  refresh_customer_data_purchase_actions();
+  refresh_customer_data_purchase_list();  
+}
+
 
 //------------------------------------------------------------------------------
 bool fichier_client::check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id)
@@ -914,11 +1108,6 @@ void fichier_client::refresh_customer_data_bill_list(void)
   m_db->get_facture_by_client_id(m_current_customer_id,l_list_facture);
   m_user_interface->update_customer_data_bill_list(l_list_facture);
 
-  if(l_list_facture.size())
-    {
-      set_customer_data_purchase_enabled(true);
-    }
-
   refresh_customer_bill_actions();
 }
 
@@ -926,7 +1115,18 @@ void fichier_client::refresh_customer_data_bill_list(void)
 void fichier_client::refresh_customer_data_purchase_list(void)
 {
   std::vector<search_achat_item> l_purchase_list;
-  m_db->get_achat_by_client_id(m_current_customer_id,l_purchase_list);
+  assert(m_user_interface);
+  assert(m_db);
+  if(m_user_interface->is_customer_data_bill_selection_empty())
+    {
+      m_db->get_achat_by_client_id(m_current_customer_id,l_purchase_list);
+    }
+  else
+    {
+      uint32_t l_bill_id = m_user_interface->get_customer_data_selected_bill_id();
+      m_db->get_purchase_by_bill_id(l_bill_id,l_purchase_list);
+    }
+
   m_user_interface->update_customer_data_purchase_list(l_purchase_list);
 }
 
@@ -985,6 +1185,18 @@ void fichier_client::check_customer_identity(void)
       m_user_interface->set_customer_data_modify_customer_enabled(false);
       m_user_interface->set_customer_data_delete_customer_enabled(false);
     }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::clear_purchase_informations(void)
+{
+  assert(m_user_interface);
+  m_user_interface->set_customer_purchase_brand(0);
+  m_user_interface->set_customer_purchase_type(0);
+  m_user_interface->set_customer_purchase_euro_price("");
+  m_user_interface->set_customer_purchase_franc_price("");
+  m_user_interface->set_customer_purchase_reference("");
+  m_user_interface->set_customer_purchase_warranty(false);
 }
 
 //------------------------------------------------------------------------------
@@ -1565,6 +1777,7 @@ void fichier_client::refresh_facture_status_list(void)
   assert(m_user_interface);
   m_user_interface->refresh_facture_status_list(l_facture_status_list);
   refresh_non_attributed_facture_status_list();
+  refresh_customer_data_facture_status_list();
 }
 
 
@@ -1754,18 +1967,62 @@ void fichier_client::refresh_facture_reason_list(void)
   refresh_non_attributed_facture_reason_list();
 }
 
+//------------------------------------------------------------------------------
+void fichier_client::refresh_customer_data_facture_status_list(void)
+{
+  vector<facture_status> l_facture_status_list;
+  assert(m_db);
+  m_db->get_all_facture_status(l_facture_status_list);
+  assert(m_user_interface);
+  m_user_interface->set_customer_facture_status_list(l_facture_status_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::refresh_customer_data_purchase_actions(void)
+{
+  bool l_purchase_creation_enabled = false;
+  bool l_purchase_modification_enabled = false;
+  bool l_purchase_deletion_enabled = false;
+  assert(m_user_interface);
+
+  // Getting information for current purchase
+  const type_achat * l_purchase_type = m_user_interface->get_customer_purchase_type();
+  const marque * l_purchase_brand = m_user_interface->get_customer_purchase_brand();
+  const std::string l_purchase_reference = m_user_interface->get_customer_purchase_reference();
+  double l_purchase_franc_price = strtod(m_user_interface->get_customer_purchase_franc_price().c_str(),NULL);
+  double l_purchase_euro_price = strtod(m_user_interface->get_customer_purchase_euro_price().c_str(),NULL);
+  bool l_purchase_warranty = m_user_interface->is_customer_purchase_warranty_selected();
+
+  bool l_complete = l_purchase_type && l_purchase_brand && l_purchase_reference != "" && m_user_interface->get_customer_purchase_franc_price() != "" && m_user_interface->get_customer_purchase_euro_price() != "";
+
+  if(m_user_interface->is_customer_data_purchase_selection_empty())
+    {
+      l_purchase_creation_enabled = l_complete;
+    }
+  else
+    {
+      if(l_complete)
+	{
+	  uint32_t l_purchase_id = m_user_interface->get_customer_data_selected_purchase_id();
+	  assert(m_db);
+	  achat l_purchase;
+	  uint32_t l_result = m_db->get_achat(l_purchase_id,l_purchase);
+	  assert(l_result == 1);
+	  l_purchase_modification_enabled = l_purchase.get_marque_id() != l_purchase_brand->get_id() ||
+	    l_purchase.get_type_id() != l_purchase_type->get_id() ||
+	    l_purchase.get_reference() != l_purchase_reference ||
+	    l_purchase.get_prix_franc() != l_purchase_franc_price ||
+	    l_purchase.get_prix_euro() != l_purchase_euro_price ||
+	    l_purchase.get_garantie() != l_purchase_warranty;
+	}
+      l_purchase_deletion_enabled = true;
+    }
 
 
-
-
-
-
-
-
-
-
-
-
+  m_user_interface->set_customer_purchase_creation_enabled(l_purchase_creation_enabled);
+  m_user_interface->set_customer_purchase_modification_enabled(l_purchase_modification_enabled);
+  m_user_interface->set_customer_purchase_deletion_enabled(l_purchase_deletion_enabled);
+}
 
 
 
@@ -1850,6 +2107,9 @@ void fichier_client::open_db(const std::string & p_name)
   open_tmp_db();
   refresh_non_attributed_facture_status_list();
   refresh_non_attributed_facture_reason_list();
+  refresh_customer_data_facture_status_list();
+  refresh_brand_list();
+  refresh_purchase_type_list();
 }
 
 //------------------------------------------------------------------------------
@@ -1904,6 +2164,33 @@ void fichier_client::copy(const std::string & p_src,const std::string & p_dest)
   l_input_file.close();
   l_output_file.close();
 }
+
+//------------------------------------------------------------------------------
+void fichier_client::refresh_brand_list(void)
+{
+  // Get list from db
+  std::vector<marque> l_brand_list;
+  assert(m_db);
+  m_db->get_all_marque(l_brand_list);
+  
+  // Update user interface
+  assert(m_user_interface);
+  m_user_interface->set_customer_purchase_brand_list(l_brand_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::refresh_purchase_type_list(void)
+{
+  // Get list from db
+  std::vector<type_achat> l_purchase_type_list;
+  assert(m_db);
+  m_db->get_all_type_achat(l_purchase_type_list);
+  
+  // Update user interface
+  assert(m_user_interface);
+  m_user_interface->set_customer_purchase_type_list(l_purchase_type_list);
+}
+
 
 //------------------------------------------------------------------------------
 void fichier_client::get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,

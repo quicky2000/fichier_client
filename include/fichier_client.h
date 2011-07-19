@@ -64,6 +64,23 @@ class fichier_client
   void treat_customer_data_bill_modification_event(void);
   void treat_customer_data_bill_deletion_event(void);
 
+  // Customer data purchase information related events
+  void treat_customer_data_purchase_brand_selection_event(void);
+  void treat_customer_data_purchase_type_selection_event(void);
+  void treat_customer_data_purchase_reference_modification_event(void);
+  void treat_customer_data_purchase_euro_price_modification_event(void);
+  void treat_customer_data_purchase_franc_price_modification_event(void);
+  void treat_customer_data_purchase_warranty_modification_event(void);
+
+  // Customer data purchase list related events
+  void treat_customer_data_purchase_selected_event(void);
+  void treat_customer_data_no_more_purchase_selected_event(void);
+
+  // Customer data purchase actions related events
+  void treat_customer_data_purchase_creation_event(void);
+  void treat_customer_data_purchase_modification_event(void);
+  void treat_customer_data_purchase_deletion_event(void);
+
   // Livre facture related events
   bool check_new_facture_id(uint32_t p_facture_id, uint32_t p_livre_facture_id);
   void treat_livre_facture_selected_event(void);
@@ -105,30 +122,47 @@ class fichier_client
   // Operations on database
   void check_db_coherency(void);
 
-  void refresh_non_attributed_facture_status_list(void);
-  void refresh_non_attributed_facture_reason_list(void);
-
  private:
   void remove_tmp_db(void);
   void open_tmp_db(void);
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
 
+  // Customer search
+
+  // Customer data
   void set_customer_identity_enabled(bool p_enabled);
   void set_customer_data_bill_enabled(bool p_enabled);
   void set_customer_data_purchase_enabled(bool p_enabled);
 
   void refresh_customer_data_bill_list(void);
   void refresh_customer_data_purchase_list(void);
-
-  void check_customer_identity(void);
   void refresh_customer_bill_actions(void);
+  void refresh_customer_data_facture_status_list(void);
+  void refresh_customer_data_purchase_actions(void);
+  void check_customer_identity(void);
+
+  void clear_purchase_informations(void);
+
+  // Bill book widget
+  void refresh_livre_facture_list(void);
   void check_non_attributed_facture(void);
   void check_livre_facture_information(void);
   void refresh_non_attributed_facture_list(void);
-  void refresh_livre_facture_list(void);
+  void refresh_non_attributed_facture_status_list(void);
+  void refresh_non_attributed_facture_reason_list(void);
+
+  // Facture status
   void refresh_facture_status_list(void);
+
+  // Facture reason
   void refresh_facture_reason_list(void);
+
+
+  // General
+  void refresh_brand_list(void);
+  void refresh_purchase_type_list(void);
+  
 
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_client_item> & p_result);
   void get_remaining_refs(const livre_facture & p_livre,std::vector<facture> & l_facture_list,std::vector<uint32_t> & p_remaining_refs);

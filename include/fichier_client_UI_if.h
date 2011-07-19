@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "facture_status.h"
+#include "type_achat.h"
+#include "marque.h"
 #include "ville.h"
 class facture;
 
@@ -77,8 +79,28 @@ class fichier_client_UI_if
 
   // Interactions with customer purchase information
   virtual void set_customer_purchase_fields_enabled(bool p_enabled)=0;
+  virtual void set_customer_purchase_brand_list(const std::vector<marque> & p_list)=0;
+  virtual void set_customer_purchase_brand(uint32_t p_id)=0;
+  virtual void set_customer_purchase_type_list(const std::vector<type_achat> & p_list)=0;
+  virtual void set_customer_purchase_type(uint32_t p_id)=0;
+  virtual void set_customer_purchase_reference(const std::string & p_ref)=0;
+  virtual void set_customer_purchase_euro_price(const std::string & p_euro_price)=0;
+  virtual void set_customer_purchase_franc_price(const std::string & p_franc_price)=0;
+  virtual void set_customer_purchase_warranty(bool p_warranty)=0;
+  virtual const marque * get_customer_purchase_brand(void)const=0;
+  virtual const type_achat * get_customer_purchase_type(void)const=0;
+  virtual const std::string get_customer_purchase_reference(void)const=0; 
+  virtual const std::string get_customer_purchase_euro_price(void)const=0; 
+  virtual const std::string get_customer_purchase_franc_price(void)const=0; 
+  virtual bool is_customer_purchase_warranty_selected(void)const=0;
+
+  // Interactions with customer purchase list
+  virtual bool is_customer_data_purchase_selection_empty(void)const=0;
+  virtual uint32_t get_customer_data_selected_purchase_id(void)const=0;
   virtual void update_customer_data_purchase_list(const std::vector<search_achat_item> & p_list)=0;
   virtual void set_customer_purchase_list_enabled(bool p_enabled)=0;
+
+  // Interactions customer purchase actions
   virtual void set_customer_purchase_creation_enabled(bool p_enabled)=0;
   virtual void set_customer_purchase_modification_enabled(bool p_enabled)=0;
   virtual void set_customer_purchase_deletion_enabled(bool p_enabled)=0;
