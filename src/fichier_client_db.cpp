@@ -701,9 +701,21 @@ void fichier_client_db::get_all_achat(std::vector<achat> & p_list)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::get_by_facture_id(uint32_t p_facture_id,std::vector<achat> & p_result)
+void fichier_client_db::get_by_facture_id(uint32_t p_id,std::vector<achat> & p_result)
 {
-  m_table_achat.get_by_facture_id(p_facture_id,p_result);
+  m_table_achat.get_by_facture_id(p_id,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_by_type_id(uint32_t p_id,std::vector<achat> & p_result)
+{
+  m_table_achat.get_by_type_id(p_id,p_result);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_by_brand_id(uint32_t p_id,std::vector<achat> & p_result)
+{
+  m_table_achat.get_by_brand_id(p_id,p_result);
 }
 
 //------------------------------------------------------------------------------

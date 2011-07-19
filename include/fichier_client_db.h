@@ -111,6 +111,8 @@ class fichier_client_db
   uint32_t get_achat(uint32_t p_id,achat & p_data);
   void get_all_achat(std::vector<achat> & p_list);
   void get_by_facture_id(uint32_t p_facture_id,std::vector<achat> & p_result);
+  void get_by_type_id(uint32_t p_id,std::vector<achat> & p_result);
+  void get_by_brand_id(uint32_t p_id,std::vector<achat> & p_result);
   
   //Management of client table
   void create( client & p_client);
