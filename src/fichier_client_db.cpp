@@ -512,6 +512,13 @@ void fichier_client_db::get_ville_by_code_postal(const std::string & p_date,std:
 }
 
 //------------------------------------------------------------------------------
+void fichier_client_db::get_city_by_name_and_postal_code(const std::string & p_name,const std::string & p_code_postal,std::vector<ville> & p_result)
+{
+  m_table_ville.get_by_name_and_postal_code(p_name,p_code_postal,p_result);
+}
+
+
+//------------------------------------------------------------------------------
 void fichier_client_db::create( marque & p_marque)
 {
   m_modified = true;
@@ -749,6 +756,12 @@ uint32_t fichier_client_db::get_client(uint32_t p_id,client & p_data)
 void fichier_client_db::get_all_client(std::vector<client> & p_list)
 {
   m_table_client.get_all(p_list);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client_db::get_customer_by_city(uint32_t p_city_id,std::vector<client> & p_list)
+{
+  m_table_client.get_by_city(p_city_id,p_list);
 }
 
 //------------------------------------------------------------------------------

@@ -71,6 +71,7 @@ class fichier_client_db
   void get_all_ville(std::vector<ville> & p_list);
   void get_ville_by_name(const std::string & p_name,std::vector<ville> & p_result, bool p_exact=false);
   void get_ville_by_code_postal(const std::string & p_code_postal,std::vector<ville> & p_result);
+  void get_city_by_name_and_postal_code(const std::string & p_name,const std::string & p_code_postal,std::vector<ville> & p_result);
   
   //Management of marque table
   void create( marque & p_marque);
@@ -120,6 +121,7 @@ class fichier_client_db
   void remove(const client & p_client);
   uint32_t get_client(uint32_t p_id,client & p_data);
   void get_all_client(std::vector<client> & p_list );
+  void get_customer_by_city(uint32_t p_city_id,std::vector<client> & p_list );
 
   //Mangement of jointures
   void get_complete_client(uint32_t p_id,search_client_item & p_result);
