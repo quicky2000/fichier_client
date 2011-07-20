@@ -222,6 +222,26 @@ class fichier_client_UI_if
   virtual void set_purchase_configuration_delete_type_enabled(bool p_enable)=0;
   virtual void set_purchase_configuration_modify_type_enabled(bool p_enable)=0;
   virtual void set_purchase_configuration_modify_type_action_name(const std::string & p_name)=0;
+
+  // Interactions with city information
+  virtual void clear_city_information(void)=0;
+  virtual void set_city_name(const std::string & p_name)=0;  
+  virtual const std::string get_city_name(void)const=0;
+  virtual void set_city_postal_code(const std::string & p_postal_code)=0;  
+  virtual const std::string get_city_postal_code(void)const=0;
+  virtual bool is_city_postal_code_complete(void)const=0;
+
+  // Interactions with city list
+  virtual bool is_city_selection_empty(void)const=0;
+  virtual uint32_t get_selected_city_id(void)const=0;
+  virtual void set_city_list(std::vector<ville> & p_list)=0;
+  virtual void set_city_list_enabled(bool p_enable)=0;
+
+  // Interactions with city actions
+  virtual void set_create_city_enabled(bool p_enable)=0;
+  virtual void set_delete_city_enabled(bool p_enable)=0;
+  virtual void set_modify_city_enabled(bool p_enable)=0;
+  virtual void set_modify_city_action_name(const std::string & p_name)=0;
 };
 
 #endif

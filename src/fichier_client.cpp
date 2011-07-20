@@ -15,6 +15,7 @@ fichier_client::fichier_client(void):
   m_facture_reason_pending_modif(false),
   m_purchase_brand_pending_modif(false),
   m_purchase_type_pending_modif(false),
+  m_city_pending_modif(false),
   m_user_interface(NULL),
   m_db(NULL),
   m_db_name("")
@@ -201,7 +202,7 @@ void fichier_client::treat_search_customer_delete_customer_event(void)
 
 // Customer data identity information related events
 //------------------------------------------------------------------------------
-void fichier_client::treat_postal_code_modification_event(void)
+void fichier_client::treat_customer_postal_code_modification_event(void)
 {
   std::cout << "Fichier_client Event::customer identity postal code modification event" << std::endl;
   assert(m_user_interface);
@@ -216,7 +217,7 @@ void fichier_client::treat_postal_code_modification_event(void)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::treat_city_selection_event(void)
+void fichier_client::treat_customer_city_selection_event(void)
 {
   std::cout << "Fichier_client Event::customer identity city selection event" << std::endl;
 
@@ -1790,88 +1791,6 @@ void fichier_client::refresh_facture_status_list(void)
 // Facture reason related events
 //--------------------------------
 //------------------------------------------------------------------------------
-void fichier_client::treat_no_more_facture_reason_selected_event(void)
-{
-  std::cout << "Fichier_ClientEvent::no more facture_reason selected" << std::endl;
-  assert(m_user_interface);
-  m_user_interface->set_delete_facture_reason_enabled(false);
-  m_user_interface->set_modify_facture_reason_enabled(false);
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::treat_delete_facture_reason_event(void)
-{
-  std::cout << "Fichier_ClientEvent::facture reason delete event" << std::endl;
-  assert(m_user_interface);
-  uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
-  
-  // Get selected reason
-  assert(m_db);
-  facture_reason l_facture_reason;
-  m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
-
-  // Check that no facture are using this reason
-  std::vector<facture> l_facture_list;
-  m_db->get_by_reason(l_facture_reason_id,l_facture_list);
-  assert(l_facture_list.size()==0);
-
-  // Remove the reason
-  m_db->remove(l_facture_reason);
-
-  // Update user interface
-  m_user_interface->set_delete_facture_reason_enabled(false);
-  m_user_interface->set_modify_facture_reason_enabled(false);
-  m_user_interface->clear_facture_reason_information();
-  refresh_facture_reason_list();
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::treat_modify_facture_reason_event(void)
-{
-  std::cout << "Fichier_ClientEvent::facture reason modify event" << std::endl;
-  assert(m_user_interface);
-  uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
-  
-  // Get selected reason
-  assert(m_db);
-  facture_reason l_facture_reason;
-  m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
-
-  // Check this is not predefined reason
-  string l_name = l_facture_reason.get_name();
-
-  m_user_interface->set_delete_facture_reason_enabled(false);
-  if(!m_facture_reason_pending_modif)
-    {
-      m_facture_reason_pending_modif = true;
-      m_user_interface->set_facture_reason_name(l_facture_reason.get_name());
-      m_user_interface->set_modify_facture_reason_action_name("Annuler");
-      m_user_interface->set_facture_reason_list_enabled(false);
-    }
-  else
-    {
-      m_user_interface->set_facture_reason_list_enabled(true);
-      m_user_interface->set_modify_facture_reason_action_name("Modifier");
-      std::string l_new_name = m_user_interface->get_facture_reason_name();
-      assert(l_new_name != "");
-
-      if(l_new_name != l_name)
-	{
-	  std::vector<facture_reason> l_list_facture_reason;
-	  m_db->get_facture_reason_by_name(l_new_name,l_list_facture_reason,true);
-	  assert(l_list_facture_reason.size()==0);
-      
-	  l_facture_reason.set_name(l_new_name);
-	  m_db->update(l_facture_reason);
-	}
-      m_facture_reason_pending_modif = false;
-      
-      m_user_interface->clear_facture_reason_information();
-      refresh_facture_reason_list();
-    }
-}
-
-//------------------------------------------------------------------------------
 void fichier_client::treat_facture_reason_name_modif_event(void)
 {
   std::cout << "Fichier_ClientEvent::facture reason name modify event" << std::endl;
@@ -1916,6 +1835,35 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
 }
 
 //------------------------------------------------------------------------------
+void fichier_client::treat_facture_reason_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::facture reason selection event" << std::endl;  
+  assert(m_user_interface);
+
+  uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
+  
+  // Get selected reason
+  assert(m_db);
+  facture_reason l_facture_reason;
+  m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
+
+  // Check that no facture are using this reason
+  std::vector<facture> l_facture_list;
+  m_db->get_by_reason(l_facture_reason_id,l_facture_list);
+  m_user_interface->set_delete_facture_reason_enabled(l_facture_list.size()==0);
+  m_user_interface->set_modify_facture_reason_enabled(true);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_no_more_facture_reason_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::no more facture_reason selected" << std::endl;
+  assert(m_user_interface);
+  m_user_interface->set_delete_facture_reason_enabled(false);
+  m_user_interface->set_modify_facture_reason_enabled(false);
+}
+
+//------------------------------------------------------------------------------
 void fichier_client::treat_create_facture_reason_event(void)
 {
   std::cout << "Fichier_ClientEvent::facture reason name create event" << std::endl;
@@ -1936,11 +1884,10 @@ void fichier_client::treat_create_facture_reason_event(void)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::treat_facture_reason_selected_event(void)
+void fichier_client::treat_modify_facture_reason_event(void)
 {
-  std::cout << "Fichier_ClientEvent::facture reason selection event" << std::endl;  
+  std::cout << "Fichier_ClientEvent::facture reason modify event" << std::endl;
   assert(m_user_interface);
-
   uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
   
   // Get selected reason
@@ -1949,12 +1896,63 @@ void fichier_client::treat_facture_reason_selected_event(void)
   m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
 
   string l_name = l_facture_reason.get_name();
-   
+
+  m_user_interface->set_delete_facture_reason_enabled(false);
+  if(!m_facture_reason_pending_modif)
+    {
+      m_facture_reason_pending_modif = true;
+      m_user_interface->set_facture_reason_name(l_facture_reason.get_name());
+      m_user_interface->set_modify_facture_reason_action_name("Annuler");
+      m_user_interface->set_facture_reason_list_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_facture_reason_list_enabled(true);
+      m_user_interface->set_modify_facture_reason_action_name("Modifier");
+      std::string l_new_name = m_user_interface->get_facture_reason_name();
+      assert(l_new_name != "");
+
+      if(l_new_name != l_name)
+	{
+	  std::vector<facture_reason> l_list_facture_reason;
+	  m_db->get_facture_reason_by_name(l_new_name,l_list_facture_reason,true);
+	  assert(l_list_facture_reason.size()==0);
+      
+	  l_facture_reason.set_name(l_new_name);
+	  m_db->update(l_facture_reason);
+	}
+      m_facture_reason_pending_modif = false;
+      
+      m_user_interface->clear_facture_reason_information();
+      refresh_facture_reason_list();
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_delete_facture_reason_event(void)
+{
+  std::cout << "Fichier_ClientEvent::facture reason delete event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_facture_reason_id = m_user_interface->get_selected_facture_reason_id();
+  
+  // Get selected reason
+  assert(m_db);
+  facture_reason l_facture_reason;
+  m_db->get_facture_reason(l_facture_reason_id,l_facture_reason);
+
   // Check that no facture are using this reason
   std::vector<facture> l_facture_list;
   m_db->get_by_reason(l_facture_reason_id,l_facture_list);
-  m_user_interface->set_delete_facture_reason_enabled(l_facture_list.size()==0);
-  m_user_interface->set_modify_facture_reason_enabled(true);
+  assert(l_facture_list.size()==0);
+
+  // Remove the reason
+  m_db->remove(l_facture_reason);
+
+  // Update user interface
+  m_user_interface->set_delete_facture_reason_enabled(false);
+  m_user_interface->set_modify_facture_reason_enabled(false);
+  m_user_interface->clear_facture_reason_information();
+  refresh_facture_reason_list();
 }
 
 // Brand information related events
@@ -2304,6 +2302,16 @@ void fichier_client::refresh_facture_reason_list(void)
 }
 
 //------------------------------------------------------------------------------
+void fichier_client::refresh_city_list(void)
+{
+  assert(m_db);
+  vector<ville> l_cities;
+  m_db->get_all_ville(l_cities);
+  m_user_interface->set_city_list(l_cities);
+}
+
+
+//------------------------------------------------------------------------------
 void fichier_client::refresh_customer_data_facture_status_list(void)
 {
   vector<facture_status> l_facture_status_list;
@@ -2361,33 +2369,182 @@ void fichier_client::refresh_customer_data_purchase_actions(void)
 }
 
 
+// City information related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_criteria_modification_event(void)
+{
+  std::cout << "Fichier_ClientEvent::city criteria modification event" << std::endl;
 
+  assert(m_user_interface);
+  std::string l_city_name = m_user_interface->get_city_name();
+  std::string l_postal_code = m_user_interface->get_city_postal_code();
+  
+  std::vector<ville> l_city_list;
+  std::vector<ville> l_city_filtered_list;
 
+  assert(m_db);
+  if(l_city_name != "")
+    {
+      m_db->get_ville_by_name(l_city_name,l_city_list,true);
+    }
+  if(l_city_name != "" || l_postal_code != "")
+    {
+      m_db->get_city_by_name_and_postal_code(l_city_name,l_postal_code,l_city_filtered_list);
+    }
+  else
+    {
+      m_db->get_all_ville(l_city_filtered_list);
+    }
 
+  if(!m_city_pending_modif)
+    {
+      m_user_interface->set_create_city_enabled(l_city_list.size()==0 && l_city_name != "" && m_user_interface->is_city_postal_code_complete());
+      m_user_interface->set_city_list(l_city_filtered_list);
+    }
+  else
+    {
+      uint32_t l_city_id = m_user_interface->get_selected_city_id();
+      ville l_city;
+      uint32_t l_result = m_db->get_ville(l_city_id,l_city);
+      assert(l_result);
+      m_user_interface->set_modify_city_action_name(l_city.get_name() != l_city_name ? "Appliquer" : "Annuler");
+      
+     m_user_interface->set_modify_city_enabled(l_city_list.size()==0  && l_city_name != "" && m_user_interface->is_city_postal_code_complete());
+    }
+}
 
+// City list related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_selection_event(void)
+{
+  std::cout << "Fichier_ClientEvent::city selection event" << std::endl;
+  assert(m_user_interface);
+  assert(!m_user_interface->is_city_selection_empty());
 
+  uint32_t l_city_id = m_user_interface->get_selected_city_id();
 
+  // Get selected city
+  assert(m_db);
+  ville l_city;
+  m_db->get_ville(l_city_id,l_city);
 
+  // Check that no customer are living in this city
+  std::vector<client> l_customer_list;
+  m_db->get_customer_by_city(l_city_id,l_customer_list);
 
+  m_user_interface->set_delete_city_enabled(l_customer_list.size()==0);
+  m_user_interface->set_modify_city_enabled(true);
+}
 
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_no_more_selected_event(void)
+{
+  std::cout << "Fichier_ClientEvent::no more city selected event" << std::endl;
+  assert(m_user_interface);
+  m_user_interface->clear_city_information();
+  m_user_interface->set_delete_city_enabled(false);
+  m_user_interface->set_modify_city_enabled(false);
+}
 
+  // City action related events
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_create_event(void)
+{
+  std::cout << "Fichier_ClientEvent::city creation event" << std::endl;
+  assert(m_user_interface);
+  std::string l_city_name = m_user_interface->get_city_name();
+  std::string l_postal_code = m_user_interface->get_city_postal_code();
 
+  assert(m_db);
+  
+  std::vector<ville> l_already;
+  m_db->get_ville_by_name(l_city_name,l_already,true);
+  assert(l_already.size()==0);
 
+  m_user_interface->set_create_city_enabled(false);
+  ville l_city(l_city_name,l_postal_code);
 
+  m_db->create(l_city);
+  m_user_interface->clear_city_information();
+  refresh_city_list();
+}
 
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_modify_event(void)
+{
+  std::cout << "Fichier_ClientEvent::city modification event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_city_id = m_user_interface->get_selected_city_id();
 
+  // Get selected city
+  assert(m_db);
+  ville l_city;
+  m_db->get_ville(l_city_id,l_city);
 
+  string l_name = l_city.get_name();
+  string l_postal_code = l_city.get_postal_code();
 
+  m_user_interface->set_delete_city_enabled(false);
 
+  if(!m_city_pending_modif)
+    {
+      m_city_pending_modif = true;
+      m_user_interface->set_city_name(l_name);
+      m_user_interface->set_city_postal_code(l_postal_code);
+      m_user_interface->set_modify_city_action_name("Annuler");
+      m_user_interface->set_city_list_enabled(false);
+    }
+  else
+    {
+      m_user_interface->set_city_list_enabled(true);
+      m_user_interface->set_modify_city_action_name("Modifier");
+      std::string l_new_name = m_user_interface->get_city_name();
+      assert(l_new_name != "");
+      std::string l_new_postal_code = m_user_interface->get_city_postal_code();
+      assert(m_user_interface->is_city_postal_code_complete());
+      if(l_new_name != l_name || l_new_postal_code != l_postal_code)
+	{
+	  std::vector<ville> l_list_ville;
+	  m_db->get_ville_by_name(l_new_name,l_list_ville,true);
+	  assert(l_list_ville.size()==0);
+      
+	  l_city.set_name(l_new_name);
+	  l_city.set_postal_code(l_new_postal_code);
+	  m_db->update(l_city);
+	}
+      m_city_pending_modif = false;
+      
+      m_user_interface->clear_city_information();
+      refresh_city_list();
+    }
+}
 
+//------------------------------------------------------------------------------
+void fichier_client::treat_city_delete_event(void)
+{
+  std::cout << "Fichier_ClientEvent::city deletion event" << std::endl;
+  assert(m_user_interface);
+  uint32_t l_city_id = m_user_interface->get_selected_city_id();
+  
+  // Get selected reason
+  assert(m_db);
+  ville l_city;
+  m_db->get_ville(l_city_id,l_city);
 
+  // Check that no customer are living in this city
+  std::vector<client> l_customer_list;
+  m_db->get_customer_by_city(l_city_id,l_customer_list);
+  assert(l_customer_list.size()==0);
 
+  // Remove the reason
+  m_db->remove(l_city);
 
-
-
-
-
-
+  // Update user interface
+  m_user_interface->set_delete_city_enabled(false);
+  m_user_interface->set_modify_city_enabled(false);
+  m_user_interface->clear_city_information();
+  refresh_city_list();
+}
 
 //------------------------------------------------------------------------------
 bool fichier_client::need_save(void)const
@@ -2446,6 +2603,7 @@ void fichier_client::open_db(const std::string & p_name)
   refresh_customer_data_facture_status_list();
   refresh_brand_list();
   refresh_purchase_type_list();
+  refresh_city_list();
 }
 
 //------------------------------------------------------------------------------

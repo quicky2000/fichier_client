@@ -40,8 +40,8 @@ class fichier_client
   void treat_search_customer_delete_customer_event(void);
 
   // Customer data identity information related events
-  void treat_postal_code_modification_event(void);
-  void treat_city_selection_event(void);
+  void treat_customer_postal_code_modification_event(void);
+  void treat_customer_city_selection_event(void);
   void treat_identity_content_modification_event(void);
 
   // Customer data identity actions related events
@@ -146,6 +146,19 @@ class fichier_client
   void treat_purchase_configuration_delete_type_event(void);
   void treat_purchase_configuration_modify_type_event(void);
 
+  // City information related events
+  void treat_city_criteria_modification_event(void);
+
+  // City list related events
+  void treat_city_selection_event(void);
+  void treat_city_no_more_selected_event(void);
+
+  // City action related events
+  void treat_city_create_event(void);
+  void treat_city_modify_event(void);
+  void treat_city_delete_event(void);
+
+
   // Operations on database
   void check_db_coherency(void);
 
@@ -185,6 +198,9 @@ class fichier_client
   // Facture reason
   void refresh_facture_reason_list(void);
 
+  // City
+  void refresh_city_list(void);
+  void refresh_city_actions(void);
 
   // General
   void refresh_brand_list(void);
@@ -199,6 +215,7 @@ class fichier_client
   bool m_facture_reason_pending_modif;
   bool m_purchase_brand_pending_modif;
   bool m_purchase_type_pending_modif;
+  bool m_city_pending_modif;
   fichier_client_UI_if * m_user_interface;
   fichier_client_db *m_db;
   std::string m_db_name;
