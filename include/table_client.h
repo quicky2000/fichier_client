@@ -10,9 +10,9 @@ class table_client:public base_table<client>
   table_client(void);
   ~table_client(void);
   void set_db(sqlite3 *p_db);
-
+  void get_by_city(uint32_t p_city_id,std::vector<client> & p_list);
  private:
-  sqlite3_stmt *m_get_by_date_stmt;
+  sqlite3_stmt *m_get_by_city_stmt;
 };
 
 
