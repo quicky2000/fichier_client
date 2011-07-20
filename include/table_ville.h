@@ -12,10 +12,10 @@ class table_ville: public named_table<ville>
   void set_db(sqlite3 *p_db);
 
   void get_by_code_postal(const std::string & p_name,std::vector<ville> & p_result);
-
+  void get_by_name_and_postal_code(const std::string & p_name,const std::string & p_code_postal,std::vector<ville> & p_result);
  private:
   sqlite3_stmt *m_get_by_code_postal_stmt;
-
+  sqlite3_stmt *m_get_by_name_and_postal_code_stmt;
 };
 
 #endif
