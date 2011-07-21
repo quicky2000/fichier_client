@@ -255,7 +255,7 @@ void fichier_client::treat_customer_data_create_customer_event(void)
 
   std::vector<search_client_item> l_client_list ;
   assert(m_db);
-  m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list);
+  m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list,true);
   assert(l_client_list.size()==0);
 
   client l_client(l_name,l_first_name,l_address,l_phone,l_city->get_id());
@@ -1153,7 +1153,7 @@ void fichier_client::check_customer_identity(void)
   if(l_complete)
     {
       std::cout << "CLient identity is complete" << std::endl ; 
-      m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list);
+      m_db->search_client(l_name,l_first_name,l_address,l_city->get_name(),l_client_list,true);
       std::cout << "Corresponding list size " << l_client_list.size() << std::endl ;
     }
 
@@ -1650,6 +1650,7 @@ void fichier_client::treat_modify_facture_status_event(void)
       m_user_interface->set_facture_status_name(l_facture_status.get_name());
       m_user_interface->set_modify_facture_status_action_name("Annuler");
       m_user_interface->set_facture_status_list_enabled(false);
+      m_user_interface->set_create_facture_status_enabled(false);
     }
   else
     {
@@ -1904,6 +1905,7 @@ void fichier_client::treat_modify_facture_reason_event(void)
       m_user_interface->set_facture_reason_name(l_facture_reason.get_name());
       m_user_interface->set_modify_facture_reason_action_name("Annuler");
       m_user_interface->set_facture_reason_list_enabled(false);
+      m_user_interface->set_create_facture_reason_enabled(false);
     }
   else
     {
@@ -2098,6 +2100,8 @@ void fichier_client::treat_purchase_configuration_modify_brand_event(void)
       m_user_interface->set_purchase_configuration_brand_name(l_brand.get_name());
       m_user_interface->set_purchase_configuration_modify_brand_action_name("Annuler");
       m_user_interface->set_purchase_configuration_brand_list_enabled(false);
+      m_user_interface->set_purchase_configuration_create_brand_enabled(false);     
+
     }
   else
     {
@@ -2265,6 +2269,7 @@ void fichier_client::treat_purchase_configuration_modify_type_event(void)
       m_user_interface->set_purchase_configuration_type_name(l_type.get_name());
       m_user_interface->set_purchase_configuration_modify_type_action_name("Annuler");
       m_user_interface->set_purchase_configuration_type_list_enabled(false);
+      m_user_interface->set_purchase_configuration_create_type_enabled(false);     
     }
   else
     {
@@ -2493,6 +2498,7 @@ void fichier_client::treat_city_modify_event(void)
       m_user_interface->set_city_postal_code(l_postal_code);
       m_user_interface->set_modify_city_action_name("Annuler");
       m_user_interface->set_city_list_enabled(false);
+      m_user_interface->set_create_city_enabled(false);
     }
   else
     {
