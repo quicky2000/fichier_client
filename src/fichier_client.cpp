@@ -1712,7 +1712,7 @@ void fichier_client::treat_facture_status_name_modif_event(void)
       // Check if modified value is acceptable
       if(l_name_ok)
 	{
-	  l_name_ok = l_facture_status_list.size() == 0;
+	  l_name_ok = l_facture_status_list.size() == 0 || l_facture_status.get_name() == l_status_name ;
 	}
       m_user_interface->set_modify_facture_status_enabled(l_name_ok);
     }  
@@ -1828,7 +1828,7 @@ void fichier_client::treat_facture_reason_name_modif_event(void)
       // Check if modified value is acceptable
       if(l_name_ok)
 	{
-	  l_name_ok = l_facture_reason_list.size()==0;
+	  l_name_ok = l_facture_reason_list.size()==0 || l_facture_reason.get_name() == l_reason_name ;
 	}
       m_user_interface->set_modify_facture_reason_enabled(l_name_ok);
     }  
@@ -1992,7 +1992,7 @@ void fichier_client::treat_purchase_configuration_brand_name_modif_event(void)
       m_user_interface->set_purchase_configuration_modify_brand_action_name(l_brand.get_name() != l_brand_name ? "Appliquer" : "Annuler");
 
       // Check if modified value is acceptable
-      bool l_name_ok = l_brand_name != "" && l_brand_list.size() == 0;
+      bool l_name_ok = l_brand_name != "" && (l_brand_list.size() == 0 || l_brand.get_name() == l_brand_name); 
       m_user_interface->set_purchase_configuration_modify_brand_enabled(l_name_ok);
     }  
 }
@@ -2162,7 +2162,7 @@ void fichier_client::treat_purchase_configuration_type_name_modif_event(void)
       m_user_interface->set_purchase_configuration_modify_type_action_name(l_type.get_name() != l_type_name ? "Appliquer" : "Annuler");
 
       // Check if modified value is acceptable
-      bool l_name_ok = l_type_name != "" && l_type_list.size() == 0;
+      bool l_name_ok = l_type_name != "" && (l_type_list.size() == 0 || l_type.get_name() == l_type_name);
       m_user_interface->set_purchase_configuration_modify_type_enabled(l_name_ok);
     }  
 }
@@ -2414,7 +2414,7 @@ void fichier_client::treat_city_criteria_modification_event(void)
       assert(l_result);
       m_user_interface->set_modify_city_action_name(l_city.get_name() != l_city_name ? "Appliquer" : "Annuler");
       
-     m_user_interface->set_modify_city_enabled(l_city_list.size()==0  && l_city_name != "" && m_user_interface->is_city_postal_code_complete());
+      m_user_interface->set_modify_city_enabled(l_city_name != "" && m_user_interface->is_city_postal_code_complete() && (l_city_list.size()==0 || l_city.get_name() == l_city_name));
     }
 }
 
