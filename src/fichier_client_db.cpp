@@ -93,12 +93,12 @@ fichier_client_db::fichier_client_db(const std::string &p_name):
 				      description<client>::get_class_type() + ".Name, "+
 				      "FirstName, " +
 				      "Address, " +
-				      "Ville.Name " +
+				      description<ville>::get_class_type() + ".Name " +
 				      "FROM " + 
 				      description<client>::get_class_type() + ", " + 
 				      description<ville>::get_class_type() +
 				      " WHERE " +
-				      description<client>::get_class_type() + ".VilleId = Ville.Id "+ 
+				      description<client>::get_class_type() + ".VilleId = " + description<ville>::get_class_type() + ".Id "+ 
 				      " AND " +
 				      description<client>::get_class_type() + ".Name LIKE @client_name" +
 				      " AND " +
@@ -765,23 +765,19 @@ void fichier_client_db::get_customer_by_city(uint32_t p_city_id,std::vector<clie
 }
 
 //------------------------------------------------------------------------------
-void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, vector<search_client_item> & p_result)
+void fichier_client_db::search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, vector<search_client_item> & p_result, bool p_exact)
 {
   //Preparing search criteria
-  string l_client_name_criteria("%");
-  l_client_name_criteria += p_name + "%";
+  string l_client_name_criteria = (p_exact ? p_name : std::string("%") + p_name + "%");
 
   //Preparing search criteria
-  string l_client_first_name_criteria("%");
-  l_client_first_name_criteria += p_first_name + "%";
+  string l_client_first_name_criteria = (p_exact ? p_first_name  : std::string("%") + p_first_name + "%");
 
   //Preparing search criteria
-  string l_client_address_criteria("%");
-  l_client_address_criteria += p_address + "%";
+  string l_client_address_criteria = (p_exact ? p_address : std::string("%") + p_address + "%");
 
   //Preparing search criteria
-  string l_city_criteria("%");
-  l_city_criteria += p_city + "%";
+  string l_city_criteria = (p_exact ? p_city  : std::string("%") + p_city + "%");
 
   // Binding values to statement
   //----------------------------

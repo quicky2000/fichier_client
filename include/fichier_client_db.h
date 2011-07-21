@@ -125,7 +125,7 @@ class fichier_client_db
 
   //Mangement of jointures
   void get_complete_client(uint32_t p_id,search_client_item & p_result);
-  void search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, std::vector<search_client_item> & p_result);
+  void search_client(const std::string & p_name, const std::string & p_first_name,const std::string & p_address, const std::string & p_city, std::vector<search_client_item> & p_result, bool p_exact = false);
   void get_achat_by_client_id(uint32_t p_client_id,std::vector<search_achat_item> & p_result);
   void get_purchase_by_bill_id(uint32_t p_facture_id,std::vector<search_achat_item> & p_result);
   void get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result);
