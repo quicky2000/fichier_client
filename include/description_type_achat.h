@@ -23,7 +23,7 @@ template <> class description<type_achat>
 //------------------------------------------------------------------------------
 const std::string description<type_achat>::get_class_type(void)
 {
-  return "Type_achat";
+  return "Purchase_type";
 }
 
 //------------------------------------------------------------------------------

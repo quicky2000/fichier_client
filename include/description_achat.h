@@ -23,25 +23,25 @@ template <> class description<achat>
 //------------------------------------------------------------------------------
 const std::string description<achat>::get_class_type(void)
 {
-  return "Achat";
+  return "Purchase";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<achat>::get_table_fields_declaration(void)
 {
-  return "FactureId INTEGER, MarqueId INTEGER, TypeId INTEGER, Reference TEXT, PrixFranc REAL, PrixEuro REAL, Garantie INTEGER";
+  return "BillId INTEGER, BrandId INTEGER, TypeId INTEGER, Reference TEXT, PriceFranc REAL, PriceEuro REAL, Warranty INTEGER";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<achat>::get_table_fields(void)
 {
-  return "FactureId, MarqueId, TypeId, Reference, PrixFranc, PrixEuro, Garantie";
+  return "BillId, BrandId, TypeId, Reference, PriceFranc, PriceEuro, Warranty";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<achat>::get_update_fields(void)
 {
-  return "FactureId = $facture_id, MarqueId = $marque_id , TypeId = $type_id , Reference = $reference, PrixFranc = $prix_franc , PrixEuro = $prix_euro, Garantie = $garantie";
+  return "BillId = $facture_id, BrandId = $marque_id , TypeId = $type_id , Reference = $reference, PriceFranc = $prix_franc , PriceEuro = $prix_euro, Warranty = $garantie";
 }
 
 //------------------------------------------------------------------------------
@@ -107,14 +107,14 @@ void description<achat>::bind_item_values(const achat & p_achat,sqlite3_stmt* p_
 //------------------------------------------------------------------------------
 achat description<achat>::get_item_from_row(sqlite3_stmt* p_stmt)
 {
-  return achat(sqlite3_column_int(p_stmt,0),//Achat Id
-	       sqlite3_column_int(p_stmt,1),//FactureId
-	       sqlite3_column_int(p_stmt,2),//MarqueId
+  return achat(sqlite3_column_int(p_stmt,0),//Purchase Id
+	       sqlite3_column_int(p_stmt,1),//BillId
+	       sqlite3_column_int(p_stmt,2),//BrandId
 	       sqlite3_column_int(p_stmt,3),//TypeId
 	       (const char*)sqlite3_column_text(p_stmt,4),//Reference
-	       sqlite3_column_double(p_stmt,5),//PrixFranc
-	       sqlite3_column_double(p_stmt,6),//PrixEuro
-	       sqlite3_column_int(p_stmt,7)//Garantie
+	       sqlite3_column_double(p_stmt,5),//PriceFranc
+	       sqlite3_column_double(p_stmt,6),//PriceEuro
+	       sqlite3_column_int(p_stmt,7)//Warranty
 	       );
 }
 

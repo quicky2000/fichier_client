@@ -23,25 +23,25 @@ template <> class description<client>
 //------------------------------------------------------------------------------
 const std::string description<client>::get_class_type(void)
 {
-  return "Client";
+  return "Customer";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<client>::get_table_fields_declaration(void)
 {
-  return "Name TEXT, FirstName TEXT, Address TEXT, Tel TEXT, VilleId INTEGER";
+  return "Name TEXT, FirstName TEXT, Address TEXT, Phone TEXT, CityId INTEGER";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<client>::get_table_fields(void)
 {
-  return "Name, FirstName, Address, Tel, VilleId";
+  return "Name, FirstName, Address, Phone, CityId";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<client>::get_update_fields(void)
 {
-  return "Name = $name, FirstName = $first_name, Address = $address , Tel = $tel , VilleId = $ville_id";
+  return "Name = $name, FirstName = $first_name, Address = $address , Phone = $tel , CityId = $ville_id";
 }
 
 //------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ void description<client>::bind_item_values(const client & p_client,sqlite3_stmt*
 //------------------------------------------------------------------------------
 client description<client>::get_item_from_row(sqlite3_stmt* p_stmt)
 {
-  return client(sqlite3_column_int(p_stmt,0),//Client Id
+  return client(sqlite3_column_int(p_stmt,0),//Customer Id
 		(const char*)sqlite3_column_text(p_stmt,1),//Name
 		(const char*)sqlite3_column_text(p_stmt,2),//First Name
 		(const char*)sqlite3_column_text(p_stmt,3),//Address

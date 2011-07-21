@@ -26,7 +26,17 @@ void table_achat::set_db(sqlite3 *p_db)
   
   // Preparing get_by_facture_id statements
   //--------------------------------------------
-  int l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),("SELECT Id,"+description<achat>::get_table_fields()+" FROM " + description<achat>::get_class_type() + " WHERE Achat.Factureid == $facture_id;").c_str(),-1,&m_get_by_facture_id_stmt,NULL);
+  int l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),
+				    ("SELECT Id," + 
+				     description<achat>::get_table_fields() + 
+				     " FROM " + 
+				     description<achat>::get_class_type() + 
+				     " WHERE " + 
+				     description<achat>::get_class_type() +".BillId == $facture_id"
+				     ).c_str(),
+				    -1,
+				    &m_get_by_facture_id_stmt,
+				    NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get "+description<achat>::get_table_fields()+" item by facture_id : " << sqlite3_errmsg(base_table<achat>::get_db()) << std::endl ;     
@@ -35,7 +45,16 @@ void table_achat::set_db(sqlite3 *p_db)
 
   // Preparing get_by_type_id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),("SELECT Id,"+description<achat>::get_table_fields()+" FROM " + description<achat>::get_class_type() + " WHERE Achat.Typeid == $type_id;").c_str(),-1,&m_get_by_type_id_stmt,NULL);
+  l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),
+				("SELECT Id," + 
+				 description<achat>::get_table_fields() + 
+				 " FROM " + 
+				 description<achat>::get_class_type() + " WHERE " + 
+				 description<achat>::get_class_type() + ".TypeId == $type_id"
+				 ).c_str(),
+				-1,
+				&m_get_by_type_id_stmt,
+				NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get "+description<achat>::get_table_fields()+" item by type_id : " << sqlite3_errmsg(base_table<achat>::get_db()) << std::endl ;     
@@ -44,7 +63,16 @@ void table_achat::set_db(sqlite3 *p_db)
 
   // Preparing get_by_brand_id statements
   //--------------------------------------------
-  l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),("SELECT Id,"+description<achat>::get_table_fields()+" FROM " + description<achat>::get_class_type() + " WHERE Achat.Marqueid == $brand_id;").c_str(),-1,&m_get_by_brand_id_stmt,NULL);
+  l_status = sqlite3_prepare_v2(base_table<achat>::get_db(),
+				("SELECT Id," + 
+				 description<achat>::get_table_fields() + 
+				 " FROM " + 
+				 description<achat>::get_class_type() + " WHERE " + 
+				 description<achat>::get_class_type() + ".BrandId == $brand_id"
+				 ).c_str(),
+				-1,
+				&m_get_by_brand_id_stmt,
+				NULL);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during preparation of statement to get "+description<achat>::get_table_fields()+" item by brand_id : " << sqlite3_errmsg(base_table<achat>::get_db()) << std::endl ;     

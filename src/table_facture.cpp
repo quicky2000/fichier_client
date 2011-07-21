@@ -56,7 +56,7 @@ void table_facture::set_db(sqlite3 *p_db)
 				 description<facture>::get_table_fields() + 
 				 " FROM " + 
 				 description<facture>::get_class_type() + 
-				 " WHERE Date LIKE @date AND ClientId = $client_id"
+				 " WHERE Date LIKE @date AND CustomerId = $client_id"
 				 ).c_str(),
 				-1,
 				&m_get_by_date_and_client_id_stmt,
@@ -75,9 +75,9 @@ void table_facture::set_db(sqlite3 *p_db)
 				 " FROM " + 
 				 description<facture>::get_class_type() + 
 				 " WHERE " +
-				 "LivreFactureId = $livre_facture_id" + 
+				 "BillBookId = $livre_facture_id" + 
 				 " ORDER BY " + 
-				 description<facture>::get_class_type() + ".FactureRef"
+				 description<facture>::get_class_type() + ".BillRef"
 				 ).c_str(),
 				-1,
 				&m_get_by_livre_facture_stmt,
@@ -95,7 +95,7 @@ void table_facture::set_db(sqlite3 *p_db)
 				 description<facture>::get_table_fields() + 
 				 " FROM " + 
 				 description<facture>::get_class_type() + 
-				 " WHERE FactureRef = $facture_ref AND LivreFactureId = $livre_facture_id"
+				 " WHERE BillRef = $facture_ref AND BillBookId = $livre_facture_id"
 				 ).c_str(),
 				-1,
 				&m_get_by_livre_facture_and_ref_stmt,
@@ -114,9 +114,9 @@ void table_facture::set_db(sqlite3 *p_db)
 				 " FROM " + 
 				 description<facture>::get_class_type() + 
 				 " WHERE " +
-				 "Status = $status" + 
+				 "StatusId = $status" + 
 				 " ORDER BY " + 
-				 description<facture>::get_class_type() + ".FactureRef"
+				 description<facture>::get_class_type() + ".BillRef"
 				 ).c_str(),
 				-1,
 				&m_get_by_status_stmt,
@@ -137,7 +137,7 @@ void table_facture::set_db(sqlite3 *p_db)
 				 " WHERE " +
 				 "ReasonId = $reason_id" + 
 				 " ORDER BY " + 
-				 description<facture>::get_class_type() + ".FactureRef"
+				 description<facture>::get_class_type() + ".BillRef"
 				 ).c_str(),
 				-1,
 				&m_get_by_reason_stmt,

@@ -23,25 +23,25 @@ template <> class description<facture>
 //------------------------------------------------------------------------------
 const std::string description<facture>::get_class_type(void)
 {
-  return "Facture";
+  return "Bill";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::get_table_fields_declaration(void)
 {
-  return "FactureRef INTEGER, ClientId INTEGER, Date TEXT, LivreFactureId INTEGER, Status INTEGER, ReasonId INTEGER";
+  return "BillRef INTEGER, CustomerId INTEGER, Date TEXT, BillBookId INTEGER, StatusId INTEGER, ReasonId INTEGER";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::get_table_fields(void)
 {
-  return "FactureRef, ClientId, Date, LivreFactureId, Status, ReasonId";
+  return "BillRef, CustomerId, Date, BillBookId, StatusId, ReasonId";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<facture>::get_update_fields(void)
 {
-  return "FactureRef = $facture_ref, ClientId = $client_id, Date = $date, LivreFactureId = $livre_facture_id, Status = $status, ReasonId = $reason_id";
+  return "BillRef = $facture_ref, CustomerId = $client_id, Date = $date, BillBookId = $livre_facture_id, StatusId = $status, ReasonId = $reason_id";
 }
 
 //------------------------------------------------------------------------------
@@ -100,12 +100,12 @@ void description<facture>::bind_item_values(const facture & p_facture,sqlite3_st
 //------------------------------------------------------------------------------
 facture description<facture>::get_item_from_row(sqlite3_stmt* p_stmt)
 {
-  return facture(sqlite3_column_int(p_stmt,0),//Facture Id
-		 sqlite3_column_int(p_stmt,1),//FactureRef
-		 sqlite3_column_int(p_stmt,2),//ClientId
+  return facture(sqlite3_column_int(p_stmt,0),//Bill Id
+		 sqlite3_column_int(p_stmt,1),//BillRef
+		 sqlite3_column_int(p_stmt,2),//CustomerId
 		 (const char*)sqlite3_column_text(p_stmt,3),//Date
-		 sqlite3_column_int(p_stmt,4),//LivreFactureId
-		 sqlite3_column_int(p_stmt,5),//Status
+		 sqlite3_column_int(p_stmt,4),//BillBookId
+		 sqlite3_column_int(p_stmt,5),//StatusId
 		 sqlite3_column_int(p_stmt,6)//ReasonId
 	       );
 }

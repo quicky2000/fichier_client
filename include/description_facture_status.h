@@ -23,7 +23,7 @@ template <> class description<facture_status>
 //------------------------------------------------------------------------------
 const std::string description<facture_status>::get_class_type(void)
 {
-  return "Facture_status";
+  return "Bill_status";
 }
 
 //------------------------------------------------------------------------------

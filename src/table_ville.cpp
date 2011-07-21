@@ -32,7 +32,7 @@ void table_ville::set_db(sqlite3 *p_db)
 					  " FROM " + 
 					  description<ville>::get_class_type() + 
 					  " WHERE " +
-					  "CodePostal LIKE @code_postal" +
+					  "PostalCode LIKE @postal_code" +
 					  " ORDER BY Name"
 					  ).c_str(),
 					 -1,
@@ -40,7 +40,7 @@ void table_ville::set_db(sqlite3 *p_db)
 				NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get "+description<ville>::get_table_fields()+" item by code postal : " << sqlite3_errmsg(base_table<ville>::get_db()) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get "+description<ville>::get_class_type()+" item by code postal : " << sqlite3_errmsg(base_table<ville>::get_db()) << std::endl ;     
       exit(-1);
     }
 
@@ -53,7 +53,7 @@ void table_ville::set_db(sqlite3 *p_db)
 				 " FROM " + 
 				 description<ville>::get_class_type() + 
 				 " WHERE " +
-				 "CodePostal LIKE @code_postal" + 
+				 "PostalCode LIKE @postal_code" + 
 				 " AND " +
 				 "Name LIKE @name" +
 				 " ORDER BY Name"
@@ -63,7 +63,7 @@ void table_ville::set_db(sqlite3 *p_db)
 				NULL);
   if(l_status != SQLITE_OK)
     {
-      std::cout << "ERROR during preparation of statement to get "+description<ville>::get_table_fields()+" item by name and postal code: " << sqlite3_errmsg(base_table<ville>::get_db()) << std::endl ;     
+      std::cout << "ERROR during preparation of statement to get "+description<ville>::get_class_type()+" item by name and postal code: " << sqlite3_errmsg(base_table<ville>::get_db()) << std::endl ;     
       exit(-1);
     }
 }
@@ -76,10 +76,10 @@ void table_ville::get_by_code_postal(const std::string & p_code_postal,std::vect
 
   // Binding values to statement
   //----------------------------
-  int l_status = sqlite3_bind_text(m_get_by_code_postal_stmt,sqlite3_bind_parameter_index(m_get_by_code_postal_stmt,"@code_postal"),l_param_value.c_str(),-1,SQLITE_STATIC);
+  int l_status = sqlite3_bind_text(m_get_by_code_postal_stmt,sqlite3_bind_parameter_index(m_get_by_code_postal_stmt,"@postal_code"),l_param_value.c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      cout << "ERROR during binding of code_postal parameter for get_by_code_postal statement of " << description<ville>::get_class_type() << " : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
+      cout << "ERROR during binding of postal_code parameter for get_by_code_postal statement of " << description<ville>::get_class_type() << " : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
       exit(-1);
     }
     
@@ -129,10 +129,10 @@ void table_ville::get_by_name_and_postal_code(const std::string & p_name,const s
 
   // Binding values to statement
   //----------------------------
-  int l_status = sqlite3_bind_text(m_get_by_name_and_postal_code_stmt,sqlite3_bind_parameter_index(m_get_by_name_and_postal_code_stmt,"@code_postal"),l_postal_code_param_value.c_str(),-1,SQLITE_STATIC);
+  int l_status = sqlite3_bind_text(m_get_by_name_and_postal_code_stmt,sqlite3_bind_parameter_index(m_get_by_name_and_postal_code_stmt,"@postal_code"),l_postal_code_param_value.c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
-      cout << "ERROR during binding of code_postal parameter for get_by_name_and_postal_code statement of " << description<ville>::get_class_type() << " : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
+      cout << "ERROR during binding of postal_code parameter for get_by_name_and_postal_code statement of " << description<ville>::get_class_type() << " : " << sqlite3_errmsg(named_table<ville>::get_db()) << endl ;     
       exit(-1);
     }
     

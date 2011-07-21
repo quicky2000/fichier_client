@@ -29,7 +29,7 @@ void table_client::set_db(sqlite3 *p_db)
 				     " FROM " + 
 				     description<client>::get_class_type() + 
 				     " WHERE " + 
-				     "VilleId == $ville_id" +
+				     "CityId == $ville_id" +
 				     " ORDER BY Name,FirstName"
 				     ).c_str(),
 				    -1,

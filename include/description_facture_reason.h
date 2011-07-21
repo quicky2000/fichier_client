@@ -23,7 +23,7 @@ template <> class description<facture_reason>
 //------------------------------------------------------------------------------
 const std::string description<facture_reason>::get_class_type(void)
 {
-  return "facture_reason";
+  return "Bill_reason";
 }
 
 //------------------------------------------------------------------------------

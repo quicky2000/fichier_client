@@ -23,31 +23,31 @@ template <> class description<ville>
 //------------------------------------------------------------------------------
 const std::string description<ville>::get_class_type(void)
 {
-  return "Ville";
+  return "City";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<ville>::get_table_fields_declaration(void)
 {
-  return "Name TEXT, CodePostal TEXT";
+  return "Name TEXT, PostalCode TEXT";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<ville>::get_table_fields(void)
 {
-  return "Name, CodePostal";
+  return "Name, PostalCode";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<ville>::get_update_fields(void)
 {
-  return "Name = $name, CodePostal = $code_postal";
+  return "Name = $name, PostalCode = $postal_code";
 }
 
 //------------------------------------------------------------------------------
 const std::string description<ville>::get_field_values(void)
 {
-  return "$name, $code_postal";
+  return "$name, $postal_code";
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void description<ville>::bind_item_values(const ville & p_ville,sqlite3_stmt* p_
       std::cout << "ERROR during binding of name parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
       exit(-1);
     }  
-  l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$code_postal"),p_ville.get_postal_code().c_str(),-1,SQLITE_STATIC);
+  l_status = sqlite3_bind_text(p_stmt,sqlite3_bind_parameter_index(p_stmt,"$postal_code"),p_ville.get_postal_code().c_str(),-1,SQLITE_STATIC);
   if(l_status != SQLITE_OK)
     {
       std::cout << "ERROR during binding of postal code parameter for update statement of " << get_class_type() << " : " << sqlite3_errmsg(p_db) << std::endl ;     
@@ -72,7 +72,7 @@ ville description<ville>::get_item_from_row(sqlite3_stmt* p_stmt)
 {
   return ville(sqlite3_column_int(p_stmt,0),//Id
 	       (const char*)sqlite3_column_text(p_stmt,1),//Name
-	       (const char*)sqlite3_column_text(p_stmt,2) //CodePostal
+	       (const char*)sqlite3_column_text(p_stmt,2) //PostalCode
 	       );
 }
 

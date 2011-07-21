@@ -23,7 +23,7 @@ template <> class description<marque>
 //------------------------------------------------------------------------------
 const std::string description<marque>::get_class_type(void)
 {
-  return "Marque";
+  return "Purchase_brand";
 }
 
 //------------------------------------------------------------------------------

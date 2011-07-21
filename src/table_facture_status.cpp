@@ -16,8 +16,8 @@ table_facture_status::~table_facture_status(void)
 void table_facture_status::set_db(sqlite3 *p_db)
 {
   named_table<facture_status>::set_db(p_db);
-  check_mandatory_status(facture_status::get_ok_status());
   check_mandatory_status(facture_status::get_non_checked_status());
+  check_mandatory_status(facture_status::get_ok_status());
 }
 
 //------------------------------------------------------------------------------
