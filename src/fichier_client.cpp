@@ -2559,10 +2559,24 @@ bool fichier_client::need_save(void)const
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::check_db_coherency(void)
+void fichier_client::treat_check_db_coherency_event(void)
 {
+  std::cout << "Fichier_clientEvent::check db coherency event" << std::endl ;
+  assert(m_user_interface);
+  m_user_interface->set_coherency_report_launch_check_enabled(false);
   assert(m_db);
-  m_db->check_db_coherency();
+  uint32_t l_nb_error = 0;
+  uint32_t l_nb_warning = 0;
+  std::vector<coherency_report_item> l_error_list;
+  std::vector<coherency_report_item> l_warning_list;
+
+  m_db->check_db_coherency(l_nb_error,l_nb_warning,l_error_list,l_warning_list);
+
+  m_user_interface->set_coherency_report_error_number(l_nb_error);
+  m_user_interface->set_coherency_report_error_list(l_error_list);
+  m_user_interface->set_coherency_report_warning_number(l_nb_warning);
+  m_user_interface->set_coherency_report_warning_list(l_warning_list);
+  m_user_interface->set_coherency_report_launch_check_enabled(true);
 }
 
 //------------------------------------------------------------------------------

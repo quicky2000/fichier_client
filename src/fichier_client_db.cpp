@@ -1076,7 +1076,7 @@ void fichier_client_db::get_complete_client(uint32_t p_client_id,search_client_i
 
 
 //------------------------------------------------------------------------------
-void fichier_client_db::check_db_coherency(void)
+void fichier_client_db::check_db_coherency(uint32_t & p_nb_error,uint32_t & p_nb_warning,std::vector<coherency_report_item> & p_error_list,std::vector<coherency_report_item> & p_warning_list)
 {
   cout << "Starting database coherency checking" << endl ;
   
@@ -1089,27 +1089,82 @@ void fichier_client_db::check_db_coherency(void)
     {
       // Check facture id
       uint32_t l_facture_id = l_iter_achat->get_facture_id();
-      facture l_facture;
-      
-      if(!m_table_facture.get(l_facture_id,l_facture))
+
+      if(l_facture_id)
 	{
-	      cout << "ERROR : no facture corresponding to id " << l_facture_id << " referenced by " << *l_iter_achat << endl ; 
+	  facture l_facture;
+	  
+	  if(!m_table_facture.get(l_facture_id,l_facture))
+	    { 
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "La facture d ID " << l_facture_id << " référencée par " << *l_iter_achat << " n existe pas";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));
+	    }
+	}
+      else
+	{
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "L'achat " << *l_iter_achat << " n est associé a aucune facture";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));	  
 	}
 
       // Check marque id
       uint32_t l_marque_id = l_iter_achat->get_marque_id();
-      marque l_marque;
-      if(!m_table_marque.get(l_marque_id,l_marque))
+      if(l_marque_id)
 	{
-	      cout << "ERROR : no marque corresponding to id " << l_marque_id << " referenced by " << *l_iter_achat << endl ; 
+	  marque l_marque;
+	  if(!m_table_marque.get(l_marque_id,l_marque))
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "La marque d'ID " << l_marque_id << " referencée par " << *l_iter_achat << " n existe pas"; 
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));
+	    }
+	}
+      else
+	{
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "L'achat " << *l_iter_achat << " n est associé a aucune marque";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));	  	  
 	}
 
       // Check type_achat id
       uint32_t l_type_achat_id = l_iter_achat->get_type_id();
-      type_achat l_type_achat;
-      if(!m_table_type_achat.get(l_type_achat_id,l_type_achat))
+      if(l_type_achat_id)
 	{
-	      cout << "ERROR : no type_achat corresponding to id " << l_type_achat_id << " referenced by " << *l_iter_achat << endl ; 
+	  type_achat l_type_achat;
+	  if(!m_table_type_achat.get(l_type_achat_id,l_type_achat))
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Le type d'achat d'ID " << l_type_achat_id << " référencé par " << *l_iter_achat << " n'existe pas";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));
+	    }
+	}
+      else
+	{
+	  ++p_nb_error;
+	  stringstream l_message;
+	  l_message << "L'achat " << *l_iter_achat << " n est associé a aucun type";
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Achat",l_message.str()));	  	  
+	}
+
+      // Check that franc price is not null
+      if(l_iter_achat->get_prix_franc()==0)
+	{
+	  ++p_nb_warning;
+	  stringstream l_message;
+	  p_warning_list.push_back(coherency_report_item(coherency_report_item::WARNING,l_iter_achat->get_id(),"Achat","L achat a un prix en franc a zéro"));
+	}
+
+      // Check that euro price is not null
+      if(l_iter_achat->get_prix_euro()==0)
+	{
+	  ++p_nb_warning;
+	  p_warning_list.push_back(coherency_report_item(coherency_report_item::WARNING,l_iter_achat->get_id(),"Achat","L achat a un prix en euro a zéro"));
 	}
 
       ++l_iter_achat;
@@ -1123,22 +1178,90 @@ void fichier_client_db::check_db_coherency(void)
   while(l_iter_facture != l_iter_facture_end)
     {
       
-      // Check client id
-      uint32_t l_client_id = l_iter_facture->get_client_id();
-      cout << "Client id is " << l_client_id << endl ;
-       client l_client;
-      
-      if(!m_table_client.get(l_client_id,l_client))
-	{
-	      cout << "ERROR : no client corresponding to id " << l_client_id << " referenced by " << *l_iter_facture << endl ; 
-	}
-      
       // Check facture ref
       if(!l_iter_facture->get_facture_ref())
 	{
-	  cout << "WARNING : no facture refence for facture " << *l_iter_facture << endl ;
+	  ++p_nb_warning;
+	  stringstream l_message;
+	  l_message << "Référence a zéro pour la facture " <<  *l_iter_facture;
+	  p_warning_list.push_back(coherency_report_item(coherency_report_item::WARNING,l_iter_facture->get_id(),"Facture",l_message.str()));
 	}
 
+      // Check status id
+      uint32_t l_facture_status_id = l_iter_facture->get_status();
+      if(l_facture_status_id)
+	{
+	  facture_status l_facture_status;      
+	  if(!m_table_facture_status.get(l_facture_status_id,l_facture_status))
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Le facture_status d'ID " << l_facture_status_id << " référencé par " << *l_iter_facture << " n existe pas" ;
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	}
+      else
+	{
+	  ++p_nb_error;
+	  stringstream l_message;
+	  l_message << "La facture " << *l_iter_facture << " n est associée a aucun status";
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_achat->get_id(),"Facture",l_message.str()));	  	  
+	  
+	}
+      
+      // Check client id
+      uint32_t l_client_id = l_iter_facture->get_client_id();
+      if(l_client_id)
+	{
+	  client l_client;      
+	  if(!m_table_client.get(l_client_id,l_client))
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Le client d'ID " << l_client_id << " référencé par " << *l_iter_facture << " n existe pas" ;
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	  if(l_iter_facture->get_reason_id())
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "La facture " << *l_iter_facture << " possède une raison de non attribution alors qu elle est affectée a un client";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	  // Check if there are some purchases related to this bill
+	  std::vector<achat> l_achats;
+	  m_table_achat.get_by_facture_id(l_iter_facture->get_id(),l_achats);
+	  if(!l_achats.size())
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Pas d achats associés a la facture " << *l_iter_facture;
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	}
+      else 
+	{
+	  uint32_t l_reason_id = l_iter_facture->get_reason_id();
+	  if(l_reason_id)
+	    {
+	      facture_reason l_facture_reason;
+	      if(!m_table_facture_reason.get(l_reason_id,l_facture_reason))
+		{
+		  ++p_nb_error;
+		  stringstream l_message;
+		  l_message << "La raison d'ID " << l_reason_id << " référencé par " << *l_iter_facture << " n existe pas" ;
+		  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));		  
+		}
+	    }
+	  else
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "La facture " << *l_iter_facture << " n est associée a aucun client et ne possède pas de raison de non attribution";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	}
+      
       // Check livre_facture_id 
       uint32_t l_livre_facture_id = l_iter_facture->get_livre_facture_id();
       if(l_livre_facture_id)
@@ -1146,12 +1269,61 @@ void fichier_client_db::check_db_coherency(void)
 	  livre_facture l_livre;
 	  if(!m_table_livre_facture.get(l_livre_facture_id,l_livre))
 	    {
-	      cout << "ERROR : no livre facture corresponding to id " << l_livre_facture_id << " referenced by " << *l_iter_facture << endl ; 
-	    }	 
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Le livre de facture d'ID " << l_livre_facture_id << " référencé par " << *l_iter_facture << " n existe pas" ;
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	  else
+	    {
+	      if(l_livre.get_nb_max_facture() < l_iter_facture->get_facture_ref())
+		{
+		  ++p_nb_error;
+		  stringstream l_message;
+		  l_message << "La facture " << *l_iter_facture << " a une référence supérieure au nombe de facture du libre d'ID " << l_livre_facture_id << " : " << l_iter_facture->get_facture_ref() << " > " << l_livre.get_nb_max_facture();
+		  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+		}
+	      if(l_iter_facture->get_date() < l_livre.getStartDate())
+		{
+		  ++p_nb_error;
+		  stringstream l_message;
+		  l_message << "La facture " << *l_iter_facture << " a une date " << l_iter_facture->get_date() << " antérieure à la date de début du livre de facture associé " << l_livre.getStartDate();
+		  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+		  
+		}
+	      if(l_iter_facture->get_date() > l_livre.getEndDate())
+		{
+		  ++p_nb_error;
+		  stringstream l_message;
+		  l_message << "La facture " << *l_iter_facture << " a une date " << l_iter_facture->get_date() << " psotérieure à la date de fin du livre de facture associé " << l_livre.getEndDate();
+		  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+		}
+	    }
 	}
       else
 	{
-	  cout << "WARNING : no livre facture id for facture " << *l_iter_facture << endl ;
+	  ++p_nb_warning;
+	  stringstream l_message;
+	  l_message << "Pas de livre de facture associé à la facture " << *l_iter_facture ;
+	  p_warning_list.push_back(coherency_report_item(coherency_report_item::WARNING,l_iter_facture->get_id(),"Facture",l_message.str()));
+
+	  std::vector<livre_facture> l_potential_book;
+	  m_table_livre_facture.containing_date(l_iter_facture->get_date(),l_potential_book);
+	  if(!l_potential_book.size())
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "Aucun livre de facture ne correspond a la date \"" << l_iter_facture->get_date() << "\" de la facture " << *l_iter_facture ;
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));
+	    }
+	}
+
+      if(l_iter_facture->get_date() == "")
+	{
+	  ++p_nb_error;
+	  stringstream l_message;
+	  l_message << "La facture " << *l_iter_facture << " n'a pas de date";
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_facture->get_id(),"Facture",l_message.str()));	  
 	}
 
       ++l_iter_facture;
@@ -1166,20 +1338,36 @@ void fichier_client_db::check_db_coherency(void)
     {
       // Check vile id
       uint32_t l_ville_id = l_iter_client->get_city_id();
-      ville l_ville;
-      
-      if(!m_table_ville.get(l_ville_id,l_ville))
+      if(l_ville_id)
 	{
-	      cout << "ERROR : no ville corresponding to id " << l_ville_id << " referenced by " << *l_iter_client << endl ; 
+	  ville l_ville;
+	  
+	  if(!m_table_ville.get(l_ville_id,l_ville))
+	    {
+	      ++p_nb_error;
+	      stringstream l_message;
+	      l_message << "La ville d'ID " << l_ville_id << " référencée par le client " << *l_iter_client << " n existe pas";
+	      p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_client->get_id(),"Client",l_message.str()));
+	    }
+	}
+      else
+	{
+	  ++p_nb_error;
+	  stringstream l_message;
+	  l_message << "Pas de ville associée au client " << *l_iter_client;
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_client->get_id(),"Client",l_message.str()));
 	}
 
       // Check if client has associated achats
       uint32_t l_client_id = l_iter_client->get_id();
-      vector<search_achat_item> l_achats;
-      get_achat_by_client_id(l_client_id,l_achats);
-      if(!l_achats.size())
+      std::vector<search_facture_item> l_factures;
+      get_facture_by_client_id(l_client_id,l_factures);
+      if(!l_factures.size())
 	{
-	  cout << "ERROR : no achat associated to client " << *l_iter_client << endl ;
+	  ++p_nb_error;
+	  stringstream l_message;
+	  l_message << "Pas de factures associées au client " << *l_iter_client;
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_client->get_id(),"Client",l_message.str()));
 	}
 
       ++l_iter_client;

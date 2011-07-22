@@ -160,7 +160,7 @@ class fichier_client
 
 
   // Operations on database
-  void check_db_coherency(void);
+  void treat_check_db_coherency_event(void);
 
  private:
   void remove_tmp_db(void);

@@ -484,7 +484,11 @@ namespace test
     display(l_result_client);
 
     // Database coherency checking
-    l_fichier_client.check_db_coherency();
+    uint32_t l_nb_error;
+    uint32_t l_nb_warning;
+    std::vector<coherency_report_item> l_error_list;
+    std::vector<coherency_report_item> l_warning_list;
+    l_fichier_client.check_db_coherency(l_nb_error,l_nb_warning,l_error_list,l_warning_list);
 
   }
 

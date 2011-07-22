@@ -17,6 +17,7 @@
 #include "search_achat_item.h"
 #include "search_facture_item.h"
 #include "search_facture_client_item.h"
+#include "coherency_report_item.h"
 
 #include <string>
 #include <vector>
@@ -131,7 +132,7 @@ class fichier_client_db
   void get_facture_by_client_id(uint32_t p_client_id,std::vector<search_facture_item> & p_result);
   void get_facture_by_livre_facture_id(uint32_t p_livre_facture_id,std::vector<search_facture_item> & p_result);
 
-  void check_db_coherency(void);
+  void check_db_coherency(uint32_t & p_nb_errors,uint32_t & p_nb_warning,std::vector<coherency_report_item> & p_error_list,std::vector<coherency_report_item> & p_warning_list);
   
  private:
   bool m_modified;

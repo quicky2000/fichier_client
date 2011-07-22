@@ -6,6 +6,7 @@
 #include "type_achat.h"
 #include "marque.h"
 #include "ville.h"
+#include "coherency_report_item.h"
 class facture;
 
 class fichier_client_UI_if
@@ -14,6 +15,8 @@ class fichier_client_UI_if
   // Comunication with user
   virtual void display_warning_message(const std::string & p_title,const std::string & p_text)=0;
   virtual void display_information_message(const std::string & p_title,const std::string & p_text)=0;
+  virtual void display_status_message(const std::string & p_text)=0;
+  virtual const std::string get_readable_date(const std::string & p_date)const=0;
 
   // Interactions with customer search information
   virtual void set_focus_on_customer_search(void)=0;
@@ -242,6 +245,16 @@ class fichier_client_UI_if
   virtual void set_delete_city_enabled(bool p_enable)=0;
   virtual void set_modify_city_enabled(bool p_enable)=0;
   virtual void set_modify_city_action_name(const std::string & p_name)=0;
+
+  // Interactions with coherency actions
+  virtual void set_coherency_report_launch_check_enabled(bool p_enable)=0;
+
+  // Interactions with coherency information
+  virtual void set_coherency_report_error_number(uint32_t p_nb)=0;
+  virtual void set_coherency_report_error_list(std::vector<coherency_report_item> p_list)=0;
+  virtual void set_coherency_report_warning_number(uint32_t p_nb)=0;
+  virtual void set_coherency_report_warning_list(std::vector<coherency_report_item> p_list)=0;
+  
 };
 
 #endif
