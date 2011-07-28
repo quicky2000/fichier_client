@@ -463,8 +463,17 @@ void fichier_client::treat_customer_data_bill_selected_event(void)
       m_db->get_by_livre_facture(l_bill_book_id,l_bill_list);
 
       get_remaining_refs(l_bill_book,l_bill_list,l_refs);
-      l_refs.push_back(l_bill.get_facture_ref());
 
+      std::vector<uint32_t>::iterator l_iter = l_refs.begin();
+      std::vector<uint32_t>::const_iterator l_iter_end = l_refs.end();
+      while(l_iter != l_iter_end && *l_iter < l_bill.get_facture_ref())
+	{
+	  ++l_iter;
+	}
+      l_refs.insert(l_iter,l_bill.get_facture_ref());
+
+
+      m_user_interface->set_customer_allowed_facture_references(l_refs);
       m_user_interface->set_customer_facture_reference(l_bill.get_facture_ref());
     }
   std::vector<facture_status> l_status_list;
@@ -1467,7 +1476,7 @@ void fichier_client::treat_facture_selected_event(void)
   assert(l_reason_id == 0 || l_client_id == 0);
   if(l_client_id)
     {
-      m_user_interface->set_facture_modification_for_selected_livre_enabled(true);      
+      m_user_interface->set_facture_modification_for_selected_livre_enabled(false);      
       m_user_interface->set_non_attributed_facture_date("");
       std::vector<uint32_t> l_empty_int_vector;
       m_user_interface->set_non_attributed_facture_allowed_livre_ids(l_empty_int_vector);
@@ -2773,6 +2782,6 @@ void fichier_client::get_remaining_refs(const livre_facture & p_livre,std::vecto
 
 
 const std::string fichier_client::m_tmp_db_name = "tmp_db";
-const std::string fichier_client::m_version = "0.1";
+const std::string fichier_client::m_version = "0.9";
 
 //EOF
