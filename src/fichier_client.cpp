@@ -35,12 +35,114 @@ void fichier_client::set_user_interface(fichier_client_UI_if * p_user_interface)
   assert(p_user_interface);
   m_user_interface = p_user_interface;
 
-  // Disable all customer data edition
-  set_customer_identity_enabled(false);
-  set_customer_data_bill_enabled(false);
-  set_customer_data_purchase_enabled(false);
+  manage_features(false);
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_open_database_event(const std::string & p_name)
+{
+  std::cout << "Fichier_Client Event::open database event" << std::endl ;
+  if(p_name != "")
+    {
+      m_user_interface->set_import_file_action_enabled(false);
+      m_user_interface->set_open_file_action_enabled(false);
+      m_user_interface->set_save_file_action_enabled(true);
+      m_user_interface->set_save_as_file_action_enabled(true);
+      m_user_interface->set_close_file_action_enabled(true);    
+
+      // Open database
+      copy(p_name,m_tmp_db_name);
+      m_db_name = p_name;
+      open_tmp_db();
+      refresh_non_attributed_facture_status_list();
+      refresh_non_attributed_facture_reason_list();
+      refresh_customer_data_facture_status_list();
+      refresh_brand_list();
+      refresh_purchase_type_list();
+      refresh_city_list();
+
+      // Update interface
+      m_user_interface->display_information_message("Open Status","File successfully opened");
+      m_user_interface->set_application_title(p_name);
+      manage_features(true);
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_close_database_event(void)
+{
+ std::cout << "Fichier_Client Event::close database event" << std::endl ;
+ bool l_close = true;
+ if(need_save())
+   {
+     l_close = m_user_interface->ask_yes_no_qestion("Close","Database has non saved modification\nAre you sure you want to close it ?");
+   }
+  if(l_close)
+    {
+      m_user_interface->set_open_file_action_enabled(true);
+      m_user_interface->set_save_file_action_enabled(false);
+      m_user_interface->set_save_as_file_action_enabled(false);
+      m_user_interface->set_close_file_action_enabled(false);    
+      manage_features(false);
+
+      // Close db
+      close_tmp_db();
+      m_db_name = "";
+
+      // Reset title
+      m_user_interface->set_application_title("Fichier client");
+    }
 
 }
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_save_database_event(void)
+{
+ std::cout << "Fichier_Client Event::save event" << std::endl ;
+ save();
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_save_as_database_event(const std::string & p_name)
+{
+ std::cout << "Fichier_Client Event::save as event" << std::endl ;
+  if(p_name != "")
+    {
+      save_as(p_name);
+      m_user_interface->display_information_message("Save Status","File successfully saved");
+      m_user_interface->set_save_file_action_enabled(true);
+      m_user_interface->set_application_title(p_name);
+    }
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::treat_import_external_sql_event(const std::string & p_name)
+{
+  std::cout << "Fichier_Client Event::import external sql event" << std::endl ;
+  if(p_name != "")
+    {
+      assert(m_user_interface);
+      m_user_interface->set_import_file_action_enabled(false);
+      m_user_interface->set_open_file_action_enabled(false);
+      m_user_interface->set_save_as_file_action_enabled(true);
+      m_user_interface->set_close_file_action_enabled(true);
+
+      // import external sql file
+      assert(m_db == NULL);
+      assert(m_db_name=="");
+      remove_tmp_db();
+      m_db = new fichier_client_db(m_tmp_db_name);
+      cout << "Importing file name \"" << p_name << "\"" << endl ;
+      external_sql_importer::import(p_name,*m_db);
+      m_db->create_information("created_by",m_version);
+      cout << "Import successfull" << endl ;
+
+      m_user_interface->display_information_message("Import Status","File successfully imported");
+      m_user_interface->set_application_title(p_name);
+      manage_features(true);
+    }
+}
+
 
 // Search client related events
 //------------------------------------------------------------------------------
@@ -1070,6 +1172,14 @@ void fichier_client::treat_livre_facture_content_modif_event(void)
 {
   std::cout << "Fichier_client Event :: Livre_facture content modif event" << std::endl;
   check_livre_facture_information(); 
+}
+
+//------------------------------------------------------------------------------
+void fichier_client::set_customer_information_enabled(bool p_enabled)
+{
+  set_customer_identity_enabled(false);
+  set_customer_data_bill_enabled(false);
+  set_customer_data_purchase_enabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -2589,19 +2699,6 @@ void fichier_client::treat_check_db_coherency_event(void)
 }
 
 //------------------------------------------------------------------------------
-void fichier_client::import_external_sql(const std::string & p_name)
-{
-  assert(m_db == NULL);
-  assert(m_db_name=="");
-  remove_tmp_db();
-  m_db = new fichier_client_db(m_tmp_db_name);
-  cout << "Importing file name \"" << p_name << "\"" << endl ;
-  external_sql_importer::import(p_name,*m_db);
-  m_db->create_information("created_by",m_version);
-  cout << "Import successfull" << endl ;
-}
-
-//------------------------------------------------------------------------------
 void fichier_client::remove_tmp_db(void)
 {
   unlink(m_tmp_db_name.c_str());
@@ -2619,27 +2716,6 @@ void fichier_client::close_tmp_db(void)
 {
   delete m_db;
   m_db = NULL;
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::open_db(const std::string & p_name)
-{
-  copy(p_name,m_tmp_db_name);
-  m_db_name = p_name;
-  open_tmp_db();
-  refresh_non_attributed_facture_status_list();
-  refresh_non_attributed_facture_reason_list();
-  refresh_customer_data_facture_status_list();
-  refresh_brand_list();
-  refresh_purchase_type_list();
-  refresh_city_list();
-}
-
-//------------------------------------------------------------------------------
-void fichier_client::close_db(void)
-{
-  close_tmp_db();
-  m_db_name = "";
 }
 
 //------------------------------------------------------------------------------
@@ -2780,6 +2856,19 @@ void fichier_client::get_remaining_refs(const livre_facture & p_livre,std::vecto
     }
 }
 
+//------------------------------------------------------------------------------
+void fichier_client::manage_features(bool p_enabled)
+{
+  assert(m_user_interface);
+  m_user_interface->set_customer_search_enabled(p_enabled);
+  set_customer_information_enabled(p_enabled);
+  m_user_interface->set_livre_facture_information_enabled(p_enabled);
+  m_user_interface->set_facture_status_information_enabled(p_enabled);
+  m_user_interface->set_facture_reason_information_enabled(p_enabled);
+  m_user_interface->set_purchase_configuration_enabled(p_enabled);
+  m_user_interface->set_city_information_enabled(p_enabled);
+  m_user_interface->set_coherency_information_enabled(p_enabled);
+}
 
 const std::string fichier_client::m_tmp_db_name = "tmp_db";
 const std::string fichier_client::m_version = "0.9";

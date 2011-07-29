@@ -24,11 +24,11 @@ class fichier_client
   void set_user_interface(fichier_client_UI_if * p_user_interface);
 
   // Database file manipulation
-  void import_external_sql(const std::string & p_name);
-  void open_db(const std::string & p_name);
-  void close_db(void);
-  void save(void);
-  void save_as(const std::string & p_name);
+  void treat_open_database_event(const std::string & p_name);
+  void treat_close_database_event(void);
+  void treat_save_database_event(void);
+  void treat_save_as_database_event(const std::string & p_name);
+  void treat_import_external_sql_event(const std::string & p_name);
   bool need_save(void)const;
 
   // Search client related events
@@ -167,10 +167,15 @@ class fichier_client
   void open_tmp_db(void);
   void close_tmp_db(void);
   void copy(const std::string & p_src,const std::string & p_dest);
+  void save(void);
+  void save_as(const std::string & p_name);
+
+  void manage_features(bool p_enabled);
 
   // Customer search
 
   // Customer data
+  void set_customer_information_enabled(bool p_enabled);
   void set_customer_identity_enabled(bool p_enabled);
   void set_customer_data_bill_enabled(bool p_enabled);
   void set_customer_data_purchase_enabled(bool p_enabled);

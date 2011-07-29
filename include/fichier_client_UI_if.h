@@ -17,8 +17,19 @@ class fichier_client_UI_if
   virtual void display_information_message(const std::string & p_title,const std::string & p_text)=0;
   virtual void display_status_message(const std::string & p_text)=0;
   virtual const std::string get_readable_date(const std::string & p_date)const=0;
+  virtual void set_application_title(const std::string & p_name)=0;
+  virtual bool ask_yes_no_qestion(const std::string & p_title, const std::string & p_question)=0;
+
+  // Interactions with main actions
+  virtual void set_import_file_action_enabled(bool p_enabled)=0;
+  virtual void set_open_file_action_enabled(bool p_enabled)=0;
+  virtual void set_save_file_action_enabled(bool p_enabled)=0;
+  virtual void set_save_as_file_action_enabled(bool p_enabled)=0;
+  virtual void set_close_file_action_enabled(bool p_enabled)=0;
+  virtual void set_exit_file_action_enabled(bool p_enabled)=0;
 
   // Interactions with customer search information
+  virtual void set_customer_search_enabled(bool p_enabled)=0;
   virtual void set_focus_on_customer_search(void)=0;
   virtual const std::string get_search_customer_name(void)const=0;
   virtual const std::string get_search_customer_first_name(void)const=0;
@@ -109,6 +120,7 @@ class fichier_client_UI_if
   virtual void set_customer_purchase_deletion_enabled(bool p_enabled)=0;
 
   // Interactions with livre facture information
+  virtual void set_livre_facture_information_enabled(bool p_enabled)=0;
   virtual void clear_livre_facture_information(void)=0;
   virtual void set_livre_facture_start_date(const std::string & p_date)=0;
   virtual void set_livre_facture_end_date(const std::string & p_date)=0;
@@ -159,6 +171,7 @@ class fichier_client_UI_if
   virtual void set_facture_modification_for_selected_livre_enabled( bool p_enabled)=0;
 
   // Interactions with facture status information
+  virtual void set_facture_status_information_enabled(bool p_enabled)=0;
   virtual void clear_facture_status_information(void)=0;
   virtual void set_facture_status_name(const std::string & p_name)=0;  
   virtual const std::string get_facture_status_name(void)const=0;
@@ -176,6 +189,7 @@ class fichier_client_UI_if
   virtual void set_modify_facture_status_action_name(const std::string & p_name)=0;
 
   // Interactions with facture reason information
+  virtual void set_facture_reason_information_enabled(bool p_enabled)=0;
   virtual void clear_facture_reason_information(void)=0;
   virtual void set_facture_reason_name(const std::string & p_name)=0;  
   virtual const std::string get_facture_reason_name(void)const=0;
@@ -193,6 +207,7 @@ class fichier_client_UI_if
   virtual void set_modify_facture_reason_action_name(const std::string & p_name)=0;
 
   // Interactions with brand information
+  virtual void set_purchase_configuration_enabled(bool p_enabled)=0;
   virtual void clear_purchase_configuration_brand_information(void)=0;
   virtual void set_purchase_configuration_brand_name(const std::string & p_name)=0;  
   virtual const std::string get_purchase_configuration_brand_name(void)const=0;
@@ -227,6 +242,7 @@ class fichier_client_UI_if
   virtual void set_purchase_configuration_modify_type_action_name(const std::string & p_name)=0;
 
   // Interactions with city information
+  virtual void set_city_information_enabled(bool p_enabled)=0;
   virtual void clear_city_information(void)=0;
   virtual void set_city_name(const std::string & p_name)=0;  
   virtual const std::string get_city_name(void)const=0;
@@ -247,6 +263,7 @@ class fichier_client_UI_if
   virtual void set_modify_city_action_name(const std::string & p_name)=0;
 
   // Interactions with coherency actions
+  virtual void set_coherency_information_enabled(bool p_enabled)=0;
   virtual void set_coherency_report_launch_check_enabled(bool p_enable)=0;
 
   // Interactions with coherency information
