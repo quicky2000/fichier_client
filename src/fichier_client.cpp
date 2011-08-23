@@ -302,6 +302,17 @@ void fichier_client::treat_search_customer_delete_customer_event(void)
   treat_search_customer_criteria_modification_event();
 }
 
+//------------------------------------------------------------------------------
+void fichier_client::treat_leave_customer_data_for_search_event(void)
+{
+  std::cout << "Fichier_client Event::customer data widget has been leaved to perform a search" << std::endl;
+  m_current_customer_id = 0;
+  set_customer_identity_enabled(false);
+  set_customer_data_bill_enabled(false);
+  set_customer_data_purchase_enabled(false);
+}
+
+
 // Customer data identity information related events
 //------------------------------------------------------------------------------
 void fichier_client::treat_customer_postal_code_modification_event(void)

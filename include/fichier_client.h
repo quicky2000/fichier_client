@@ -39,6 +39,8 @@ class fichier_client
   void treat_search_customer_modify_customer_event(void);
   void treat_search_customer_delete_customer_event(void);
 
+  void treat_leave_customer_data_for_search_event(void);
+
   // Customer data identity information related events
   void treat_customer_postal_code_modification_event(void);
   void treat_customer_city_selection_event(void);
