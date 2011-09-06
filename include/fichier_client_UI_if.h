@@ -31,6 +31,7 @@ class fichier_client_UI_if
   // Interactions with customer search information
   virtual void set_customer_search_enabled(bool p_enabled)=0;
   virtual void set_focus_on_customer_search(void)=0;
+  virtual void clear_customer_search_criteria(void)=0;
   virtual const std::string get_search_customer_name(void)const=0;
   virtual const std::string get_search_customer_first_name(void)const=0;
   virtual const std::string get_search_customer_address(void)const=0;

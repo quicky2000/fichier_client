@@ -310,6 +310,8 @@ void fichier_client::treat_leave_customer_data_for_search_event(void)
   set_customer_identity_enabled(false);
   set_customer_data_bill_enabled(false);
   set_customer_data_purchase_enabled(false);
+  assert(m_user_interface);
+  m_user_interface->clear_customer_search_criteria();
 }
 
 
