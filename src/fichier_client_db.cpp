@@ -1336,6 +1336,15 @@ void fichier_client_db::check_db_coherency(uint32_t & p_nb_error,uint32_t & p_nb
   vector<client>::const_iterator l_iter_client_end = l_clients.end();
   while(l_iter_client != l_iter_client_end)
     {
+      // Check phone number length
+      std::string l_phone = l_iter_client->get_phone();
+      if(l_phone.size() != 10 && l_phone.size() !=0)
+	{
+	  stringstream l_phone_message ;
+	  l_phone_message << "Phone number \"" << l_phone << "\" has a length differnt of 10 or 0" ;
+	  p_error_list.push_back(coherency_report_item(coherency_report_item::ERROR,l_iter_client->get_id(),"Client",l_phone_message.str()));
+	}
+
       // Check vile id
       uint32_t l_ville_id = l_iter_client->get_city_id();
       if(l_ville_id)
