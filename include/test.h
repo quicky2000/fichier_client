@@ -4,7 +4,7 @@
 namespace test
 {
   void test(void);
-};
+}
 
 #endif //_TEST_H_
 //EOF
