@@ -79,7 +79,7 @@ void compatibility_db::upgrade_from_1_0(void)
     }
 
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during upgrade from 1.0" << std::endl ;
       exit(-1);
@@ -135,7 +135,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop Ville table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -192,7 +192,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop type_achat table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -248,7 +248,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop marque table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -305,7 +305,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop livre_facture table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -365,7 +365,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop facture_status table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -422,7 +422,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop facture table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -479,7 +479,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop client table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
@@ -537,7 +537,7 @@ void compatibility_db::upgrade_from_1_0(void)
       exit(-1);
     }
   l_status = sqlite3_step(l_upgrade_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during execution of drop achat table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);

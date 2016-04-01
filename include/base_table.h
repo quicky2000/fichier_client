@@ -89,7 +89,7 @@ template <class T> void base_table<T>::set_db(sqlite3 *p_db)
     }
   
   l_status = sqlite3_step(l_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during creation of " << description<T>::get_class_type() << " table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);

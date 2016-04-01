@@ -52,7 +52,7 @@ void information_table::set_db(sqlite3 *p_db)
     }
   
   l_status = sqlite3_step(l_stmt);
-  if(!l_status == SQLITE_DONE)
+  if(l_status != SQLITE_DONE)
     {
       std::cout << "ERROR during creation of " << m_table_name << " table : " << sqlite3_errmsg(m_db) << std::endl ;
       exit(-1);
