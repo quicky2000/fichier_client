@@ -2753,14 +2753,14 @@ void fichier_client::save_as(const std::string & p_name)
 void fichier_client::copy(const std::string & p_src,const std::string & p_dest)
 {
   ifstream l_input_file(p_src.c_str(),ios::in | ios::binary);
-  if(l_input_file==NULL)
+  if(!l_input_file.is_open())
     {
       cout << "ERROR : Unable to open input file \"" << p_src << "\"" << endl ;
       exit(-1);
     }
 
   ofstream l_output_file(p_dest.c_str(),ios::out | ios::binary);
-  if(l_output_file==NULL)
+  if(!l_output_file.is_open())
     {
       cout << "ERROR : Unable to open output file \"" << p_dest << "\"" << endl ;
       exit(-1);

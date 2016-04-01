@@ -31,7 +31,7 @@ namespace external_sql_importer
   void import(const std::string p_file_name,fichier_client_db & p_db)
   {
     ifstream l_input_file(p_file_name.c_str());
-    if(l_input_file==NULL)
+    if(!l_input_file.is_open())
       {
 	cout << "ERROR : unable to open file \"" << p_file_name << "\"" << endl ;
 	exit(-1);
